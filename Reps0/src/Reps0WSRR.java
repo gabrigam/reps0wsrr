@@ -4,13 +4,22 @@ import teamworks.TWList;
 
 public class Reps0WSRR {
 
-	// 150117
+	// 150117 prima scrittura
 	
-	public boolean updateEndPointAndWSProxyData(String interfaceType, String serviceVersionbsrURI, TWList notes,
+	// 180117 versione testata ok
+	
+	public Reps0WSRR() {
+		
+		//notes
+	}
+	
+	public boolean updateEndPointAndWSProxyData(String bsrURISLD,String interfaceType, TWList notes,
 			TWList endPointbsrURI, TWList endpontProxybsrURI, TWList securizedUrls, String registry, String user,
 			String password) {
 
 
+
+		
 		WSRRUtility wsrrutility = new WSRRUtility();
 		WSDLLoaderBPM envelopes = new WSDLLoaderBPM();
 
@@ -33,6 +42,8 @@ public class Reps0WSRR {
 		Boolean result = false;
 		String bsrURI = null;
 
+		try {
+			
 		// rename url application with securized application URL
 		result = wsrrutility.updateSinglePropertyJSONFormat(uriendpointApplication, "name", applicationUrlSecurized,
 				registry, user, password);
@@ -133,13 +144,17 @@ public class Reps0WSRR {
 					}
 
 					bsrURI = wsrrutility.createWSRRGenericObject(envelope, "POST", registry, user, password);
+					
 				}
 
 				if (bsrURI != null) {
+					
+					result=wsrrutility.updateRelationShip(bsrURISLD, "gep63_availableEndpoints", bsrURI, registry, user, password);
+					
 
 					bsrURI = null;
 
-					if (uriendpointProduction != null) {
+					if (uriendpointProduction != null && result) {
 
 						// rename url sysytem with securized system URL
 						result = wsrrutility.updateSinglePropertyJSONFormat(uriendpointProduction, "name",
@@ -205,6 +220,9 @@ public class Reps0WSRR {
 
 						if (bsrURI == null)
 							result = false;
+						else {
+							result=wsrrutility.updateRelationShip(bsrURISLD, "gep63_availableEndpoints", bsrURI, registry, user, password);
+						}
 					}
 
 				} else
@@ -212,6 +230,10 @@ public class Reps0WSRR {
 
 			}
 
+		}
+		}
+		catch(Exception ex ){
+			result=false; //error
 		}
 
 		return result;
