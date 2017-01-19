@@ -72,7 +72,7 @@ public class Reps0WSRR {
 					// update application EndPointProxy
 					// sm63_ERRORE_GENERAZIONE_WSPROXY
 					result = wsrrutility.updateSinglePropertyJSONFormat(uriproxyApplication,
-							"sm63_ERRORE_GENERAZIONE_WSPROXY", noteDP, registry, user, password);
+							"sm63_ERRORE_GENERAZIONE_WSPROXY", noteError, registry, user, password);
 				}
 
 			}
@@ -112,7 +112,7 @@ public class Reps0WSRR {
 								// update System Test EndPointProxy
 								// sm63_ERRORE_GENERAZIONE_WSPROXY
 								result = wsrrutility.updateSinglePropertyJSONFormat(uriproxySystemTest,
-										"sm63_ERRORE_GENERAZIONE_WSPROXY", noteDP, registry, user, password);
+										"sm63_ERRORE_GENERAZIONE_WSPROXY", noteError, registry, user, password);
 							}
 
 						}
