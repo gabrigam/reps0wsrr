@@ -10,7 +10,7 @@ public class Reps0WSRR {
 
 	public Reps0WSRR() {
 
-		// notes
+		// notes 
 	}
 
 	public boolean updateEndPointAndWSProxyData(String bsrURISLD, String interfaceType, TWList notes,
