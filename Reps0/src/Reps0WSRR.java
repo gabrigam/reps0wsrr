@@ -129,17 +129,22 @@ public class Reps0WSRR {
 						}
 
 						bsrURI = wsrrutility.createWSRRGenericObject(envelope, "POST", registry, user, password);
+						
+						if (bsrURI==null) {
+							result=false;
+						} else {
+							
+							result = wsrrutility.updateRelationShip(bsrURISLD, "gep63_availableEndpoints", bsrURI, registry,
+									user, password);
+						}
 
 					}
 
-					if (bsrURI != null) {
+					bsrURI = null;
 
-						result = wsrrutility.updateRelationShip(bsrURISLD, "gep63_availableEndpoints", bsrURI, registry,
-								user, password);
+					if (result) {
 
-						bsrURI = null;
-
-						if (uriendpointProduction != null && result) {
+						if (uriendpointProduction != null) {
 
 							result = wsrrutility.updateSinglePropertyJSONFormat(uriendpointProduction, "name",
 									productionUrlSecurized, registry, user, password);
@@ -148,7 +153,7 @@ public class Reps0WSRR {
 
 								if (noteUser != null && noteUser.length() != 0) {
 									result = wsrrutility.updateSinglePropertyJSONFormat(uriproxyProduction,
-											"sm63_NOTE_GEN_WSPROXY", noteError, registry, user, password);
+											"sm63_NOTE_GEN_WSPROXY", noteUser, registry, user, password);
 								}
 
 								if (result) {
@@ -165,7 +170,7 @@ public class Reps0WSRR {
 									if (noteError != null && noteError.length() != 0) {
 
 										result = wsrrutility.updateSinglePropertyJSONFormat(uriproxyProduction,
-												"sm63_ERRORE_GENERAZIONE_WSPROXY", noteDP, registry, user, password);
+												"sm63_ERRORE_GENERAZIONE_WSPROXY", noteError, registry, user, password);
 									}
 
 								}
@@ -204,8 +209,7 @@ public class Reps0WSRR {
 							}
 						}
 
-					} else
-						result = false;
+					}
 
 				}
 
