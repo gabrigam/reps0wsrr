@@ -112,19 +112,19 @@ public class Reps0WSRR {
 
 						if (interfaceType.equalsIgnoreCase("SOAP")) {
 
-							envelope = envelopes.createSoapEndpointXMLDAta(systemTestUrlSecurized, "10", "NO",
+							envelope = envelopes.createSoapEndpointXMLDAta(systemTestUrlSecurized, "180", "NO",
 									"SystemTest", "", null, "SI-Datapower");
 						}
 
 						if (interfaceType.equalsIgnoreCase("REST")) {
 
-							envelope = envelopes.createRestEndpointXMLDAta(systemTestUrlSecurized, "10", "SystemTest",
+							envelope = envelopes.createRestEndpointXMLDAta(systemTestUrlSecurized, "180", "SystemTest",
 									"", null, "SI-Datapower");
 						}
 
 						if (interfaceType.equalsIgnoreCase("CALLABLE")) {
 
-							envelope = envelopes.createCallableEndpointXMLDAta(systemTestUrlSecurized, "10",
+							envelope = envelopes.createCallableEndpointXMLDAta(systemTestUrlSecurized, "180",
 									"SystemTest", "", null, "SI-Datapower");
 						}
 
@@ -183,19 +183,19 @@ public class Reps0WSRR {
 
 							if (interfaceType.equalsIgnoreCase("SOAP")) {
 
-								envelope = envelopes.createSoapEndpointXMLDAta(productionUrlSecurized, "10", "NO",
+								envelope = envelopes.createSoapEndpointXMLDAta(productionUrlSecurized, "180", "NO",
 										"Produzione", "", null, "SI-Datapower");
 							}
 
 							if (interfaceType.equalsIgnoreCase("REST")) {
 
-								envelope = envelopes.createRestEndpointXMLDAta(productionUrlSecurized, "10",
+								envelope = envelopes.createRestEndpointXMLDAta(productionUrlSecurized, "180",
 										"Produzione", "", null, "SI-Datapower");
 							}
 
 							if (interfaceType.equalsIgnoreCase("CALLABLE")) {
 
-								envelope = envelopes.createCallableEndpointXMLDAta(productionUrlSecurized, "10",
+								envelope = envelopes.createCallableEndpointXMLDAta(productionUrlSecurized, "180",
 										"Produzione", "", null, "SI-Datapower");
 							}
 
@@ -221,5 +221,5 @@ public class Reps0WSRR {
 		return result;
 
 	}
-
+	
 }
