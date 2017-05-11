@@ -8,7 +8,7 @@ public class Reps0WSRR {
 
 	// 180117 versione testata ok
 	
-	// 11052017 nella creazione degli endpoint sostituito "NO" con "N" (si tratta del flag header)
+	// 11052017 nella creazione degli endpoint sostituito "NO" con "N" (si tratta del flag header) 
 
 	public Reps0WSRR() {
 
