@@ -7,6 +7,8 @@ public class Reps0WSRR {
 	// 150117 prima scrittura
 
 	// 180117 versione testata ok
+	
+	// 11052017 nella creazione degli endpoint sostituito "NO" con "N" (si tratta del flag header)
 
 	public Reps0WSRR() {
 
@@ -112,7 +114,7 @@ public class Reps0WSRR {
 
 						if (interfaceType.equalsIgnoreCase("SOAP")) {
 
-							envelope = envelopes.createSoapEndpointXMLDAta(systemTestUrlSecurized, "180", "NO",
+							envelope = envelopes.createSoapEndpointXMLDAta(systemTestUrlSecurized, "180", "N",
 									"SystemTest", "", null, "SI-Datapower");
 						}
 
@@ -183,7 +185,7 @@ public class Reps0WSRR {
 
 							if (interfaceType.equalsIgnoreCase("SOAP")) {
 
-								envelope = envelopes.createSoapEndpointXMLDAta(productionUrlSecurized, "180", "NO",
+								envelope = envelopes.createSoapEndpointXMLDAta(productionUrlSecurized, "180", "N",
 										"Produzione", "", null, "SI-Datapower");
 							}
 
