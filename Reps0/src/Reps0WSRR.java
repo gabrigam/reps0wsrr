@@ -25,14 +25,22 @@ public class Reps0WSRR {
 		String uriendpointApplication = (String) endPointbsrURI.getArrayData(0);
 		String uriendpointSystemTest = (String) endPointbsrURI.getArrayData(1);
 		String uriendpointProduction = (String) endPointbsrURI.getArrayData(2);
+		String uriendpointIndependent= (String) endPointbsrURI.getArrayData(3);
+		String uriendpointUserAcceptance = (String) endPointbsrURI.getArrayData(4);
 
 		String uriproxyApplication = (String) endpontProxybsrURI.getArrayData(0);
 		String uriproxySystemTest = (String) endpontProxybsrURI.getArrayData(1);
 		String uriproxyProduction = (String) endpontProxybsrURI.getArrayData(2);
+		String uriproxyIndependent = (String) endpontProxybsrURI.getArrayData(3);
+		String uriproxyUserAcceptance = (String) endpontProxybsrURI.getArrayData(4);
 
 		String applicationUrlSecurized = (String) securizedUrls.getArrayData(0);
 		String systemTestUrlSecurized = (String) securizedUrls.getArrayData(1);
 		String productionUrlSecurized = (String) securizedUrls.getArrayData(2);
+		String independentSecurized = (String) securizedUrls.getArrayData(3);
+		String userAcceptanceUrlSecurized = (String) securizedUrls.getArrayData(4);
+
+		
 
 		String noteUser = (String) notes.getArrayData(0);
 		String noteDP = (String) notes.getArrayData(1);
@@ -212,7 +220,149 @@ public class Reps0WSRR {
 						}
 
 					}
+                    //////////////////////////////
+					bsrURI = null;
 
+					if (result) {
+
+						if (uriendpointIndependent != null) {
+
+							result = wsrrutility.updateSinglePropertyJSONFormat(uriendpointIndependent, "name",
+									independentSecurized, registry, user, password);
+
+							if (result) {
+
+								if (noteUser != null && noteUser.length() != 0) {
+									result = wsrrutility.updateSinglePropertyJSONFormat(uriproxyIndependent,
+											"sm63_NOTE_GEN_WSPROXY", noteUser, registry, user, password);
+								}
+
+								if (result) {
+
+									if (noteDP != null && noteDP.length() != 0) {
+
+										result = wsrrutility.updateSinglePropertyJSONFormat(uriproxyIndependent,
+												"sm63_NOTE", noteDP, registry, user, password);
+									}
+								}
+
+								if (result) {
+
+									if (noteError != null && noteError.length() != 0) {
+
+										result = wsrrutility.updateSinglePropertyJSONFormat(uriproxyIndependent,
+												"sm63_ERRORE_GENERAZIONE_WSPROXY", noteError, registry, user, password);
+									}
+
+								}
+
+							}
+
+						} else {
+
+							String envelope = null;
+
+							if (interfaceType.equalsIgnoreCase("SOAP")) {
+
+								envelope = envelopes.createSoapEndpointXMLDAta(independentSecurized, "180", "N",
+										"Produzione", "", null, "SI-Datapower");
+							}
+
+							if (interfaceType.equalsIgnoreCase("REST")) {
+
+								envelope = envelopes.createRestEndpointXMLDAta(independentSecurized, "180",
+										"Produzione", "", null, "SI-Datapower");
+							}
+
+							if (interfaceType.equalsIgnoreCase("CALLABLE")) {
+
+								envelope = envelopes.createCallableEndpointXMLDAta(independentSecurized, "180",
+										"Produzione", "", null, "SI-Datapower");
+							}
+
+							bsrURI = wsrrutility.createWSRRGenericObject(envelope, "POST", registry, user, password);
+
+							if (bsrURI == null)
+								result = false;
+							else {
+								result = wsrrutility.updateRelationShip(bsrURISLD, "gep63_availableEndpoints", bsrURI,
+										registry, user, password);
+							}
+						}
+
+					}
+					//////////////////////////////
+					bsrURI = null;
+
+					if (result) {
+
+						if (uriendpointUserAcceptance != null) {
+
+							result = wsrrutility.updateSinglePropertyJSONFormat(uriendpointUserAcceptance, "name",
+									userAcceptanceUrlSecurized, registry, user, password);
+
+							if (result) {
+
+								if (noteUser != null && noteUser.length() != 0) {
+									result = wsrrutility.updateSinglePropertyJSONFormat(uriproxyUserAcceptance,
+											"sm63_NOTE_GEN_WSPROXY", noteUser, registry, user, password);
+								}
+
+								if (result) {
+
+									if (noteDP != null && noteDP.length() != 0) {
+
+										result = wsrrutility.updateSinglePropertyJSONFormat(uriproxyUserAcceptance,
+												"sm63_NOTE", noteDP, registry, user, password);
+									}
+								}
+
+								if (result) {
+
+									if (noteError != null && noteError.length() != 0) {
+
+										result = wsrrutility.updateSinglePropertyJSONFormat(uriproxyUserAcceptance,
+												"sm63_ERRORE_GENERAZIONE_WSPROXY", noteError, registry, user, password);
+									}
+
+								}
+
+							}
+
+						} else {
+
+							String envelope = null;
+
+							if (interfaceType.equalsIgnoreCase("SOAP")) {
+
+								envelope = envelopes.createSoapEndpointXMLDAta(userAcceptanceUrlSecurized, "180", "N",
+										"Produzione", "", null, "SI-Datapower");
+							}
+
+							if (interfaceType.equalsIgnoreCase("REST")) {
+
+								envelope = envelopes.createRestEndpointXMLDAta(userAcceptanceUrlSecurized, "180",
+										"Produzione", "", null, "SI-Datapower");
+							}
+
+							if (interfaceType.equalsIgnoreCase("CALLABLE")) {
+
+								envelope = envelopes.createCallableEndpointXMLDAta(userAcceptanceUrlSecurized, "180",
+										"Produzione", "", null, "SI-Datapower");
+							}
+
+							bsrURI = wsrrutility.createWSRRGenericObject(envelope, "POST", registry, user, password);
+
+							if (bsrURI == null)
+								result = false;
+							else {
+								result = wsrrutility.updateRelationShip(bsrURISLD, "gep63_availableEndpoints", bsrURI,
+										registry, user, password);
+							}
+						}
+
+					}
+					//////////////////////////////
 				}
 
 			}
