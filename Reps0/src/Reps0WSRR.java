@@ -9,6 +9,8 @@ public class Reps0WSRR {
 	// 180117 versione testata ok
 	
 	// 11052017 nella creazione degli endpoint sostituito "NO" con "N" (si tratta del flag header) 
+	
+	// 21052017 inserita gestione flag ispheader
 
 	public Reps0WSRR() {
 
@@ -16,7 +18,7 @@ public class Reps0WSRR {
 	}
 
 	public boolean updateEndPointAndWSProxyData(String bsrURISLD, String interfaceType, TWList notes,
-			TWList endPointbsrURI, TWList endpontProxybsrURI, TWList securizedUrls, String registry, String user,
+			TWList endPointbsrURI, TWList endpontProxybsrURI, TWList securizedUrls, TWList flagISPHeader,String registry, String user,
 			String password) {
 
 		WSRRUtility wsrrutility = new WSRRUtility();
@@ -39,8 +41,17 @@ public class Reps0WSRR {
 		String productionUrlSecurized = (String) securizedUrls.getArrayData(2);
 		String independentSecurized = (String) securizedUrls.getArrayData(3);
 		String userAcceptanceUrlSecurized = (String) securizedUrls.getArrayData(4);
-
 		
+		String applicationFlagISPHeader = (String) flagISPHeader.getArrayData(0);
+		String systemTestFlagISPHeader = (String) flagISPHeader.getArrayData(1);
+		String productionFlagISPHeader = (String) flagISPHeader.getArrayData(2);
+		String independentFlagISPHeader = (String) flagISPHeader.getArrayData(3);
+		String userAcceptanceFlagISPHeader = (String) flagISPHeader.getArrayData(4);
+		
+		if (uriendpointSystemTest == null ) systemTestFlagISPHeader=applicationFlagISPHeader;
+		if (uriendpointProduction == null ) productionFlagISPHeader=applicationFlagISPHeader;
+		if (uriendpointIndependent == null ) independentFlagISPHeader=applicationFlagISPHeader;
+		if (uriendpointUserAcceptance == null ) userAcceptanceFlagISPHeader=applicationFlagISPHeader;
 
 		String noteUser = (String) notes.getArrayData(0);
 		String noteDP = (String) notes.getArrayData(1);
@@ -122,7 +133,7 @@ public class Reps0WSRR {
 
 						if (interfaceType.equalsIgnoreCase("SOAP")) {
 
-							envelope = envelopes.createSoapEndpointXMLDAta(systemTestUrlSecurized, "180", "N",
+							envelope = envelopes.createSoapEndpointXMLDAta(systemTestUrlSecurized, "180", systemTestFlagISPHeader,
 									"SystemTest", "", null, "SI-Datapower");
 						}
 
@@ -193,7 +204,7 @@ public class Reps0WSRR {
 
 							if (interfaceType.equalsIgnoreCase("SOAP")) {
 
-								envelope = envelopes.createSoapEndpointXMLDAta(productionUrlSecurized, "180", "N",
+								envelope = envelopes.createSoapEndpointXMLDAta(productionUrlSecurized, "180", productionFlagISPHeader,
 										"Produzione", "", null, "SI-Datapower");
 							}
 
@@ -264,20 +275,20 @@ public class Reps0WSRR {
 
 							if (interfaceType.equalsIgnoreCase("SOAP")) {
 
-								envelope = envelopes.createSoapEndpointXMLDAta(independentSecurized, "180", "N",
-										"Produzione", "", null, "SI-Datapower");
+								envelope = envelopes.createSoapEndpointXMLDAta(independentSecurized, "180", independentFlagISPHeader,
+										"IndipendentTest", "", null, "SI-Datapower");
 							}
 
 							if (interfaceType.equalsIgnoreCase("REST")) {
 
 								envelope = envelopes.createRestEndpointXMLDAta(independentSecurized, "180",
-										"Produzione", "", null, "SI-Datapower");
+										"IndipendentTest", "", null, "SI-Datapower");
 							}
 
 							if (interfaceType.equalsIgnoreCase("CALLABLE")) {
 
 								envelope = envelopes.createCallableEndpointXMLDAta(independentSecurized, "180",
-										"Produzione", "", null, "SI-Datapower");
+										"IndipendentTest", "", null, "SI-Datapower");
 							}
 
 							bsrURI = wsrrutility.createWSRRGenericObject(envelope, "POST", registry, user, password);
@@ -335,20 +346,20 @@ public class Reps0WSRR {
 
 							if (interfaceType.equalsIgnoreCase("SOAP")) {
 
-								envelope = envelopes.createSoapEndpointXMLDAta(userAcceptanceUrlSecurized, "180", "N",
-										"Produzione", "", null, "SI-Datapower");
+								envelope = envelopes.createSoapEndpointXMLDAta(userAcceptanceUrlSecurized, "180", userAcceptanceFlagISPHeader,
+										"UserAcceptanceTest", "", null, "SI-Datapower");
 							}
 
 							if (interfaceType.equalsIgnoreCase("REST")) {
 
 								envelope = envelopes.createRestEndpointXMLDAta(userAcceptanceUrlSecurized, "180",
-										"Produzione", "", null, "SI-Datapower");
+										"UserAcceptanceTest", "", null, "SI-Datapower");
 							}
 
 							if (interfaceType.equalsIgnoreCase("CALLABLE")) {
 
 								envelope = envelopes.createCallableEndpointXMLDAta(userAcceptanceUrlSecurized, "180",
-										"Produzione", "", null, "SI-Datapower");
+										"UserAcceptanceTest", "", null, "SI-Datapower");
 							}
 
 							bsrURI = wsrrutility.createWSRRGenericObject(envelope, "POST", registry, user, password);
