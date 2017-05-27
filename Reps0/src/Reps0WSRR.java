@@ -11,6 +11,8 @@ public class Reps0WSRR {
 	// 11052017 nella creazione degli endpoint sostituito "NO" con "N" (si tratta del flag header) 
 	
 	// 21052017 inserita gestione flag ispheader
+	
+	// 27052017 inserita gestione timeout
 
 	public Reps0WSRR() {
 
@@ -18,7 +20,7 @@ public class Reps0WSRR {
 	}
 
 	public boolean updateEndPointAndWSProxyData(String bsrURISLD, String interfaceType, TWList notes,
-			TWList endPointbsrURI, TWList endpontProxybsrURI, TWList securizedUrls, TWList flagISPHeader,String registry, String user,
+			TWList endPointbsrURI, TWList endpontProxybsrURI, TWList securizedUrls, TWList flagISPHeader,TWList timeout,String registry, String user,
 			String password) {
 
 		WSRRUtility wsrrutility = new WSRRUtility();
@@ -47,6 +49,13 @@ public class Reps0WSRR {
 		String productionFlagISPHeader = (String) flagISPHeader.getArrayData(2);
 		String independentFlagISPHeader = (String) flagISPHeader.getArrayData(3);
 		String userAcceptanceFlagISPHeader = (String) flagISPHeader.getArrayData(4);
+		
+		String applicationTimeout = (String) timeout.getArrayData(0);
+		String systemTestTimeout  = (String) timeout.getArrayData(1);
+		String productionTimeout  = (String) timeout.getArrayData(2);
+		String independentTimeout = (String) timeout.getArrayData(3);
+		String userAcceptanceTimeout  = (String) timeout.getArrayData(4);
+		
 		
 		if (uriendpointSystemTest == null ) systemTestFlagISPHeader=applicationFlagISPHeader;
 		if (uriendpointProduction == null ) productionFlagISPHeader=applicationFlagISPHeader;
@@ -133,19 +142,19 @@ public class Reps0WSRR {
 
 						if (interfaceType.equalsIgnoreCase("SOAP")) {
 
-							envelope = envelopes.createSoapEndpointXMLDAta(systemTestUrlSecurized, "180", systemTestFlagISPHeader,
+							envelope = envelopes.createSoapEndpointXMLDAta(systemTestUrlSecurized, systemTestTimeout, systemTestFlagISPHeader,
 									"SystemTest", "", null, "SI-Datapower");
 						}
 
 						if (interfaceType.equalsIgnoreCase("REST")) {
 
-							envelope = envelopes.createRestEndpointXMLDAta(systemTestUrlSecurized, "180", "SystemTest",
+							envelope = envelopes.createRestEndpointXMLDAta(systemTestUrlSecurized,systemTestTimeout, "SystemTest",
 									"", null, "SI-Datapower");
 						}
 
 						if (interfaceType.equalsIgnoreCase("CALLABLE")) {
 
-							envelope = envelopes.createCallableEndpointXMLDAta(systemTestUrlSecurized, "180",
+							envelope = envelopes.createCallableEndpointXMLDAta(systemTestUrlSecurized, systemTestTimeout,
 									"SystemTest", "", null, "SI-Datapower");
 						}
 
@@ -204,19 +213,19 @@ public class Reps0WSRR {
 
 							if (interfaceType.equalsIgnoreCase("SOAP")) {
 
-								envelope = envelopes.createSoapEndpointXMLDAta(productionUrlSecurized, "180", productionFlagISPHeader,
+								envelope = envelopes.createSoapEndpointXMLDAta(productionUrlSecurized, productionTimeout, productionFlagISPHeader,
 										"Produzione", "", null, "SI-Datapower");
 							}
 
 							if (interfaceType.equalsIgnoreCase("REST")) {
 
-								envelope = envelopes.createRestEndpointXMLDAta(productionUrlSecurized, "180",
+								envelope = envelopes.createRestEndpointXMLDAta(productionUrlSecurized, productionTimeout,
 										"Produzione", "", null, "SI-Datapower");
 							}
 
 							if (interfaceType.equalsIgnoreCase("CALLABLE")) {
 
-								envelope = envelopes.createCallableEndpointXMLDAta(productionUrlSecurized, "180",
+								envelope = envelopes.createCallableEndpointXMLDAta(productionUrlSecurized, productionTimeout,
 										"Produzione", "", null, "SI-Datapower");
 							}
 
@@ -275,19 +284,19 @@ public class Reps0WSRR {
 
 							if (interfaceType.equalsIgnoreCase("SOAP")) {
 
-								envelope = envelopes.createSoapEndpointXMLDAta(independentSecurized, "180", independentFlagISPHeader,
+								envelope = envelopes.createSoapEndpointXMLDAta(independentSecurized, independentTimeout, independentFlagISPHeader,
 										"IndipendentTest", "", null, "SI-Datapower");
 							}
 
 							if (interfaceType.equalsIgnoreCase("REST")) {
 
-								envelope = envelopes.createRestEndpointXMLDAta(independentSecurized, "180",
+								envelope = envelopes.createRestEndpointXMLDAta(independentSecurized, independentTimeout,
 										"IndipendentTest", "", null, "SI-Datapower");
 							}
 
 							if (interfaceType.equalsIgnoreCase("CALLABLE")) {
 
-								envelope = envelopes.createCallableEndpointXMLDAta(independentSecurized, "180",
+								envelope = envelopes.createCallableEndpointXMLDAta(independentSecurized, independentTimeout,
 										"IndipendentTest", "", null, "SI-Datapower");
 							}
 
@@ -346,19 +355,19 @@ public class Reps0WSRR {
 
 							if (interfaceType.equalsIgnoreCase("SOAP")) {
 
-								envelope = envelopes.createSoapEndpointXMLDAta(userAcceptanceUrlSecurized, "180", userAcceptanceFlagISPHeader,
+								envelope = envelopes.createSoapEndpointXMLDAta(userAcceptanceUrlSecurized, userAcceptanceTimeout, userAcceptanceFlagISPHeader,
 										"UserAcceptanceTest", "", null, "SI-Datapower");
 							}
 
 							if (interfaceType.equalsIgnoreCase("REST")) {
 
-								envelope = envelopes.createRestEndpointXMLDAta(userAcceptanceUrlSecurized, "180",
+								envelope = envelopes.createRestEndpointXMLDAta(userAcceptanceUrlSecurized, userAcceptanceTimeout,
 										"UserAcceptanceTest", "", null, "SI-Datapower");
 							}
 
 							if (interfaceType.equalsIgnoreCase("CALLABLE")) {
 
-								envelope = envelopes.createCallableEndpointXMLDAta(userAcceptanceUrlSecurized, "180",
+								envelope = envelopes.createCallableEndpointXMLDAta(userAcceptanceUrlSecurized, userAcceptanceTimeout,
 										"UserAcceptanceTest", "", null, "SI-Datapower");
 							}
 
