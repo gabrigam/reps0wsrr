@@ -12,7 +12,9 @@ public class Reps0WSRR {
 	
 	// 21052017 inserita gestione flag ispheader
 	
-	// 27052017 inserita gestione timeout
+	// 27052017 inserita gestione timeout in creazione
+	
+	// 29052017 inserita gestione timout in modifica
 
 	public Reps0WSRR() {
 
@@ -113,7 +115,14 @@ public class Reps0WSRR {
 								result = wsrrutility.updateSinglePropertyJSONFormat(uriproxySystemTest,
 										"sm63_NOTE_GEN_WSPROXY", noteUser, registry, user, password);
 							}
+							
+							//29052017
+							if (result) {
 
+								result = wsrrutility.updateSinglePropertyJSONFormat(uriproxySystemTest,
+										"sm63_Timeout", systemTestTimeout, registry, user, password);
+							}
+							
 							if (result) {
 
 								if (noteDP != null && noteDP.length() != 0) {
@@ -184,6 +193,13 @@ public class Reps0WSRR {
 								if (noteUser != null && noteUser.length() != 0) {
 									result = wsrrutility.updateSinglePropertyJSONFormat(uriproxyProduction,
 											"sm63_NOTE_GEN_WSPROXY", noteUser, registry, user, password);
+								}
+								
+								//29052017
+								if (result) {
+
+									result = wsrrutility.updateSinglePropertyJSONFormat(uriproxyProduction,
+											"sm63_Timeout", productionTimeout, registry, user, password);
 								}
 
 								if (result) {
@@ -257,6 +273,13 @@ public class Reps0WSRR {
 											"sm63_NOTE_GEN_WSPROXY", noteUser, registry, user, password);
 								}
 
+								//29052017
+								if (result) {
+
+									result = wsrrutility.updateSinglePropertyJSONFormat(uriproxyIndependent,
+											"sm63_Timeout", independentTimeout, registry, user, password);
+								}
+								
 								if (result) {
 
 									if (noteDP != null && noteDP.length() != 0) {
@@ -326,6 +349,13 @@ public class Reps0WSRR {
 								if (noteUser != null && noteUser.length() != 0) {
 									result = wsrrutility.updateSinglePropertyJSONFormat(uriproxyUserAcceptance,
 											"sm63_NOTE_GEN_WSPROXY", noteUser, registry, user, password);
+								}
+								
+								//29052017
+								if (result) {
+
+									result = wsrrutility.updateSinglePropertyJSONFormat(uriproxyUserAcceptance,
+											"sm63_Timeout", userAcceptanceTimeout, registry, user, password);
 								}
 
 								if (result) {
