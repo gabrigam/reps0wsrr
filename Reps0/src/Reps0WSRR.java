@@ -14,7 +14,9 @@ public class Reps0WSRR {
 	
 	// 27052017 inserita gestione timeout in creazione
 	
-	// 29052017 inserita gestione timout in modifica
+	// 29052017 inserita gestione timout in modifica (ma serve?)
+	
+	// 30052017 modifica settaggio timeout
 
 	public Reps0WSRR() {
 
@@ -57,12 +59,17 @@ public class Reps0WSRR {
 		String productionTimeout  = (String) timeout.getArrayData(2);
 		String independentTimeout = (String) timeout.getArrayData(3);
 		String userAcceptanceTimeout  = (String) timeout.getArrayData(4);
-		
-		
+				
 		if (uriendpointSystemTest == null ) systemTestFlagISPHeader=applicationFlagISPHeader;
 		if (uriendpointProduction == null ) productionFlagISPHeader=applicationFlagISPHeader;
 		if (uriendpointIndependent == null ) independentFlagISPHeader=applicationFlagISPHeader;
 		if (uriendpointUserAcceptance == null ) userAcceptanceFlagISPHeader=applicationFlagISPHeader;
+		
+		//30052017
+		if (uriendpointSystemTest == null ) systemTestTimeout=applicationTimeout;
+		if (uriendpointProduction == null ) productionTimeout=applicationTimeout;
+		if (uriendpointIndependent == null ) independentTimeout=applicationTimeout;
+		if (uriendpointUserAcceptance == null ) userAcceptanceTimeout=applicationTimeout;
 
 		String noteUser = (String) notes.getArrayData(0);
 		String noteDP = (String) notes.getArrayData(1);
