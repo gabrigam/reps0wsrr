@@ -3400,68 +3400,7 @@ public class WSRRUtility {
 		return graph;
 
 	}
-	// 29052017
-	public String executeGeneralWSRRQuery(String userquery, String baseURL,String user, String password) {
 
-		String graph = null;
-
-		// &p1=name
-
-		HttpURLConnection urlConnection = null;
-
-		try {
-			StringBuffer sb = new StringBuffer();
-			sb.append(baseURL).append(userquery);
-			URL url = new URL(sb.toString());
-			urlConnection = (HttpURLConnection) url.openConnection();
-			urlConnection.setRequestMethod("GET");
-			urlConnection.setRequestProperty("Content-Type", "text/xml; charset=UTF-8");
-			urlConnection.setUseCaches(false);
-
-			if (user != null && password != null) {
-
-				String userPassword = user + ":" + password;
-
-				String encoding = new String(Base64.encodeBase64(userPassword.getBytes()));
-
-				urlConnection.setRequestProperty("Authorization", "Basic " + encoding);
-			}
-
-			System.out.println(url);
-			
-			int responsecode = urlConnection.getResponseCode();
-			if (responsecode == 200 || (responsecode == 201)) {
-				InputStream is = null;
-				is = urlConnection.getInputStream();
-				int ch;
-				sb.delete(0, sb.length());
-				while ((ch = is.read()) != -1) {
-					sb.append((char) ch);
-				}
-				graph = sb.toString();
-				is.close();
-			} else {
-				BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-				StringBuffer stringBuffer = new StringBuffer();
-				String line = null;
-				while (null != (line = reader.readLine())) {
-					stringBuffer.append(line);
-				}
-				reader.close();
-			}
-			urlConnection.disconnect();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		finally {
-			if (urlConnection != null)
-				urlConnection.disconnect();
-		}
-
-		return graph;
-
-	}
 	//
 	// Check is a object is of particular primarytype and name if so return
 	// jsonArray with selected properties
@@ -3837,6 +3776,70 @@ public class WSRRUtility {
 			}
 		}
 		return bsrURI;
+
+	}
+	
+	// 29052017
+	
+	public String generalWSRRQuery(String userquery, String baseURL,String user, String password) {
+
+		String graph = null;
+
+		// &p1=name
+
+		HttpURLConnection urlConnection = null;
+
+		try {
+			StringBuffer sb = new StringBuffer();
+			sb.append(baseURL).append(userquery);
+			URL url = new URL(sb.toString());
+			urlConnection = (HttpURLConnection) url.openConnection();
+			urlConnection.setRequestMethod("GET");
+			urlConnection.setRequestProperty("Content-Type", "text/xml; charset=UTF-8");
+			urlConnection.setUseCaches(false);
+
+			if (user != null && password != null) {
+
+				String userPassword = user + ":" + password;
+
+				String encoding = new String(Base64.encodeBase64(userPassword.getBytes()));
+
+				urlConnection.setRequestProperty("Authorization", "Basic " + encoding);
+			}
+
+			System.out.println(url);
+			
+			int responsecode = urlConnection.getResponseCode();
+			if (responsecode == 200 || (responsecode == 201)) {
+				InputStream is = null;
+				is = urlConnection.getInputStream();
+				int ch;
+				sb.delete(0, sb.length());
+				while ((ch = is.read()) != -1) {
+					sb.append((char) ch);
+				}
+				graph = sb.toString();
+				is.close();
+			} else {
+				BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+				StringBuffer stringBuffer = new StringBuffer();
+				String line = null;
+				while (null != (line = reader.readLine())) {
+					stringBuffer.append(line);
+				}
+				reader.close();
+			}
+			urlConnection.disconnect();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		finally {
+			if (urlConnection != null)
+				urlConnection.disconnect();
+		}
+
+		return graph;
 
 	}
 
