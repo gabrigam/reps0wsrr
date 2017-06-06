@@ -197,18 +197,15 @@ public class WSRRToBusinessObject {
 					//NBP_BO = (TWObject) TWObjectFactory.createObject();
 
 					doc = (Document) xpath.evaluate("/", source, XPathConstants.NODE);
+					
 					countag = Integer.parseInt(xpath.evaluate("count(/resources/resource/properties)", doc));
-					System.out.println("counttag "+countag);
-
 					
 					for (int ii = 1; ii <= countag; ii++) {
-					
-
-						
-                     //recupero l'ambiente operativo dell 'endpoint
-						
+										
+                    //recupero l'ambiente operativo dell 'endpoint						
 				    count = Integer.parseInt(xpath.evaluate("count(/resources/resource["+String.valueOf(ii)+"]/classifications/classification)", doc));
-				    type=null;
+				    
+					type=null;
 				    environment=null;
 				    
 					for (int i = 1; i <= count; i++) {
@@ -221,7 +218,7 @@ public class WSRRToBusinessObject {
 						current = null;
 					}
 				    
-					//recupero eventuale Proxy
+					//recupero eventuale Proxy/MQ manual
 					count = Integer.parseInt(xpath.evaluate("count(/resources/resource["+String.valueOf(ii)+"]/relationships/relationship)", doc));
 					
 					relation=null;
@@ -250,10 +247,22 @@ public class WSRRToBusinessObject {
 							current = "/resources/resource["+String.valueOf(ii)+"]/relationships/relationship[" + String.valueOf(i) + "]/@targetBsrURI";
 							proxybsrURI=xpath.evaluate(current, doc);
 						}
+						
+						if (proxy == null && relation != null && relation.indexOf("sm63_mqEndpoint") != -1) {
+							proxy="MQMANUAL";
+							current = "/resources/resource["+String.valueOf(ii)+"]/relationships/relationship[" + String.valueOf(i) + "]/@targetBsrURI";
+							proxybsrURI=xpath.evaluate(current, doc);
+						}
 
 						current = null;
 					}
 					
+					/*
+					 * ServiceModel#SOAPServiceEndpoint
+					 * http://www.ibm.com/xmlns/prod/serviceregistry/v6r3/ServiceModel#MQServiceEndpoint
+					 * http://www.ibm.com/xmlns/prod/serviceregistry/profile/v8r0/RESTModel#RESTServiceEndpoint
+					 * http://www.ibm.com/xmlns/prod/serviceregistry/v6r3/ServiceModel#CICSServiceEndpoint
+					*/
 					
 					count = Integer.parseInt(xpath.evaluate("count(/resources/resource["+String.valueOf(ii)+"]/properties/property)", doc));
 
