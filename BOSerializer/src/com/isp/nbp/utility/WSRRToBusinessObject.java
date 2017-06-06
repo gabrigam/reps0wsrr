@@ -41,6 +41,50 @@ public class WSRRToBusinessObject {
 	public TWObject createServiceVersionBO(String name, String version, String url, String user, String password)
 			throws XPathExpressionException {
 
+		
+		TWObject SV_BO = null;
+		TWObject BS_BO = null;
+		TWObject ACR_BO = null;
+		
+		TWList EP_BO_REST_APPL=null;
+		TWList EP_BO_REST_SYST=null;
+		TWList EP_BO_REST_PROD=null;
+		TWList EP_BO_REST_UAT=null;
+		TWList EP_BO_REST_INDEP=null;
+		
+		
+		TWList EP_BO_SOAP_APPL=null;
+		TWList EP_BO_SOAP_SYST=null;
+		TWList EP_BO_SOAP_PROD=null;
+		TWList EP_BO_SOAP_UAT=null;
+		TWList EP_BO_SOAP_INDEP=null;
+		
+		TWList EP_BO_CALLABLE_APPL=null;
+		TWList EP_BO_CALLABLE_SYST=null;
+		TWList EP_BO_CALLABLE_PROD=null;
+		TWList EP_BO_CALLABLE_UAT=null;
+		TWList EP_BO_CALLABLE_INDEP=null;
+		
+		TWList EP_BO_ZRES_APPL=null;
+		TWList EP_BO_ZRES_SYST=null;
+		TWList EP_BO_ZRES_PROD=null;
+		TWList EP_BO_ZRES_UAT=null;
+		TWList EP_BO_ZRES_INDEP=null;
+		
+		TWList EP_BO_WOLA_APPL=null;
+		TWList EP_BO_WOLA_SYST=null;
+		TWList EP_BO_WOLA_PROD=null;
+		TWList EP_BO_WOLA_UAT=null;
+		TWList EP_BO_WOLA_INDEP=null;
+		
+		TWList EP_BO_MQ_APPL=null;
+		TWList EP_BO_MQ_SYST=null;
+		TWList EP_BO_MQ_PROD=null;
+		TWList EP_BO_MQ_UAT=null;
+		TWList EP_BO_MQ_INDEP=null;
+		
+		
+		
 		String SCHOST = "[type, subType, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, gep63_DESC_ESTESA, gep63_ABILITAZ_INFRASTR, ale63_assetType, gep63_SCHOST_NOME_CPY_OUT, ale63_guid, gep63_SCHOST_NOME_CPY_INP, ale63_remoteState, gep63_DATA_RITIRO_SERV, gep63_MATR_RICH_CREAZIONE, ale63_assetOwners, gep63_PIATT_EROG, gep63_FLG_CTRL_TIPOLOGIA, gep63_DISP_SERV, gep63_MATR_RICH_MODIFICA, gep63_PID_PROCESSO_GOV, gep63_TIPOLOGIA, gep63_MATR_PUBBLICATORE_CREAZ_SERV, gep63_DERIVANTE_DA_ALTRI_SERV, gep63_SCHOST_PGM_MD_X_MPE, gep63_VINCOLI_RIUSO, gep63_SCHOST_CONVNULL, gep63_INFO_COSTO, gep63_ATTIVATO_IN_PROD, gep63_consumerIdentifier, gep63_SCHOST_PGM_SERVIZIO, gep63_UTILIZ_PIU_BAN_CLONI, gep63_SCHOST_ID_SERVIZIO, ale63_ownerEmail, gep63_ATTIVATO_IN_SYST, ale63_communityName, gep63_DATA_PUBBL_CREAZ_SERV, gep63_SECURITY_ROLE, gep63_NOME_SERVIZIO_PRECEDENTE, gep63_SCHOST_PGM_MD_X_INTEROPER, ale63_fullDescription, gep63_SCHOST_PGM_MD, gep63_SCHOST_TRANS_SERVIZIO, gep63_ATTIVATO_IN_APPL, gep63_TIPOLOGIA_OGGETTO_ESISTENTE, gep63_SCHOST_COD_VERSIONE, gep63_versionTerminationDate, gep63_DOC_ANALISI_FUNZIONALE, gep63_versionAvailabilityDate, gep63_DOC_ANALISI_DETTAGLIO, gep63_DOC_ANALISI_TECNICA, ale63_requirementsLink, ale63_assetWebLink]";
 		String SHOST = " [type, subType, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, gep63_DESC_ESTESA, gep63_ABILITAZ_INFRASTR, ale63_assetType, gep63_SHOST_TRANS_SERVIZIO, ale63_guid, gep63_SHOST_CONVNULL, gep63_SHOST_PGM_SERVIZIO, ale63_remoteState, gep63_SHOST_NOME_CPY_INP, gep63_DATA_RITIRO_SERV, gep63_MATR_RICH_CREAZIONE, ale63_assetOwners, gep63_PIATT_EROG, gep63_FLG_CTRL_TIPOLOGIA, gep63_DISP_SERV, gep63_MATR_RICH_MODIFICA, gep63_PID_PROCESSO_GOV, gep63_TIPOLOGIA, gep63_MATR_PUBBLICATORE_CREAZ_SERV, gep63_SHOST_PGM_MD_X_INTEROPER, gep63_SHOST_NOME_CPY_OUT, gep63_DERIVANTE_DA_ALTRI_SERV, gep63_SHOST_PGM_MD_X_MPE, gep63_VINCOLI_RIUSO, gep63_INFO_COSTO, gep63_ATTIVATO_IN_PROD, gep63_consumerIdentifier, gep63_UTILIZ_PIU_BAN_CLONI, ale63_ownerEmail, gep63_ATTIVATO_IN_SYST, ale63_communityName, gep63_DATA_PUBBL_CREAZ_SERV, gep63_SECURITY_ROLE, gep63_NOME_SERVIZIO_PRECEDENTE, gep63_SHOST_ID_SERVIZIO, gep63_SHOST_PGM_MD, ale63_fullDescription, gep63_ATTIVATO_IN_APPL, gep63_TIPOLOGIA_OGGETTO_ESISTENTE, gep63_versionTerminationDate, gep63_DOC_ANALISI_FUNZIONALE, gep63_versionAvailabilityDate, gep63_DOC_ANALISI_DETTAGLIO, gep63_DOC_ANALISI_TECNICA, ale63_requirementsLink, ale63_assetWebLink]";
 		String SCOPEN = "[type, subType, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, gep63_DESC_ESTESA, gep63_ABILITAZ_INFRASTR, gep63_SCOPEN_AMBITO_IMPLEMENTAZIONE, ale63_assetType, ale63_guid, gep63_SCOPEN_DIM_MAX_MSG, ale63_remoteState, gep63_DATA_RITIRO_SERV, gep63_MATR_RICH_CREAZIONE, ale63_assetOwners, gep63_FLG_CTRL_TIPOLOGIA, gep63_PIATT_EROG, gep63_MATR_RICH_MODIFICA, gep63_DISP_SERV, gep63_PID_PROCESSO_GOV, gep63_TIPOLOGIA, gep63_SCOPEN_STATO_ATTUALE_FUNZ, gep63_MATR_PUBBLICATORE_CREAZ_SERV, gep63_DERIVANTE_DA_ALTRI_SERV, gep63_SCOPEN_DOWNTIME_PIANIFICATO, gep63_SCOPEN_DIM_MIN_MSG, gep63_VINCOLI_RIUSO, gep63_ATTIVATO_IN_PROD, gep63_INFO_COSTO, gep63_consumerIdentifier, gep63_UTILIZ_PIU_BAN_CLONI, gep63_SCOPEN_ATTACHMENT_TYPE, ale63_ownerEmail, gep63_SCOPEN_LINK_SIN_APPS_EST, gep63_ATTIVATO_IN_SYST, gep63_SCOPEN_REPS0, ale63_communityName, gep63_SCOPEN_NUM_CHIAMATE_PICCO, gep63_DATA_PUBBL_CREAZ_SERV, gep63_SECURITY_ROLE, gep63_NOME_SERVIZIO_PRECEDENTE, gep63_SCOPEN_EAR_SERVIZIO, gep63_SCOPEN_FLG_CONTIENE_ATTACHMENT, gep63_SCOPEN_AMBIENTE_FISICO, gep63_SCOPEN_RIF_CHIAMANTI_INT, ale63_fullDescription, gep63_SCOPEN_VOLUME_GIORN, gep63_ATTIVATO_IN_APPL, gep63_SCOPEN_RIF_CHIAMANTI_EST, gep63_TIPOLOGIA_OGGETTO_ESISTENTE, gep63_versionTerminationDate, gep63_DOC_ANALISI_FUNZIONALE, gep63_versionAvailabilityDate, gep63_DOC_ANALISI_DETTAGLIO, gep63_DOC_ANALISI_TECNICA, ale63_requirementsLink, ale63_assetWebLink]";
@@ -55,9 +99,8 @@ public class WSRRToBusinessObject {
 
 		result = wsrrutility.generalWSRRQuery(query1, url, user, password);
 
-		TWObject SV_BO = null;
-		TWObject BS_BO = null;
-		TWObject ACR_BO = null;
+
+		
 
 		if (result == null)
 			return null;
@@ -129,6 +172,7 @@ public class WSRRToBusinessObject {
 				//navigo gli endpoints 
 				
 				
+				
 				//////////////////////////////////////////////////////////////////////////////////////////////
 				
 				
@@ -143,6 +187,7 @@ public class WSRRToBusinessObject {
 				String value = null;
 				String current_ = null;
 				String value_ = null;
+				String environment=null;
 				
 				try {
 					
@@ -155,27 +200,29 @@ public class WSRRToBusinessObject {
 					
 					for (int ii = 1; ii <= countag; ii++) {
 					
-					//if( type != null) NBP_BO.setPropertyValue("type", type);
-					
-					//if (subType != null) NBP_BO.setPropertyValue("subType", subType);
-					
-					//System.out.println(target);
+
+						
+                     //recupero l'ambiente operativo dell 'endpoint
+						
+				    count = Integer.parseInt(xpath.evaluate("count(/resources/resource["+String.valueOf(ii)+"]/classifications/classification)", doc));
+				    type=null;
+				    environment=null;
+				    
+					for (int i = 1; i <= count; i++) {
+						current = "/resources/resource["+String.valueOf(ii)+"]/classifications/classification[" + String.valueOf(i) + "]/@uri";
+						classification = xpath.evaluate(current, doc);
+						if (environment == null && classification != null && classification.indexOf("http://www.ibm.com/xmlns/prod/serviceregistry/6/1/GovernanceProfileTaxonomy#") != -1) {
+							environment = classification.substring(classification.indexOf("#") + 1, classification.length());
+						}
+
+						current = null;
+					}
+				    
 					
 					count = Integer.parseInt(xpath.evaluate("count(/resources/resource["+String.valueOf(ii)+"]/properties/property)", doc));
-					
-					//count = Integer.parseInt(xpath.evaluate("count(/resources/resource/properties/property)", doc));
-					
-					System.out.println("count singolo "+count);
-					System.out.println("count(/resources/resource/properties["+String.valueOf(ii)+"]/property");
 
-					
 					for (int i = 1; i <= count; i++) {
-						
-						
-						
-						//current = "/resources/resource/properties["+String.valueOf(ii)+"]/property[" + String.valueOf(i) + "]/@name";
-						//value = "/resources/resource/properties["+String.valueOf(ii)+"]/property[" + String.valueOf(i) + "]/@value";
-						
+
 						current = "/resources/resource["+String.valueOf(ii)+"]/properties/property[" + String.valueOf(i) + "]/@name";
 						value = "/resources/resource["+String.valueOf(ii)+"]/properties/property[" + String.valueOf(i) + "]/@value";
 						
@@ -196,6 +243,16 @@ public class WSRRToBusinessObject {
 
 							if (value_ == null)
 								value_ = "";
+							
+							
+							if (current_ != null && current_.equals("primaryType")) {
+								
+								if (type == null && value_ != null && value_.indexOf(
+										"#") != -1) {
+									type = value_.substring(value_.indexOf("#") + 1, value_.length());
+								}
+														
+							}
 
 							System.out.println("********>>>>>**  "+current_+"="+value_);
 							//NBP_BO.setPropertyValue(current_, value_);
@@ -211,6 +268,9 @@ public class WSRRToBusinessObject {
 						}
 
 					}
+					//
+					System.out.println("V1OOOOOOOOOOOOOOOOOOOOOOOOOOO = "+type);
+					System.out.println("V2OOOOOOOOOOOOOOOOOOOOOOOOOOO = "+environment);
 					}
 					
 					//System.out.println(NBP_BO.getPropertyNames());
