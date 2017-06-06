@@ -31,8 +31,8 @@ public class WSRRToBusinessObject {
 
 	String query1 = "/Metadata/XML/GraphQuery?query=/WSRR/GenericObject[@name='%CATALOGNAME%'%20and%20@version='%VERSION%']";
 	String query2 = "/Metadata/XML/GraphQuery?query=/WSRR/GenericObject[@name='%CATALOGNAME%'%20and%20@primaryType='http://www.ibm.com/xmlns/prod/serviceregistry/profile/v6r3/GovernanceEnablementModel%23%TYPE%']";
-
-	// String[] SCHOST_ATT="{}"
+    String query3 = "/Metadata/XML/GraphQuery?query=/WSRR/GenericObject[@bsrURI='%BSRURI%']/ale63_owningOrganization(.)[exactlyClassifiedByAllOf(.,'http://www.ibm.com/xmlns/prod/serviceregistry/v6r3/ALEModel%23Organization')]";
+	String query4= "/Metadata/XML/GraphQuery?query=/WSRR/GenericObject[@bsrURI='%BSRURI%']/gep63_provides(.)/gep63_availableEndpoints(.)";
 
 	public WSRRToBusinessObject() {
 
@@ -57,6 +57,7 @@ public class WSRRToBusinessObject {
 
 		TWObject SV_BO = null;
 		TWObject BS_BO = null;
+		TWObject ACR_BO = null;
 
 		if (result == null)
 			return null;
@@ -77,6 +78,7 @@ public class WSRRToBusinessObject {
 		try {
 			BS_BO = (TWObject) TWObjectFactory.createObject();
 			SV_BO = (TWObject) TWObjectFactory.createObject();
+			ACR_BO =(TWObject) TWObjectFactory.createObject();
 
 			doc = (Document) xpath.evaluate("/", source, XPathConstants.NODE);
 			count = Integer.parseInt(xpath.evaluate("count(/resources/resource/classifications/classification)", doc));
@@ -106,9 +108,125 @@ public class WSRRToBusinessObject {
 			
 			BS_BO=WSRRToBusinessObject.makeBO(result, type.substring(0, type.length()-7), subType, url, user, password);
 			
+			//Ricavo acronimo
 			
-			System.out.println("------------> " +query2);
-			System.out.println("------------> " +result);
+			query3=query3.replaceAll("%BSRURI%", (String) BS_BO.getPropertyValue("bsrURI"));
+			
+			result = wsrrutility.generalWSRRQuery(query3, url, user, password);
+			
+			ACR_BO=WSRRToBusinessObject.makeBO(result, "Organization", null, url, user, password);
+			
+			//Ricavo Endpoint
+
+			query4=query4.replaceAll("%BSRURI%", (String) SV_BO.getPropertyValue("bsrURI"));
+			
+			result = wsrrutility.generalWSRRQuery(query4, url, user, password);
+			
+			System.out.println("Query4 " +result);
+			
+			if (result !=null) {
+				
+				//navigo gli endpoints 
+				
+				
+				//////////////////////////////////////////////////////////////////////////////////////////////
+				
+				
+				xpathFactory = XPathFactory.newInstance();
+				xpath = xpathFactory.newXPath();
+				// result=result.replaceAll("(\\r|\\n)", "");
+				source = new InputSource(new StringReader(result));
+				doc = null;
+				count = 0;
+				int countag=0;
+				current = null;
+				String value = null;
+				String current_ = null;
+				String value_ = null;
+				
+				try {
+					
+					//NBP_BO = (TWObject) TWObjectFactory.createObject();
+
+					doc = (Document) xpath.evaluate("/", source, XPathConstants.NODE);
+					countag = Integer.parseInt(xpath.evaluate("count(/resources/resource/properties)", doc));
+					System.out.println("counttag "+countag);
+
+					
+					for (int ii = 1; ii <= countag; ii++) {
+					
+					//if( type != null) NBP_BO.setPropertyValue("type", type);
+					
+					//if (subType != null) NBP_BO.setPropertyValue("subType", subType);
+					
+					//System.out.println(target);
+					
+					count = Integer.parseInt(xpath.evaluate("count(/resources/resource["+String.valueOf(ii)+"]/properties/property)", doc));
+					
+					//count = Integer.parseInt(xpath.evaluate("count(/resources/resource/properties/property)", doc));
+					
+					System.out.println("count singolo "+count);
+					System.out.println("count(/resources/resource/properties["+String.valueOf(ii)+"]/property");
+
+					
+					for (int i = 1; i <= count; i++) {
+						
+						
+						
+						//current = "/resources/resource/properties["+String.valueOf(ii)+"]/property[" + String.valueOf(i) + "]/@name";
+						//value = "/resources/resource/properties["+String.valueOf(ii)+"]/property[" + String.valueOf(i) + "]/@value";
+						
+						current = "/resources/resource["+String.valueOf(ii)+"]/properties/property[" + String.valueOf(i) + "]/@name";
+						value = "/resources/resource["+String.valueOf(ii)+"]/properties/property[" + String.valueOf(i) + "]/@value";
+						
+						
+						System.out.println("///////////////////////////////////////////////////////////////////");
+						System.out.println(current);
+						System.out.println(value);
+						System.out.println("///////////////////////////////////////////////////////////////////");
+
+						current_ = (String) xpath.evaluate(current, doc);
+						value_ = (String) xpath.evaluate(value, doc);
+
+						//if (target.indexOf(current_) != -1) {
+					    if (true) {
+							
+							if (current_.equals("namespace"))
+								current_ = "nspace";
+
+							if (value_ == null)
+								value_ = "";
+
+							System.out.println("********>>>>>**  "+current_+"="+value_);
+							//NBP_BO.setPropertyValue(current_, value_);
+
+							current = null;
+							current_ = null;
+							value = null;
+							value_ = null;
+
+						} else {
+							
+							System.out.println("Bypass_for "+current_ +" 4 type "+type);
+						}
+
+					}
+					}
+					
+					//System.out.println(NBP_BO.getPropertyNames());
+					
+
+				} catch (Exception e) {
+
+					System.out.println("*********************************************KO************************************+");
+					System.out.println(e.getMessage());
+					System.out.println("*********************************************KO************************************+");
+					e.printStackTrace();
+				}
+
+				
+				///////////////////////////////////////////////////////////////////////////////////////////////
+			}
 
 		} catch (Exception e) {
 
@@ -128,8 +246,10 @@ public class WSRRToBusinessObject {
 		final  String SCHOST = "[type, subType, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, gep63_DESC_ESTESA, gep63_ABILITAZ_INFRASTR, ale63_assetType, gep63_SCHOST_NOME_CPY_OUT, ale63_guid, gep63_SCHOST_NOME_CPY_INP, ale63_remoteState, gep63_DATA_RITIRO_SERV, gep63_MATR_RICH_CREAZIONE, ale63_assetOwners, gep63_PIATT_EROG, gep63_FLG_CTRL_TIPOLOGIA, gep63_DISP_SERV, gep63_MATR_RICH_MODIFICA, gep63_PID_PROCESSO_GOV, gep63_TIPOLOGIA, gep63_MATR_PUBBLICATORE_CREAZ_SERV, gep63_DERIVANTE_DA_ALTRI_SERV, gep63_SCHOST_PGM_MD_X_MPE, gep63_VINCOLI_RIUSO, gep63_SCHOST_CONVNULL, gep63_INFO_COSTO, gep63_ATTIVATO_IN_PROD, gep63_consumerIdentifier, gep63_SCHOST_PGM_SERVIZIO, gep63_UTILIZ_PIU_BAN_CLONI, gep63_SCHOST_ID_SERVIZIO, ale63_ownerEmail, gep63_ATTIVATO_IN_SYST, ale63_communityName, gep63_DATA_PUBBL_CREAZ_SERV, gep63_SECURITY_ROLE, gep63_NOME_SERVIZIO_PRECEDENTE, gep63_SCHOST_PGM_MD_X_INTEROPER, ale63_fullDescription, gep63_SCHOST_PGM_MD, gep63_SCHOST_TRANS_SERVIZIO, gep63_ATTIVATO_IN_APPL, gep63_TIPOLOGIA_OGGETTO_ESISTENTE, gep63_SCHOST_COD_VERSIONE, gep63_versionTerminationDate, gep63_DOC_ANALISI_FUNZIONALE, gep63_versionAvailabilityDate, gep63_DOC_ANALISI_DETTAGLIO, gep63_DOC_ANALISI_TECNICA, ale63_requirementsLink, ale63_assetWebLink]";
 		final String SHOST = " [type, subType, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, gep63_DESC_ESTESA, gep63_ABILITAZ_INFRASTR, ale63_assetType, gep63_SHOST_TRANS_SERVIZIO, ale63_guid, gep63_SHOST_CONVNULL, gep63_SHOST_PGM_SERVIZIO, ale63_remoteState, gep63_SHOST_NOME_CPY_INP, gep63_DATA_RITIRO_SERV, gep63_MATR_RICH_CREAZIONE, ale63_assetOwners, gep63_PIATT_EROG, gep63_FLG_CTRL_TIPOLOGIA, gep63_DISP_SERV, gep63_MATR_RICH_MODIFICA, gep63_PID_PROCESSO_GOV, gep63_TIPOLOGIA, gep63_MATR_PUBBLICATORE_CREAZ_SERV, gep63_SHOST_PGM_MD_X_INTEROPER, gep63_SHOST_NOME_CPY_OUT, gep63_DERIVANTE_DA_ALTRI_SERV, gep63_SHOST_PGM_MD_X_MPE, gep63_VINCOLI_RIUSO, gep63_INFO_COSTO, gep63_ATTIVATO_IN_PROD, gep63_consumerIdentifier, gep63_UTILIZ_PIU_BAN_CLONI, ale63_ownerEmail, gep63_ATTIVATO_IN_SYST, ale63_communityName, gep63_DATA_PUBBL_CREAZ_SERV, gep63_SECURITY_ROLE, gep63_NOME_SERVIZIO_PRECEDENTE, gep63_SHOST_ID_SERVIZIO, gep63_SHOST_PGM_MD, ale63_fullDescription, gep63_ATTIVATO_IN_APPL, gep63_TIPOLOGIA_OGGETTO_ESISTENTE, gep63_versionTerminationDate, gep63_DOC_ANALISI_FUNZIONALE, gep63_versionAvailabilityDate, gep63_DOC_ANALISI_DETTAGLIO, gep63_DOC_ANALISI_TECNICA, ale63_requirementsLink, ale63_assetWebLink]";
 		final String SCOPEN = "[type, subType, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, gep63_DESC_ESTESA, gep63_ABILITAZ_INFRASTR, gep63_SCOPEN_AMBITO_IMPLEMENTAZIONE, ale63_assetType, ale63_guid, gep63_SCOPEN_DIM_MAX_MSG, ale63_remoteState, gep63_DATA_RITIRO_SERV, gep63_MATR_RICH_CREAZIONE, ale63_assetOwners, gep63_FLG_CTRL_TIPOLOGIA, gep63_PIATT_EROG, gep63_MATR_RICH_MODIFICA, gep63_DISP_SERV, gep63_PID_PROCESSO_GOV, gep63_TIPOLOGIA, gep63_SCOPEN_STATO_ATTUALE_FUNZ, gep63_MATR_PUBBLICATORE_CREAZ_SERV, gep63_DERIVANTE_DA_ALTRI_SERV, gep63_SCOPEN_DOWNTIME_PIANIFICATO, gep63_SCOPEN_DIM_MIN_MSG, gep63_VINCOLI_RIUSO, gep63_ATTIVATO_IN_PROD, gep63_INFO_COSTO, gep63_consumerIdentifier, gep63_UTILIZ_PIU_BAN_CLONI, gep63_SCOPEN_ATTACHMENT_TYPE, ale63_ownerEmail, gep63_SCOPEN_LINK_SIN_APPS_EST, gep63_ATTIVATO_IN_SYST, gep63_SCOPEN_REPS0, ale63_communityName, gep63_SCOPEN_NUM_CHIAMATE_PICCO, gep63_DATA_PUBBL_CREAZ_SERV, gep63_SECURITY_ROLE, gep63_NOME_SERVIZIO_PRECEDENTE, gep63_SCOPEN_EAR_SERVIZIO, gep63_SCOPEN_FLG_CONTIENE_ATTACHMENT, gep63_SCOPEN_AMBIENTE_FISICO, gep63_SCOPEN_RIF_CHIAMANTI_INT, ale63_fullDescription, gep63_SCOPEN_VOLUME_GIORN, gep63_ATTIVATO_IN_APPL, gep63_SCOPEN_RIF_CHIAMANTI_EST, gep63_TIPOLOGIA_OGGETTO_ESISTENTE, gep63_versionTerminationDate, gep63_DOC_ANALISI_FUNZIONALE, gep63_versionAvailabilityDate, gep63_DOC_ANALISI_DETTAGLIO, gep63_DOC_ANALISI_TECNICA, ale63_requirementsLink, ale63_assetWebLink]";
-		final String SOPEN = " [type, subType, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, gep63_ABILITAZ_INFRASTR, gep63_DESC_ESTESA, gep63_SOPEN_LINK_SIN_APPS_EST, gep63_SOPEN_ATTACHMENT_TYPE, gep63_SOPEN_DOWNTIME_PIANIFICATO, gep63_SOPEN_REPS0, ale63_assetType, gep63_SOPEN_NUM_CHIAMATE_PICCO, ale63_guid, gep63_SOPEN_RIF_CHIAMANTI_EST, gep63_SOPEN_STATO_ATTUALE_FUNZ, ale63_remoteState, gep63_DATA_RITIRO_SERV, gep63_MATR_RICH_CREAZIONE, ale63_assetOwners, gep63_FLG_CTRL_TIPOLOGIA, gep63_PIATT_EROG, gep63_MATR_RICH_MODIFICA, gep63_DISP_SERV, gep63_PID_PROCESSO_GOV, gep63_SOPEN_RIF_CHIAMANTI_INT, gep63_TIPOLOGIA, gep63_MATR_PUBBLICATORE_CREAZ_SERV, gep63_SOPEN_EAR_SERVIZIO, gep63_SOPEN_AMBIENTE_FISICO, gep63_DERIVANTE_DA_ALTRI_SERV, gep63_VINCOLI_RIUSO, gep63_ATTIVATO_IN_PROD, gep63_INFO_COSTO, gep63_consumerIdentifier, gep63_SOPEN_VOLUME_GIORN, gep63_SOPEN_AMBITO_IMPLEMENTAZIONE, gep63_UTILIZ_PIU_BAN_CLONI, ale63_ownerEmail, gep63_ATTIVATO_IN_SYST, gep63_SOPEN_DIM_MAX_MSG, ale63_communityName, gep63_DATA_PUBBL_CREAZ_SERV, gep63_SECURITY_ROLE, gep63_NOME_SERVIZIO_PRECEDENTE, gep63_SOPEN_DIM_MIN_MSG, gep63_SOPEN_FLG_CONTIENE_ATTACHMENT, ale63_fullDescription, gep63_ATTIVATO_IN_APPL, gep63_TIPOLOGIA_OGGETTO_ESISTENTE, gep63_versionTerminationDate, gep63_DOC_ANALISI_FUNZIONALE, gep63_versionAvailabilityDate, gep63_DOC_ANALISI_DETTAGLIO, g*ep63_DOC_ANALISI_TECNICA, ale63_requirementsLink, ale63_assetWebLink]";
+		final String SOPEN = " [type, subType, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, gep63_ABILITAZ_INFRASTR, gep63_DESC_ESTESA, gep63_SOPEN_LINK_SIN_APPS_EST, gep63_SOPEN_ATTACHMENT_TYPE, gep63_SOPEN_DOWNTIME_PIANIFICATO, gep63_SOPEN_REPS0, ale63_assetType, gep63_SOPEN_NUM_CHIAMATE_PICCO, ale63_guid, gep63_SOPEN_RIF_CHIAMANTI_EST, gep63_SOPEN_STATO_ATTUALE_FUNZ, ale63_remoteState, gep63_DATA_RITIRO_SERV, gep63_MATR_RICH_CREAZIONE, ale63_assetOwners, gep63_FLG_CTRL_TIPOLOGIA, gep63_PIATT_EROG, gep63_MATR_RICH_MODIFICA, gep63_DISP_SERV, gep63_PID_PROCESSO_GOV, gep63_SOPEN_RIF_CHIAMANTI_INT, gep63_TIPOLOGIA, gep63_MATR_PUBBLICATORE_CREAZ_SERV, gep63_SOPEN_EAR_SERVIZIO, gep63_SOPEN_AMBIENTE_FISICO, gep63_DERIVANTE_DA_ALTRI_SERV, gep63_VINCOLI_RIUSO, gep63_ATTIVATO_IN_PROD, gep63_INFO_COSTO, gep63_consumerIdentifier, gep63_SOPEN_VOLUME_GIORN, gep63_SOPEN_AMBITO_IMPLEMENTAZIONE, gep63_UTILIZ_PIU_BAN_CLONI, ale63_ownerEmail, gep63_ATTIVATO_IN_SYST, gep63_SOPEN_DIM_MAX_MSG, ale63_communityName, gep63_DATA_PUBBL_CREAZ_SERV, gep63_SECURITY_ROLE, gep63_NOME_SERVIZIO_PRECEDENTE, gep63_SOPEN_DIM_MIN_MSG, gep63_SOPEN_FLG_CONTIENE_ATTACHMENT, ale63_fullDescription, gep63_ATTIVATO_IN_APPL, gep63_TIPOLOGIA_OGGETTO_ESISTENTE, gep63_versionTerminationDate, gep63_DOC_ANALISI_FUNZIONALE, gep63_versionAvailabilityDate, gep63_DOC_ANALISI_DETTAGLIO, gep63_DOC_ANALISI_TECNICA, ale63_requirementsLink, ale63_assetWebLink]";
 		final String SERVICEVERSION="[type, subType, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, ale63_remoteState, ale63_communityName, ale63_assetOwners, ale63_assetType, ale63_guid, ale63_fullDescription, ale63_ownerEmail, ale63_requirementsLink, ale63_assetWebLink]";
+		final String ACRONIMO="[bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, ale63_RESP_FUNZIONALE_MATRICOLA, ale63_RESP_ATTIVITA_NOMINATIVO, ale63_RESP_FUNZIONALE_NOMINATIVO, ale63_DESC_AMBITO, ale63_RESP_SERVIZIO_NOMINATIVO, ale63_contact, ale63_contactEmail, ale63_CODICE_SISTEMA_APPLICATIVO, ale63_RESP_ATTIVITA_MATRICOLA, ale63_RESP_SERVIZIO_MATRICOLA, ale63_RESP_UFFICIO_MATRICOLA, ale63_RESP_TECNICO_MATRICOLA, ale63_RESP_UFFICIO_NOMINATIVO, ale63_RESP_TECNICO_NOMINATIVO, ale63_AMBITO]";
+		
 		String target = "UNDEF";
 
 
@@ -158,28 +278,34 @@ public class WSRRToBusinessObject {
 			count = Integer.parseInt(xpath.evaluate("count(/resources/resource/properties/property)", doc));
 
 			
-			if (type != null && type.indexOf("SOPENServiceVersion") != -1)
+			if (type != null && type.indexOf("SOPENServiceVersion") != -1 && target.equals("UNDEF"))
 				target = SOPEN;
-			if (type != null && type.indexOf("SCOPENServiceVersion") != -1)
+			if (type != null && type.indexOf("SCOPENServiceVersion" ) != -1 && target.equals("UNDEF"))
 				target = SCOPEN;
-			if (type != null && type.indexOf("SHOSTServiceVersion") != -1)
+			if (type != null && type.indexOf("SHOSTServiceVersion") != -1 && target.equals("UNDEF"))
 				target = SHOST;
-			if (type != null && type.indexOf("SCHOSTServiceVersion") != -1)
+			if (type != null && type.indexOf("SCHOSTServiceVersion") != -1 && target.equals("UNDEF"))
 				target = SCHOST;
 			
-			if (type != null && type.indexOf("SOPENService") != -1)
+			if (type != null && type.indexOf("SOPENService") != -1 && target.equals("UNDEF"))
 				target = SERVICEVERSION;
-			if (type != null && type.indexOf("SCOPENService") != -1)
+			if (type != null && type.indexOf("SCOPENService") != -1 && target.equals("UNDEF"))
 				target = SERVICEVERSION;
-			if (type != null && type.indexOf("SHOSTService") != -1)
+			if (type != null && type.indexOf("SHOSTService") != -1 && target.equals("UNDEF"))
 				target = SERVICEVERSION;
-			if (type != null && type.indexOf("SCHOSTService") != -1)
+			if (type != null && type.indexOf("SCHOSTService") != -1 && target.equals("UNDEF"))
 				target = SERVICEVERSION;
 			
-			System.out.println("*****************************ZZZZZZZZ "+type);
+			if (type != null && type.indexOf("Organization") != -1 && target.equals("UNDEF"))
+				target = ACRONIMO;
 			
-			NBP_BO.setPropertyValue("type", type);
-			NBP_BO.setPropertyValue("subType", subType);
+			
+			
+			if( type != null) NBP_BO.setPropertyValue("type", type);
+			
+			if (subType != null) NBP_BO.setPropertyValue("subType", subType);
+			
+			System.out.println(target);
 
 			for (int i = 1; i <= count; i++) {
 				current = "/resources/resource/properties/property[" + String.valueOf(i) + "]/@name";
@@ -190,15 +316,14 @@ public class WSRRToBusinessObject {
 
 				if (target.indexOf(current_) != -1) {
 				//if (true) {
-
-					// System.out.println("**SYPE"+current_+"="+value_);
-
+					
 					if (current_.equals("namespace"))
 						current_ = "nspace";
 
 					if (value_ == null)
 						value_ = "";
 
+					//System.out.println("********>>>>> "+current_+"="+value_);
 					NBP_BO.setPropertyValue(current_, value_);
 
 					current = null;
@@ -208,7 +333,7 @@ public class WSRRToBusinessObject {
 
 				} else {
 					
-					System.out.println("Bypass for "+current_);
+					System.out.println("Bypass_for "+current_ +" 4 type "+type);
 				}
 
 			}
