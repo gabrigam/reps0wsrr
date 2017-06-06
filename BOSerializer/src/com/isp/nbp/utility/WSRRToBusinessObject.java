@@ -115,6 +115,7 @@ public class WSRRToBusinessObject {
 		int count = 0;
 		String current = null;
 		String classification = null;
+		String relation=null;
 		String type = null;
 		String subType = null;
 
@@ -188,6 +189,8 @@ public class WSRRToBusinessObject {
 				String current_ = null;
 				String value_ = null;
 				String environment=null;
+				String proxy=null;
+				String proxybsrURI=null;
 				
 				try {
 					
@@ -211,13 +214,46 @@ public class WSRRToBusinessObject {
 					for (int i = 1; i <= count; i++) {
 						current = "/resources/resource["+String.valueOf(ii)+"]/classifications/classification[" + String.valueOf(i) + "]/@uri";
 						classification = xpath.evaluate(current, doc);
+						
 						if (environment == null && classification != null && classification.indexOf("http://www.ibm.com/xmlns/prod/serviceregistry/6/1/GovernanceProfileTaxonomy#") != -1) {
 							environment = classification.substring(classification.indexOf("#") + 1, classification.length());
+						}
+						current = null;
+					}
+				    
+					//recupero eventuale Proxy
+					count = Integer.parseInt(xpath.evaluate("count(/resources/resource["+String.valueOf(ii)+"]/relationships/relationship)", doc));
+					
+					relation=null;
+					proxybsrURI=null;
+					proxy=null;
+					
+					for (int i = 1; i <= count; i++) {
+						current = "/resources/resource["+String.valueOf(ii)+"]/relationships/relationship[" + String.valueOf(i) + "]/@name";
+						
+						relation = xpath.evaluate(current, doc);
+						
+						if (proxy == null && relation != null && relation.indexOf("rest80_CALLABLEProxy") != -1) {
+							proxy="CALLABLE";
+							current = "/resources/resource["+String.valueOf(ii)+"]/relationships/relationship[" + String.valueOf(i) + "]/@targetBsrURI";
+							proxybsrURI=xpath.evaluate(current, doc);
+						}
+						
+						if (proxy == null && relation != null && relation.indexOf("sm63_SOAPProxy") != -1) {
+							proxy="SOAP";
+							current = "/resources/resource["+String.valueOf(ii)+"]/relationships/relationship[" + String.valueOf(i) + "]/@targetBsrURI";
+							proxybsrURI=xpath.evaluate(current, doc);
+						}
+						
+						if (proxy == null && relation != null && relation.indexOf("rest80_RESTProxy") != -1) {
+							proxy="REST";
+							current = "/resources/resource["+String.valueOf(ii)+"]/relationships/relationship[" + String.valueOf(i) + "]/@targetBsrURI";
+							proxybsrURI=xpath.evaluate(current, doc);
 						}
 
 						current = null;
 					}
-				    
+					
 					
 					count = Integer.parseInt(xpath.evaluate("count(/resources/resource["+String.valueOf(ii)+"]/properties/property)", doc));
 
@@ -271,6 +307,10 @@ public class WSRRToBusinessObject {
 					//
 					System.out.println("V1OOOOOOOOOOOOOOOOOOOOOOOOOOO = "+type);
 					System.out.println("V2OOOOOOOOOOOOOOOOOOOOOOOOOOO = "+environment);
+					System.out.println("V3OOOOOOOOOOOOOOOOOOOOOOOOOOO = "+proxy);
+					System.out.println("V4OOOOOOOOOOOOOOOOOOOOOOOOOOO = "+proxybsrURI);
+					
+					
 					}
 					
 					//System.out.println(NBP_BO.getPropertyNames());
