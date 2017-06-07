@@ -34,6 +34,7 @@ public class WSRRToBusinessObject {
 	String query3 = "/Metadata/XML/GraphQuery?query=/WSRR/GenericObject[@bsrURI='%BSRURI%']/ale63_owningOrganization(.)[exactlyClassifiedByAllOf(.,'http://www.ibm.com/xmlns/prod/serviceregistry/v6r3/ALEModel%23Organization')]";
 	String query4= "/Metadata/XML/GraphQuery?query=/WSRR/GenericObject[@bsrURI='%BSRURI%']/gep63_provides(.)/gep63_availableEndpoints(.)";
 	String query5= "/Metadata/XML/GraphQuery?query=/WSRR/GenericObject[@bsrURI='%BSRURI%']";
+	String query6= "";
 
 	public WSRRToBusinessObject() {
 
@@ -263,10 +264,14 @@ public class WSRRToBusinessObject {
 
 						relation=null;
 						proxybsrURI=null;
-						proxy=null;
-						type=null;
+						
+						System.out.println("THE TYPE "+type);
+						System.out.println("THE TARGET "+target);
 
 						for (int i = 1; i <= count; i++) {
+							
+							proxy=null;
+							
 							current = "/resources/resource["+String.valueOf(ii)+"]/relationships/relationship[" + String.valueOf(i) + "]/@name";
 
 							relation = xpath.evaluate(current, doc);
@@ -277,6 +282,10 @@ public class WSRRToBusinessObject {
 								if (xpath.evaluate(current, doc) != null) {
 									proxybsrURI=xpath.evaluate(current, doc);
 									proxy="CALLABLE";
+									query6=query5;
+									query6=query6.replaceAll("%BSRURI%",proxybsrURI );
+									result = wsrrutility.generalWSRRQuery(query6, url, user, password);
+									WSRRToBusinessObject.makeBO(result, proxy, null, url, user, password);
 								}
 
 							}
@@ -287,6 +296,10 @@ public class WSRRToBusinessObject {
 								if (xpath.evaluate(current, doc) != null) {
 									proxybsrURI=xpath.evaluate(current, doc);
 									proxy="SOAP";
+									query6=query5;
+									query6=query6.replaceAll("%BSRURI%",proxybsrURI );
+									result = wsrrutility.generalWSRRQuery(query6, url, user, password);
+									WSRRToBusinessObject.makeBO(result, proxy, null, url, user, password);
 								}
 							}
 
@@ -296,6 +309,10 @@ public class WSRRToBusinessObject {
 								if (xpath.evaluate(current, doc) != null) {
 									proxybsrURI=xpath.evaluate(current, doc);
 									proxy="REST";
+									query6=query5;
+									query6=query6.replaceAll("%BSRURI%",proxybsrURI );
+									result = wsrrutility.generalWSRRQuery(query6, url, user, password);
+									WSRRToBusinessObject.makeBO(result, proxy, null, url, user, password);
 								}
 							}
 
@@ -305,14 +322,17 @@ public class WSRRToBusinessObject {
 								if (xpath.evaluate(current, doc) != null) {
 									proxybsrURI=xpath.evaluate(current, doc);
 									proxy="MQMANUAL";
+									query6=query5;
+									query6=query6.replaceAll("%BSRURI%",proxybsrURI );
+									result = wsrrutility.generalWSRRQuery(query6, url, user, password);
+									WSRRToBusinessObject.makeBO(result, proxy, null, url, user, password);
 								}
 							}
 
 							current = null;
 						}
 
-						//navigo le prorieta' del singolo endpoint e in base al tipo estratto i campi 
-
+						//navigo le prorieta' del singolo endpoint
 						count = Integer.parseInt(xpath.evaluate("count(/resources/resource["+String.valueOf(ii)+"]/properties/property)", doc));
 
 						for (int i = 1; i <= count; i++) {
@@ -360,6 +380,7 @@ public class WSRRToBusinessObject {
 						
 						//Se è presente Proxy/MQ recupero i dettagli
 
+						/**
 						if (proxybsrURI !=null) {
 
 							query5=query5.replaceAll("%BSRURI%",proxybsrURI );
@@ -369,6 +390,9 @@ public class WSRRToBusinessObject {
 
 
 						}
+						
+						*/
+						
 						//System.out.println("V1OOOOOOOOOOOOOOOOOOOOOOOOOOO = "+type);
 						//System.out.println("V2OOOOOOOOOOOOOOOOOOOOOOOOOOO = "+environment);
 						//System.out.println("V3OOOOOOOOOOOOOOOOOOOOOOOOOOO = "+proxy);
