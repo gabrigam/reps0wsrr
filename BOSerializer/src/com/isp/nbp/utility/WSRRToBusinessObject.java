@@ -186,7 +186,7 @@ public class WSRRToBusinessObject {
 				
 				try {
 					
-					//NBP_BO = (TWObject) TWObjectFactory.createObject();
+					TWObject NBP_BO = null;
 
 					doc = (Document) xpath.evaluate("/", source, XPathConstants.NODE);
 					
@@ -200,6 +200,8 @@ public class WSRRToBusinessObject {
 				    
 					type=null;
 				    environment=null;
+				    
+				    NBP_BO = (TWObject) TWObjectFactory.createObject();
 				    
 					for (int i = 1; i <= count; i++) {
 						current = "/resources/resource["+String.valueOf(ii)+"]/classifications/classification[" + String.valueOf(i) + "]/@uri";
@@ -254,27 +256,40 @@ public class WSRRToBusinessObject {
 						relation = xpath.evaluate(current, doc);
 						
 						if (proxy == null && relation != null && relation.indexOf("rest80_CALLABLEProxy") != -1) {
-							proxy="CALLABLE";
+							
 							current = "/resources/resource["+String.valueOf(ii)+"]/relationships/relationship[" + String.valueOf(i) + "]/@targetBsrURI";
-							proxybsrURI=xpath.evaluate(current, doc);
+							if (xpath.evaluate(current, doc) != null) {
+								proxybsrURI=xpath.evaluate(current, doc);
+								proxy="CALLABLE";
+							}
+								
 						}
 						
 						if (proxy == null && relation != null && relation.indexOf("sm63_SOAPProxy") != -1) {
-							proxy="SOAP";
+							
 							current = "/resources/resource["+String.valueOf(ii)+"]/relationships/relationship[" + String.valueOf(i) + "]/@targetBsrURI";
-							proxybsrURI=xpath.evaluate(current, doc);
+							if (xpath.evaluate(current, doc) != null) {
+								proxybsrURI=xpath.evaluate(current, doc);
+								proxy="SOAP";
+							}
 						}
 						
 						if (proxy == null && relation != null && relation.indexOf("rest80_RESTProxy") != -1) {
-							proxy="REST";
+							
 							current = "/resources/resource["+String.valueOf(ii)+"]/relationships/relationship[" + String.valueOf(i) + "]/@targetBsrURI";
-							proxybsrURI=xpath.evaluate(current, doc);
+							if (xpath.evaluate(current, doc) != null) {
+								proxybsrURI=xpath.evaluate(current, doc);
+								proxy="REST";
+							}
 						}
 						
 						if (proxy == null && relation != null && relation.indexOf("sm63_mqEndpoint") != -1) {
-							proxy="MQMANUAL";
+							
 							current = "/resources/resource["+String.valueOf(ii)+"]/relationships/relationship[" + String.valueOf(i) + "]/@targetBsrURI";
-							proxybsrURI=xpath.evaluate(current, doc);
+							if (xpath.evaluate(current, doc) != null) {
+								proxybsrURI=xpath.evaluate(current, doc);
+								proxy="MQMANUAL";
+							}
 						}
 					
 						current = null;
@@ -290,10 +305,10 @@ public class WSRRToBusinessObject {
 						value = "/resources/resource["+String.valueOf(ii)+"]/properties/property[" + String.valueOf(i) + "]/@value";
 						
 						
-						System.out.println("///////////////////////////////////////////////////////////////////");
-						System.out.println(current);
-						System.out.println(value);
-						System.out.println("///////////////////////////////////////////////////////////////////");
+						//System.out.println("///////////////////////////////////////////////////////////////////");
+						//System.out.println(current);
+						//System.out.println(value);
+						//System.out.println("///////////////////////////////////////////////////////////////////");
 
 						current_ = (String) xpath.evaluate(current, doc);
 						value_ = (String) xpath.evaluate(value, doc);
@@ -317,8 +332,8 @@ public class WSRRToBusinessObject {
 														
 							}
 
-							System.out.println("********>>>>>**  "+current_+"="+value_);
-							//NBP_BO.setPropertyValue(current_, value_);
+							//System.out.println("********>>>>>**  "+current_+"="+value_);
+							NBP_BO.setPropertyValue(current_, value_);
 
 							current = null;
 							current_ = null;
@@ -337,10 +352,12 @@ public class WSRRToBusinessObject {
 					System.out.println("V3OOOOOOOOOOOOOOOOOOOOOOOOOOO = "+proxy);
 					System.out.println("V4OOOOOOOOOOOOOOOOOOOOOOOOOOO = "+proxybsrURI);
 					
+					System.out.println(NBP_BO.getPropertyNames());
+					
 					
 					}
 					
-					//System.out.println(NBP_BO.getPropertyNames());
+					
 					
 
 				} catch (Exception e) {
