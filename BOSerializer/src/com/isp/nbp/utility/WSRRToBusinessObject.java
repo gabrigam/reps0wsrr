@@ -43,10 +43,12 @@ public class WSRRToBusinessObject {
 	public TWObject createServiceVersionBO(String name, String version, String url, String user, String password)
 			throws XPathExpressionException {
 
-
+		TWObject NBP_BO = null;
 		TWObject SV_BO = null;
 		TWObject BS_BO = null;
 		TWObject ACR_BO = null;
+		TWObject PROXY_BO = null;
+		TWObject EP_BO = null;
 
 		TWList EP_BO_REST_APPL=null;
 		TWList EP_BO_REST_SYST=null;
@@ -129,6 +131,9 @@ public class WSRRToBusinessObject {
 		String relation=null;
 		String type = null;
 		String subType = null;
+		String environment=null;
+		String proxy=null;
+		String proxybsrURI=null;
 		String target="UNDEF";
 
 		try {
@@ -196,13 +201,10 @@ public class WSRRToBusinessObject {
 				String value = null;
 				String current_ = null;
 				String value_ = null;
-				String environment=null;
-				String proxy=null;
-				String proxybsrURI=null;
 
 				try {
 
-					TWObject NBP_BO = null;
+					//TWObject NBP_BO = null;
 
 					doc = (Document) xpath.evaluate("/", source, XPathConstants.NODE);
 
@@ -217,8 +219,9 @@ public class WSRRToBusinessObject {
 						type=null;
 						environment=null;
 
-						NBP_BO = (TWObject) TWObjectFactory.createObject();
-
+						EP_BO = (TWObject) TWObjectFactory.createObject();
+						PROXY_BO = (TWObject) TWObjectFactory.createObject();
+						
 						for (int i = 1; i <= count; i++) {
 							
 							current = "/resources/resource["+String.valueOf(ii)+"]/classifications/classification[" + String.valueOf(i) + "]/@uri";
@@ -268,10 +271,11 @@ public class WSRRToBusinessObject {
 						System.out.println("THE TYPE "+type);
 						System.out.println("THE TARGET "+target);
 
+						proxy=null;
+						
 						for (int i = 1; i <= count; i++) {
 							
-							proxy=null;
-							
+				
 							current = "/resources/resource["+String.valueOf(ii)+"]/relationships/relationship[" + String.valueOf(i) + "]/@name";
 
 							relation = xpath.evaluate(current, doc);
@@ -281,11 +285,10 @@ public class WSRRToBusinessObject {
 								current = "/resources/resource["+String.valueOf(ii)+"]/relationships/relationship[" + String.valueOf(i) + "]/@targetBsrURI";
 								if (xpath.evaluate(current, doc) != null) {
 									proxybsrURI=xpath.evaluate(current, doc);
-									proxy="CALLABLE";
-									query6=query5;
+									proxy="CALLABLE";query6=query5;
 									query6=query6.replaceAll("%BSRURI%",proxybsrURI );
 									result = wsrrutility.generalWSRRQuery(query6, url, user, password);
-									WSRRToBusinessObject.makeBO(result, proxy, null, url, user, password);
+									PROXY_BO=WSRRToBusinessObject.makeBO(result, proxy, null, url, user, password);
 								}
 
 							}
@@ -295,11 +298,10 @@ public class WSRRToBusinessObject {
 								current = "/resources/resource["+String.valueOf(ii)+"]/relationships/relationship[" + String.valueOf(i) + "]/@targetBsrURI";
 								if (xpath.evaluate(current, doc) != null) {
 									proxybsrURI=xpath.evaluate(current, doc);
-									proxy="SOAP";
-									query6=query5;
+									proxy="SOAP";query6=query5;
 									query6=query6.replaceAll("%BSRURI%",proxybsrURI );
 									result = wsrrutility.generalWSRRQuery(query6, url, user, password);
-									WSRRToBusinessObject.makeBO(result, proxy, null, url, user, password);
+									PROXY_BO=WSRRToBusinessObject.makeBO(result, proxy, null, url, user, password);
 								}
 							}
 
@@ -308,11 +310,10 @@ public class WSRRToBusinessObject {
 								current = "/resources/resource["+String.valueOf(ii)+"]/relationships/relationship[" + String.valueOf(i) + "]/@targetBsrURI";
 								if (xpath.evaluate(current, doc) != null) {
 									proxybsrURI=xpath.evaluate(current, doc);
-									proxy="REST";
-									query6=query5;
+									proxy="REST";query6=query5;
 									query6=query6.replaceAll("%BSRURI%",proxybsrURI );
 									result = wsrrutility.generalWSRRQuery(query6, url, user, password);
-									WSRRToBusinessObject.makeBO(result, proxy, null, url, user, password);
+									PROXY_BO=WSRRToBusinessObject.makeBO(result, proxy, null, url, user, password);
 								}
 							}
 
@@ -321,11 +322,10 @@ public class WSRRToBusinessObject {
 								current = "/resources/resource["+String.valueOf(ii)+"]/relationships/relationship[" + String.valueOf(i) + "]/@targetBsrURI";
 								if (xpath.evaluate(current, doc) != null) {
 									proxybsrURI=xpath.evaluate(current, doc);
-									proxy="MQMANUAL";
-									query6=query5;
+									proxy="MQMANUAL";query6=query5;
 									query6=query6.replaceAll("%BSRURI%",proxybsrURI );
 									result = wsrrutility.generalWSRRQuery(query6, url, user, password);
-									WSRRToBusinessObject.makeBO(result, proxy, null, url, user, password);
+									PROXY_BO=WSRRToBusinessObject.makeBO(result, proxy, null, url, user, password);
 								}
 							}
 
@@ -363,7 +363,7 @@ public class WSRRToBusinessObject {
 								}
 
 								//System.out.println("********>>>>>**  "+current_+"="+value_);
-								NBP_BO.setPropertyValue(current_, value_);
+								EP_BO.setPropertyValue(current_, value_);
 
 								current = null;
 								current_ = null;
@@ -376,22 +376,22 @@ public class WSRRToBusinessObject {
 							}
 
 						}
-						//
+
+						NBP_BO = (TWObject) TWObjectFactory.createObject();
+						System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+						System.out.println("type - "+type);
+						System.out.println("environment  - "+environment);
+						//if (proxy !=null) {
+							System.out.println("proxy - "+ proxy);
+							System.out.println("proxybsrURI - "+ proxybsrURI);
+						//}
 						
-						//Se è presente Proxy/MQ recupero i dettagli
-
-						/**
-						if (proxybsrURI !=null) {
-
-							query5=query5.replaceAll("%BSRURI%",proxybsrURI );
-							result = wsrrutility.generalWSRRQuery(query5, url, user, password);
-							WSRRToBusinessObject.makeBO(result, type, null, url, user, password);
-
-
-
-						}
+						System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+						//ho letto tutti i dati compongo il BO globale
+						//NBP_BO = (TWObject) TWObjectFactory.createObject();
+		
+						//type - proxy
 						
-						*/
 						
 						//System.out.println("V1OOOOOOOOOOOOOOOOOOOOOOOOOOO = "+type);
 						//System.out.println("V2OOOOOOOOOOOOOOOOOOOOOOOOOOO = "+environment);
@@ -417,6 +417,18 @@ public class WSRRToBusinessObject {
 
 				///////////////////////////////////////////////////////////////////////////////////////////////
 			}
+			/*
+			NBP_BO = (TWObject) TWObjectFactory.createObject();
+			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+			System.out.println("type - "+type);
+			System.out.println("environment  - "+environment);
+			if (proxy !=null) {
+				System.out.println("proxy - "+ proxy);
+				System.out.println("proxybsrURI - "+ proxybsrURI);
+			}
+			
+			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+			*/
 
 		} catch (Exception e) {
 
