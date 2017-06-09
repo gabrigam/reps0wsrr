@@ -34,7 +34,9 @@ public class WSRRToBusinessObject {
 	String query3 = "/Metadata/XML/GraphQuery?query=/WSRR/GenericObject[@bsrURI='%BSRURI%']/ale63_owningOrganization(.)[exactlyClassifiedByAllOf(.,'http://www.ibm.com/xmlns/prod/serviceregistry/v6r3/ALEModel%23Organization')]";
 	String query4= "/Metadata/XML/GraphQuery?query=/WSRR/GenericObject[@bsrURI='%BSRURI%']/gep63_provides(.)/gep63_availableEndpoints(.)";
 	String query5= "/Metadata/XML/GraphQuery?query=/WSRR/GenericObject[@bsrURI='%BSRURI%']";
-	String query6= "";
+	String query6= "dynamic";
+	String query7= "/Metadata/XML/GraphQuery?query=/WSRR/GenericObject[@bsrURI='%BSRURI%']/gep63_provides(.)/gep63_serviceInterface(.)"; //interfaccia
+	String query8= "/Metadata/XML/GraphQuery?query=/WSRR/GenericObject[@bsrURI='%BSRURI%']/gep63_provides(.)";
 
 	public WSRRToBusinessObject() {
 
@@ -47,9 +49,12 @@ public class WSRRToBusinessObject {
 		TWObject SV_BO = null;
 		TWObject BS_BO = null;
 		TWObject ACR_BO = null;
-		TWObject PROXY_BO = null;
+		TWObject INT_BO=null;
+		TWObject SLD_BO=null;
+		
 		TWObject EP_BO = null;
-
+		TWObject PROXY_BO = null;
+		
 		TWList EP_BO_REST_APPL=null;
 		TWList EP_BO_REST_SYST=null;
 		TWList EP_BO_REST_PROD=null;
@@ -80,6 +85,12 @@ public class WSRRToBusinessObject {
 		TWList EP_BO_WOLA_PROD=null;
 		TWList EP_BO_WOLA_UAT=null;
 		TWList EP_BO_WOLA_INDEP=null;
+		
+		TWList EP_BO_CICS_APPL=null;
+		TWList EP_BO_CICS_SYST=null;
+		TWList EP_BO_CICS_PROD=null;
+		TWList EP_BO_CICS_UAT=null;
+		TWList EP_BO_CICS_INDEP=null;
 
 		TWList EP_BO_MQ_APPL=null;
 		TWList EP_BO_MQ_SYST=null;
@@ -104,10 +115,10 @@ public class WSRRToBusinessObject {
 		final String MQ_EP="[bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, sm63_PGM_DEST, sm63_serviceVersion, sm63_EXPIRY, sm63_serviceName, sm63_DATA_PRIMO_UTILIZZO, sm63_LUNGH_OUT, sm63_endpointType, sm63_PGM_DEST_RISP,sm63_FLAG_3LINK, sm63_STATO_OPER, sm63_serviceNamespace, sm63_PGM_QUADRATURA, sm63_USO_SICUREZZA, sm63_ID_APPL, sm63_TIPO_OPER, sm63_LUNGH_IN, sm63_TRACCIATURA, sm63_ALTER_COLL, sm63_TGT_SERVER, sm63_PRIORITY, sm63_PGM_FORM, sm63_DATA_ULTIMO_UTILIZZO, sm63_CALL_HEADER, sm63_MOD_COLLOQUIO, sm63_Timeout, sm63_ID_TGT_DES, sm63_SPECIALIZZAZIONE, sm63_BACKOUT_COUNT]";
 		final String CICS_EP="[bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, sm63_serviceVersion, sm63_serviceName, sm63_DATA_PRIMO_UTILIZZO, sm63_endpointType, sm63_Stage, sm63_DATA_ULTIMO_UTILIZZO, sm63_Timeout, sm63_serviceNamespace, sm63_USO_SICUREZZA, sm63_SPECIALIZZAZIONE]";
 
-		final String SOAP_PROXY="[type, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, sm63_DATAPOWER_DEDICATO, sm63_FLG_USO_DATAPOWER_DEDICATO, sm63_ESPOSIZIONE, sm63_ESPOSTO_INTRANET, sm63_ERRORE_GENERAZIONE_WSPROXY, sm63_NOTE, sm63_FLG_ESP_CONTROPARTE_ESTERNA, sm63_FLG_ESPOSTO_SOCIETA_GRUPPO, sm63_NOTE_GEN_WSPROXY, sm63_SOCIETA_CHE_ESPONE_SERVIZIO, sm63_FLG_RICHIAMABILE_DA_CICS, sm63_FLG_CONTROPARTE_DSI, sm63_FLG_CONTROPARTE_INTERNET, sm63_Timeout]";
-		final String REST_PROXY="[type, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, sm63_DATAPOWER_DEDICATO, sm63_FLG_USO_DATAPOWER_DEDICATO, sm63_ESPOSIZIONE, sm63_ESPOSTO_INTRANET, sm63_ERRORE_GENERAZIONE_WSPROXY, sm63_NOTE, sm63_FLG_ESP_CONTROPARTE_ESTERNA, sm63_FLG_ESPOSTO_SOCIETA_GRUPPO, sm63_NOTE_GEN_WSPROXY, sm63_SOCIETA_CHE_ESPONE_SERVIZIO, sm63_FLG_RICHIAMABILE_DA_CICS, sm63_FLG_CONTROPARTE_DSI, sm63_FLG_CONTROPARTE_INTERNET, sm63_Timeout]";
-		final String CALLABLE_PROXY="[type, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, sm63_DATAPOWER_DEDICATO, sm63_FLG_USO_DATAPOWER_DEDICATO, sm63_ESPOSIZIONE, sm63_ESPOSTO_INTRANET, sm63_ERRORE_GENERAZIONE_WSPROXY, sm63_NOTE, sm63_FLG_ESP_CONTROPARTE_ESTERNA, sm63_FLG_ESPOSTO_SOCIETA_GRUPPO, sm63_NOTE_GEN_WSPROXY, sm63_SOCIETA_CHE_ESPONE_SERVIZIO, sm63_FLG_RICHIAMABILE_DA_CICS, sm63_FLG_CONTROPARTE_DSI, sm63_FLG_CONTROPARTE_INTERNET, sm63_Timeout]";
-		final String MQ_MANUAL="[type, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, sm63_serviceVersion, sm63_DATA_ULTIMO_UTILIZZO_MQM, sm63_PRODOTTO, sm63_DIR_ID_TGT_DES, sm63_serviceName, sm63_serviceNamespace, sm63_responseQMgr, sm63_portName, sm63_requestQMgr, sm63_MOD_COLLOQUIO_MQM, sm63_PROC_DEST, sm63_ID_MACCHINA, sm63_requestQName, sm63_DATA_PRIMO_UTILIZZO_MQM, sm63_PGM_AREE, sm63_responseQName]";
+		//final String SOAP_PROXY="[type, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, sm63_DATAPOWER_DEDICATO, sm63_FLG_USO_DATAPOWER_DEDICATO, sm63_ESPOSIZIONE, sm63_ESPOSTO_INTRANET, sm63_ERRORE_GENERAZIONE_WSPROXY, sm63_NOTE, sm63_FLG_ESP_CONTROPARTE_ESTERNA, sm63_FLG_ESPOSTO_SOCIETA_GRUPPO, sm63_NOTE_GEN_WSPROXY, sm63_SOCIETA_CHE_ESPONE_SERVIZIO, sm63_FLG_RICHIAMABILE_DA_CICS, sm63_FLG_CONTROPARTE_DSI, sm63_FLG_CONTROPARTE_INTERNET, sm63_Timeout]";
+		//final String REST_PROXY="[type, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, sm63_DATAPOWER_DEDICATO, sm63_FLG_USO_DATAPOWER_DEDICATO, sm63_ESPOSIZIONE, sm63_ESPOSTO_INTRANET, sm63_ERRORE_GENERAZIONE_WSPROXY, sm63_NOTE, sm63_FLG_ESP_CONTROPARTE_ESTERNA, sm63_FLG_ESPOSTO_SOCIETA_GRUPPO, sm63_NOTE_GEN_WSPROXY, sm63_SOCIETA_CHE_ESPONE_SERVIZIO, sm63_FLG_RICHIAMABILE_DA_CICS, sm63_FLG_CONTROPARTE_DSI, sm63_FLG_CONTROPARTE_INTERNET, sm63_Timeout]";
+		//final String CALLABLE_PROXY="[type, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, sm63_DATAPOWER_DEDICATO, sm63_FLG_USO_DATAPOWER_DEDICATO, sm63_ESPOSIZIONE, sm63_ESPOSTO_INTRANET, sm63_ERRORE_GENERAZIONE_WSPROXY, sm63_NOTE, sm63_FLG_ESP_CONTROPARTE_ESTERNA, sm63_FLG_ESPOSTO_SOCIETA_GRUPPO, sm63_NOTE_GEN_WSPROXY, sm63_SOCIETA_CHE_ESPONE_SERVIZIO, sm63_FLG_RICHIAMABILE_DA_CICS, sm63_FLG_CONTROPARTE_DSI, sm63_FLG_CONTROPARTE_INTERNET, sm63_Timeout]";
+		//final String MQ_MANUAL="[type, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, sm63_serviceVersion, sm63_DATA_ULTIMO_UTILIZZO_MQM, sm63_PRODOTTO, sm63_DIR_ID_TGT_DES, sm63_serviceName, sm63_serviceNamespace, sm63_responseQMgr, sm63_portName, sm63_requestQMgr, sm63_MOD_COLLOQUIO_MQM, sm63_PROC_DEST, sm63_ID_MACCHINA, sm63_requestQName, sm63_DATA_PRIMO_UTILIZZO_MQM, sm63_PGM_AREE, sm63_responseQName]";
 		
 		query1 = query1.replaceAll("%CATALOGNAME%", name).replaceAll("%VERSION%", version);
 		String result;
@@ -137,9 +148,55 @@ public class WSRRToBusinessObject {
 		String target="UNDEF";
 
 		try {
+			NBP_BO = (TWObject) TWObjectFactory.createObject();
 			BS_BO = (TWObject) TWObjectFactory.createObject();
 			SV_BO = (TWObject) TWObjectFactory.createObject();
 			ACR_BO =(TWObject) TWObjectFactory.createObject();
+			INT_BO =(TWObject) TWObjectFactory.createObject();
+			SLD_BO =(TWObject) TWObjectFactory.createObject();
+			
+			EP_BO_REST_APPL=TWObjectFactory.createList();
+			EP_BO_REST_SYST=TWObjectFactory.createList();
+			EP_BO_REST_PROD=TWObjectFactory.createList();
+			EP_BO_REST_UAT=TWObjectFactory.createList();
+			EP_BO_REST_INDEP=TWObjectFactory.createList();
+
+
+			EP_BO_SOAP_APPL=TWObjectFactory.createList();
+		    EP_BO_SOAP_SYST=TWObjectFactory.createList();
+			EP_BO_SOAP_PROD=TWObjectFactory.createList();
+			EP_BO_SOAP_UAT=TWObjectFactory.createList();
+			EP_BO_SOAP_INDEP=TWObjectFactory.createList();
+
+			EP_BO_CALLABLE_APPL=TWObjectFactory.createList();
+			EP_BO_CALLABLE_SYST=TWObjectFactory.createList();
+			EP_BO_CALLABLE_PROD=TWObjectFactory.createList();
+			EP_BO_CALLABLE_UAT=TWObjectFactory.createList();
+			EP_BO_CALLABLE_INDEP=TWObjectFactory.createList();
+
+			EP_BO_ZRES_APPL=TWObjectFactory.createList();
+			EP_BO_ZRES_SYST=TWObjectFactory.createList();
+			EP_BO_ZRES_PROD=TWObjectFactory.createList();
+			EP_BO_ZRES_UAT=TWObjectFactory.createList();
+			EP_BO_ZRES_INDEP=TWObjectFactory.createList();
+
+			EP_BO_WOLA_APPL=TWObjectFactory.createList();
+			EP_BO_WOLA_SYST=TWObjectFactory.createList();
+			EP_BO_WOLA_PROD=TWObjectFactory.createList();
+			EP_BO_WOLA_UAT=TWObjectFactory.createList();
+			EP_BO_WOLA_INDEP=TWObjectFactory.createList();
+			
+			EP_BO_CICS_APPL=TWObjectFactory.createList();
+			EP_BO_CICS_SYST=TWObjectFactory.createList();
+			EP_BO_CICS_PROD=TWObjectFactory.createList();
+			EP_BO_CICS_UAT=TWObjectFactory.createList();
+			EP_BO_CICS_INDEP=TWObjectFactory.createList();
+
+			EP_BO_MQ_APPL=TWObjectFactory.createList();
+			EP_BO_MQ_SYST=TWObjectFactory.createList();
+			EP_BO_MQ_PROD=TWObjectFactory.createList();
+			EP_BO_MQ_UAT=TWObjectFactory.createList();
+			EP_BO_MQ_INDEP=TWObjectFactory.createList();
 
 
 			doc = (Document) xpath.evaluate("/", source, XPathConstants.NODE);
@@ -159,17 +216,19 @@ public class WSRRToBusinessObject {
 			}
 
 			SV_BO=WSRRToBusinessObject.makeBO(result, type, subType, url, user, password);
+			
+			NBP_BO.setPropertyValue("SV",SV_BO);
 
 			//Ho trovato il Service Version ora recupero il Business Service
-
-			//Ricavo il nome del servizio 
 
 			query2=query2.replaceAll("%CATALOGNAME%", name).replaceAll("%TYPE%", type.substring(0, type.length()-7));
 
 			result = wsrrutility.generalWSRRQuery(query2, url, user, password);
 
 			BS_BO=WSRRToBusinessObject.makeBO(result, type.substring(0, type.length()-7), subType, url, user, password);
-
+			
+			NBP_BO.setPropertyValue("BS",SV_BO);
+			
 			//Ricavo acronimo
 
 			query3=query3.replaceAll("%BSRURI%", (String) BS_BO.getPropertyValue("bsrURI"));
@@ -177,6 +236,28 @@ public class WSRRToBusinessObject {
 			result = wsrrutility.generalWSRRQuery(query3, url, user, password);
 
 			ACR_BO=WSRRToBusinessObject.makeBO(result, "Organization", null, url, user, password);
+			
+			NBP_BO.setPropertyValue("ACRO",ACR_BO);
+			
+			//Ricavo Interfaccia
+			
+			query7=query7.replaceAll("%BSRURI%", (String) SV_BO.getPropertyValue("bsrURI"));
+			
+			result = wsrrutility.generalWSRRQuery(query7, url, user, password);
+			
+			INT_BO=WSRRToBusinessObject.makeBO(result, "Interface", null, url, user, password);
+			
+			NBP_BO.setPropertyValue("INT",INT_BO);
+			
+			//Ricavo SLD
+			
+			query8=query8.replaceAll("%BSRURI%", (String) SV_BO.getPropertyValue("bsrURI"));
+			
+			result = wsrrutility.generalWSRRQuery(query8, url, user, password);
+			
+			SLD_BO=WSRRToBusinessObject.makeBO(result, "SLD", null, url, user, password);
+			
+			SLD_BO.setPropertyValue("SLD",ACR_BO);
 
 			//Ricavo Endpoint
 
@@ -267,10 +348,6 @@ public class WSRRToBusinessObject {
 
 						relation=null;
 						proxybsrURI=null;
-						
-						System.out.println("THE TYPE "+type);
-						System.out.println("THE TARGET "+target);
-
 						proxy=null;
 						
 						for (int i = 1; i <= count; i++) {
@@ -333,6 +410,7 @@ public class WSRRToBusinessObject {
 						}
 
 						//navigo le prorieta' del singolo endpoint
+						
 						count = Integer.parseInt(xpath.evaluate("count(/resources/resource["+String.valueOf(ii)+"]/properties/property)", doc));
 
 						for (int i = 1; i <= count; i++) {
@@ -377,7 +455,7 @@ public class WSRRToBusinessObject {
 
 						}
 
-						NBP_BO = (TWObject) TWObjectFactory.createObject();
+						//NBP_BO = (TWObject) TWObjectFactory.createObject();
 						System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 						System.out.println("type - "+type);
 						System.out.println("environment  - "+environment);
@@ -387,25 +465,314 @@ public class WSRRToBusinessObject {
 						//}
 						
 						System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-						//ho letto tutti i dati compongo il BO globale
-						//NBP_BO = (TWObject) TWObjectFactory.createObject();
-		
-						//type - proxy
-						
-						
-						//System.out.println("V1OOOOOOOOOOOOOOOOOOOOOOOOOOO = "+type);
-						//System.out.println("V2OOOOOOOOOOOOOOOOOOOOOOOOOOO = "+environment);
-						//System.out.println("V3OOOOOOOOOOOOOOOOOOOOOOOOOOO = "+proxy);
-						//System.out.println("V4OOOOOOOOOOOOOOOOOOOOOOOOOOO = "+proxybsrURI);
 
-						//System.out.println(NBP_BO.getPropertyNames());
+						if (proxy !=null) {
+							
+							EP_BO.setPropertyValue("PROXY", PROXY_BO); //collego proxy/MQManual a endpoint
+						}
+						
+						////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////77
 
+						int a=0;
+						
+						if (type.equals(SOAP_EP)) {
+							
+							switch(environment) {
+							
+							case "Application":
+								System.out.println("PASSO!");
+								EP_BO_SOAP_APPL.addArrayData(EP_BO_SOAP_APPL.getArraySize(), EP_BO);
+								 break;
+								 
+							case "SystemTest":
+								System.out.println("PASSO!");
+								EP_BO_SOAP_SYST.addArrayData(EP_BO_SOAP_SYST.getArraySize(), EP_BO);
+								 break;
+								 
+							case "Produzione":
+								System.out.println("PASSO!");
+								EP_BO_SOAP_PROD.addArrayData(EP_BO_SOAP_PROD.getArraySize(), EP_BO);
+								 break;
+								 
+							case "UserAcceptanceTest":
+								System.out.println("PASSO!");
+								EP_BO_SOAP_UAT.addArrayData(EP_BO_SOAP_UAT.getArraySize(), EP_BO);
+								 break;
+
+							case "IndipendentTest":
+								System.out.println("PASSO!");
+								EP_BO_SOAP_INDEP.addArrayData(EP_BO_SOAP_INDEP.getArraySize(), EP_BO);
+								 break;
+								 
+							}							
+						}
+
+						if (type.equals(REST_EP)) {
+							
+							switch(environment) {
+							
+							case "Application":
+								System.out.println("PASSO!");
+								EP_BO_REST_APPL.addArrayData(EP_BO_REST_APPL.getArraySize(), EP_BO);
+								 break;
+								 
+							case "SystemTest":
+								System.out.println("PASSO!");
+								EP_BO_REST_SYST.addArrayData(EP_BO_REST_SYST.getArraySize(), EP_BO);
+								 break;
+								 
+							case "Produzione":
+								System.out.println("PASSO!");
+								EP_BO_REST_PROD.addArrayData(EP_BO_REST_PROD.getArraySize(), EP_BO);
+								 break;
+								 
+							case "UserAcceptanceTest":
+								System.out.println("PASSO!");
+								EP_BO_REST_UAT.addArrayData(EP_BO_REST_UAT.getArraySize(), EP_BO);
+								 break;
+
+							case "IndipendentTest":
+								System.out.println("PASSO!");
+								EP_BO_REST_INDEP.addArrayData(EP_BO_REST_INDEP.getArraySize(), EP_BO);
+								 break;
+								 
+							}						
+						}
+
+						if (type.equals(CALLABLE_EP)) {
+							
+							switch(environment) {
+							
+							case "Application":
+								System.out.println("PASSO!");
+								EP_BO_CALLABLE_APPL.addArrayData(EP_BO_CALLABLE_APPL.getArraySize(), EP_BO);
+								 break;
+								 
+							case "SystemTest":
+								System.out.println("PASSO!");
+								EP_BO_CALLABLE_SYST.addArrayData(EP_BO_CALLABLE_SYST.getArraySize(), EP_BO);
+								 break;
+								 
+							case "Produzione":
+								System.out.println("PASSO!");
+								EP_BO_CALLABLE_PROD.addArrayData(EP_BO_CALLABLE_PROD.getArraySize(), EP_BO);
+								 break;
+								 
+							case "UserAcceptanceTest":
+								System.out.println("PASSO!");
+								EP_BO_CALLABLE_UAT.addArrayData(EP_BO_CALLABLE_UAT.getArraySize(), EP_BO);
+								 break;
+
+							case "IndipendentTest":
+								System.out.println("PASSO!");
+								EP_BO_CALLABLE_INDEP.addArrayData(EP_BO_CALLABLE_INDEP.getArraySize(), EP_BO);
+								 break;
+								 
+							}							
+						}
+						
+						if (type.equals(WOLA_EP)) {
+							
+							switch(environment) {
+							
+							case "Application":
+								System.out.println("PASSO!");
+								EP_BO_WOLA_APPL.addArrayData(EP_BO_WOLA_APPL.getArraySize(), EP_BO);
+								 break;
+								 
+							case "SystemTest":
+								System.out.println("PASSO!");
+								EP_BO_WOLA_SYST.addArrayData(EP_BO_WOLA_SYST.getArraySize(), EP_BO);
+								 break;
+								 
+							case "Produzione":
+								System.out.println("PASSO!");
+								EP_BO_WOLA_PROD.addArrayData(EP_BO_WOLA_PROD.getArraySize(), EP_BO);
+								 break;
+								 
+							case "UserAcceptanceTest":
+								System.out.println("PASSO!");
+								EP_BO_WOLA_UAT.addArrayData(EP_BO_WOLA_UAT.getArraySize(), EP_BO);
+								 break;
+
+							case "IndipendentTest":
+								System.out.println("PASSO!");
+								EP_BO_WOLA_INDEP.addArrayData(EP_BO_WOLA_INDEP.getArraySize(), EP_BO);
+								 break;
+								 
+							}								
+						}
+
+						if (type.equals(ZRES_EP)) {
+							
+							switch(environment) {
+							
+							case "Application":
+								System.out.println("PASSO!");
+								EP_BO_ZRES_APPL.addArrayData(EP_BO_ZRES_APPL.getArraySize(), EP_BO);
+								 break;
+								 
+							case "SystemTest":
+								System.out.println("PASSO!");
+								EP_BO_ZRES_SYST.addArrayData(EP_BO_ZRES_SYST.getArraySize(), EP_BO);
+								 break;
+								 
+							case "Produzione":
+								System.out.println("PASSO!");
+								EP_BO_ZRES_PROD.addArrayData(EP_BO_ZRES_PROD.getArraySize(), EP_BO);
+								 break;
+								 
+							case "UserAcceptanceTest":
+								System.out.println("PASSO!");
+								EP_BO_ZRES_UAT.addArrayData(EP_BO_ZRES_UAT.getArraySize(), EP_BO);
+								 break;
+
+							case "IndipendentTest":
+								System.out.println("PASSO!");
+								EP_BO_ZRES_INDEP.addArrayData(EP_BO_ZRES_INDEP.getArraySize(), EP_BO);
+								 break;
+								 
+							}						
+						}
+
+						if (type.equals(CICS_EP)) {
+							
+							switch(environment) {
+							
+							case "Application":
+								System.out.println("PASSO!");
+								EP_BO_CICS_APPL.addArrayData(EP_BO_CICS_APPL.getArraySize(), EP_BO);
+								 break;
+								 
+							case "SystemTest":
+								System.out.println("PASSO!");
+								EP_BO_CICS_SYST.addArrayData(EP_BO_CICS_SYST.getArraySize(), EP_BO);
+								 break;
+								 
+							case "Produzione":
+								System.out.println("PASSO!");
+								EP_BO_CICS_PROD.addArrayData(EP_BO_CICS_PROD.getArraySize(), EP_BO);
+								 break;
+								 
+							case "UserAcceptanceTest":
+								System.out.println("PASSO!");
+								EP_BO_CICS_UAT.addArrayData(EP_BO_CICS_UAT.getArraySize(), EP_BO);
+								 break;
+
+							case "IndipendentTest":
+								System.out.println("PASSO!");
+								EP_BO_CICS_INDEP.addArrayData(EP_BO_CICS_INDEP.getArraySize(), EP_BO);
+								 break;
+								 
+							}
+
+						}
+						
+						if (type.equals(MQ_EP) ) {
+							
+							switch(environment) {
+							
+							case "Application":
+								System.out.println("PASSO!");
+								EP_BO_MQ_APPL.addArrayData(EP_BO_MQ_APPL.getArraySize(), EP_BO);
+								 break;
+								 
+							case "SystemTest":
+								System.out.println("PASSO!");
+								EP_BO_MQ_SYST.addArrayData(EP_BO_MQ_SYST.getArraySize(), EP_BO);
+								 break;
+								 
+							case "Produzione":
+								System.out.println("PASSO!");
+								EP_BO_MQ_PROD.addArrayData(EP_BO_MQ_PROD.getArraySize(), EP_BO);
+								 break;
+								 
+							case "UserAcceptanceTest":
+								System.out.println("PASSO!");
+								EP_BO_MQ_UAT.addArrayData(EP_BO_MQ_UAT.getArraySize(), EP_BO);
+								 break;
+
+							case "IndipendentTest":
+								System.out.println("PASSO!");
+								EP_BO_MQ_INDEP.addArrayData(EP_BO_MQ_INDEP.getArraySize(), EP_BO);
+								 break;
+								 
+							}
+											
+						}
 
 					}
+					//aggancio all'oggetto NBP_BO tutte li tipologia di endpoint
+					NBP_BO.setPropertyValue("ENDPOINT_SOAP_APPL",EP_BO_SOAP_APPL);
+					NBP_BO.setPropertyValue("ENDPOINT_SOAP_SYST",EP_BO_SOAP_SYST);
+					NBP_BO.setPropertyValue("ENDPOINT_SOAP_PROD",EP_BO_SOAP_PROD);
+					NBP_BO.setPropertyValue("ENDPOINT_SOAP_UAT",EP_BO_SOAP_UAT);
+					NBP_BO.setPropertyValue("ENDPOINT_SOAP_INDEP",EP_BO_SOAP_INDEP);
 
-
-
-
+					NBP_BO.setPropertyValue("ENDPOINT_REST_APPL",EP_BO_REST_APPL);
+					NBP_BO.setPropertyValue("ENDPOINT_REST_SYST",EP_BO_REST_SYST);
+					NBP_BO.setPropertyValue("ENDPOINT_REST_PROD",EP_BO_REST_PROD);
+					NBP_BO.setPropertyValue("ENDPOINT_REST_UAT",EP_BO_REST_UAT);
+					NBP_BO.setPropertyValue("ENDPOINT_REST_INDEP",EP_BO_REST_INDEP);
+					
+					NBP_BO.setPropertyValue("ENDPOINT_CALLABLE_APPL",EP_BO_CALLABLE_APPL);
+					NBP_BO.setPropertyValue("ENDPOINT_CALLABLE_SYST",EP_BO_CALLABLE_SYST);
+					NBP_BO.setPropertyValue("ENDPOINT_CALLABLE_PROD",EP_BO_CALLABLE_PROD);
+					NBP_BO.setPropertyValue("ENDPOINT_CALLABLE_UAT",EP_BO_CALLABLE_UAT);
+					NBP_BO.setPropertyValue("ENDPOINT_CALLABLE_INDEP",EP_BO_CALLABLE_INDEP);
+					
+					NBP_BO.setPropertyValue("ENDPOINT_ZRES_APPL",EP_BO_ZRES_APPL);
+					NBP_BO.setPropertyValue("ENDPOINT_ZRES_SYST",EP_BO_ZRES_SYST);
+					NBP_BO.setPropertyValue("ENDPOINT_ZRES_PROD",EP_BO_ZRES_PROD);
+					NBP_BO.setPropertyValue("ENDPOINT_ZRES_UAT",EP_BO_ZRES_UAT);
+					NBP_BO.setPropertyValue("ENDPOINT_ZRES_INDEP",EP_BO_ZRES_INDEP);
+					
+					NBP_BO.setPropertyValue("ENDPOINT_WOLA_APPL",EP_BO_WOLA_APPL);
+					NBP_BO.setPropertyValue("ENDPOINT_WOLA_SYST",EP_BO_WOLA_SYST);
+					NBP_BO.setPropertyValue("ENDPOINT_WOLA_PROD",EP_BO_WOLA_PROD);
+					NBP_BO.setPropertyValue("ENDPOINT_WOLA_UAT",EP_BO_WOLA_UAT);
+					NBP_BO.setPropertyValue("ENDPOINT_WOLA_INDEP",EP_BO_WOLA_INDEP);
+					
+					NBP_BO.setPropertyValue("ENDPOINT_CICS_APPL",EP_BO_CICS_APPL);
+					NBP_BO.setPropertyValue("ENDPOINT_CICS_SYST",EP_BO_CICS_SYST);
+					NBP_BO.setPropertyValue("ENDPOINT_CICS_PROD",EP_BO_CICS_PROD);
+					NBP_BO.setPropertyValue("ENDPOINT_CICS_UAT",EP_BO_CICS_UAT);
+					NBP_BO.setPropertyValue("ENDPOINT_CICS_INDEP",EP_BO_CICS_INDEP);
+					
+					NBP_BO.setPropertyValue("ENDPOINT_MQ_APPL",EP_BO_CICS_APPL);
+					NBP_BO.setPropertyValue("ENDPOINT_MQ_SYST",EP_BO_CICS_SYST);
+					NBP_BO.setPropertyValue("ENDPOINT_MQ_PROD",EP_BO_CICS_PROD);
+					NBP_BO.setPropertyValue("ENDPOINT_MQ_UAT",EP_BO_CICS_UAT);
+					NBP_BO.setPropertyValue("ENDPOINT_MQ_INDEP",EP_BO_CICS_INDEP);
+					
+					System.out.println("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
+					System.out.println(NBP_BO.toXMLString().toString());
+					System.out.println("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
+					System.out.println(EP_BO_SOAP_APPL.getArraySize());
+					System.out.println(EP_BO_SOAP_SYST.getArraySize());
+					System.out.println(EP_BO_SOAP_PROD.getArraySize());
+					System.out.println(EP_BO_SOAP_UAT.getArraySize());
+					System.out.println(EP_BO_SOAP_INDEP.getArraySize());
+					/*
+					System.out.println(EP_BO_ZRES_APPL.getArraySize());
+					System.out.println(EP_BO_ZRES_APPL.getArraySize());
+					System.out.println(EP_BO_ZRES_APPL.getArraySize());
+					System.out.println(EP_BO_ZRES_APPL.getArraySize());
+					System.out.println(EP_BO_ZRES_APPL.getArraySize());
+					System.out.println(EP_BO_ZRES_APPL.getArraySize());
+					System.out.println(EP_BO_ZRES_APPL.getArraySize());
+					System.out.println(EP_BO_ZRES_APPL.getArraySize());
+					System.out.println(EP_BO_ZRES_APPL.getArraySize());
+					System.out.println(EP_BO_ZRES_APPL.getArraySize());
+					System.out.println(EP_BO_ZRES_APPL.getArraySize());
+					System.out.println(EP_BO_ZRES_APPL.getArraySize());
+					System.out.println(EP_BO_ZRES_APPL.getArraySize());
+					System.out.println(EP_BO_ZRES_APPL.getArraySize());
+					System.out.println(EP_BO_ZRES_APPL.getArraySize());
+					*/
+					System.out.println("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
+					
+					
 				} catch (Exception e) {
 
 					System.out.println("*********************************************KO************************************+");
@@ -451,14 +818,16 @@ public class WSRRToBusinessObject {
 		final String SOPEN = " [type, subType, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, gep63_ABILITAZ_INFRASTR, gep63_DESC_ESTESA, gep63_SOPEN_LINK_SIN_APPS_EST, gep63_SOPEN_ATTACHMENT_TYPE, gep63_SOPEN_DOWNTIME_PIANIFICATO, gep63_SOPEN_REPS0, ale63_assetType, gep63_SOPEN_NUM_CHIAMATE_PICCO, ale63_guid, gep63_SOPEN_RIF_CHIAMANTI_EST, gep63_SOPEN_STATO_ATTUALE_FUNZ, ale63_remoteState, gep63_DATA_RITIRO_SERV, gep63_MATR_RICH_CREAZIONE, ale63_assetOwners, gep63_FLG_CTRL_TIPOLOGIA, gep63_PIATT_EROG, gep63_MATR_RICH_MODIFICA, gep63_DISP_SERV, gep63_PID_PROCESSO_GOV, gep63_SOPEN_RIF_CHIAMANTI_INT, gep63_TIPOLOGIA, gep63_MATR_PUBBLICATORE_CREAZ_SERV, gep63_SOPEN_EAR_SERVIZIO, gep63_SOPEN_AMBIENTE_FISICO, gep63_DERIVANTE_DA_ALTRI_SERV, gep63_VINCOLI_RIUSO, gep63_ATTIVATO_IN_PROD, gep63_INFO_COSTO, gep63_consumerIdentifier, gep63_SOPEN_VOLUME_GIORN, gep63_SOPEN_AMBITO_IMPLEMENTAZIONE, gep63_UTILIZ_PIU_BAN_CLONI, ale63_ownerEmail, gep63_ATTIVATO_IN_SYST, gep63_SOPEN_DIM_MAX_MSG, ale63_communityName, gep63_DATA_PUBBL_CREAZ_SERV, gep63_SECURITY_ROLE, gep63_NOME_SERVIZIO_PRECEDENTE, gep63_SOPEN_DIM_MIN_MSG, gep63_SOPEN_FLG_CONTIENE_ATTACHMENT, ale63_fullDescription, gep63_ATTIVATO_IN_APPL, gep63_TIPOLOGIA_OGGETTO_ESISTENTE, gep63_versionTerminationDate, gep63_DOC_ANALISI_FUNZIONALE, gep63_versionAvailabilityDate, gep63_DOC_ANALISI_DETTAGLIO, gep63_DOC_ANALISI_TECNICA, ale63_requirementsLink, ale63_assetWebLink]";
 		final String SERVICEVERSION="[type, subType, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, ale63_remoteState, ale63_communityName, ale63_assetOwners, ale63_assetType, ale63_guid, ale63_fullDescription, ale63_ownerEmail, ale63_requirementsLink, ale63_assetWebLink]";
 		final String ACRONIMO="[bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, ale63_RESP_FUNZIONALE_MATRICOLA, ale63_RESP_ATTIVITA_NOMINATIVO, ale63_RESP_FUNZIONALE_NOMINATIVO, ale63_DESC_AMBITO, ale63_RESP_SERVIZIO_NOMINATIVO, ale63_contact, ale63_contactEmail, ale63_CODICE_SISTEMA_APPLICATIVO, ale63_RESP_ATTIVITA_MATRICOLA, ale63_RESP_SERVIZIO_MATRICOLA, ale63_RESP_UFFICIO_MATRICOLA, ale63_RESP_TECNICO_MATRICOLA, ale63_RESP_UFFICIO_NOMINATIVO, ale63_RESP_TECNICO_NOMINATIVO, ale63_AMBITO]";
+		
+		final String INTERF="[type, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, sm63_interfaceVersion,sm63_interfaceNamespace, sm63_interfaceName, rest80_webLink]";
+		final String SLD="[type, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, gep63_consumerIdentifierLocationInfo, gep63_contextIdentifierLocationInfo]";
 		final String SOAP_PROXY="[type, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, sm63_DATAPOWER_DEDICATO, sm63_FLG_USO_DATAPOWER_DEDICATO, sm63_ESPOSIZIONE, sm63_ESPOSTO_INTRANET, sm63_ERRORE_GENERAZIONE_WSPROXY, sm63_NOTE, sm63_FLG_ESP_CONTROPARTE_ESTERNA, sm63_FLG_ESPOSTO_SOCIETA_GRUPPO, sm63_NOTE_GEN_WSPROXY, sm63_SOCIETA_CHE_ESPONE_SERVIZIO, sm63_FLG_RICHIAMABILE_DA_CICS, sm63_FLG_CONTROPARTE_DSI, sm63_FLG_CONTROPARTE_INTERNET, sm63_Timeout]";
 		final String REST_PROXY="[type, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, sm63_DATAPOWER_DEDICATO, sm63_FLG_USO_DATAPOWER_DEDICATO, sm63_ESPOSIZIONE, sm63_ESPOSTO_INTRANET, sm63_ERRORE_GENERAZIONE_WSPROXY, sm63_NOTE, sm63_FLG_ESP_CONTROPARTE_ESTERNA, sm63_FLG_ESPOSTO_SOCIETA_GRUPPO, sm63_NOTE_GEN_WSPROXY, sm63_SOCIETA_CHE_ESPONE_SERVIZIO, sm63_FLG_RICHIAMABILE_DA_CICS, sm63_FLG_CONTROPARTE_DSI, sm63_FLG_CONTROPARTE_INTERNET, sm63_Timeout]";
 		final String CALLABLE_PROXY="[type, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, sm63_DATAPOWER_DEDICATO, sm63_FLG_USO_DATAPOWER_DEDICATO, sm63_ESPOSIZIONE, sm63_ESPOSTO_INTRANET, sm63_ERRORE_GENERAZIONE_WSPROXY, sm63_NOTE, sm63_FLG_ESP_CONTROPARTE_ESTERNA, sm63_FLG_ESPOSTO_SOCIETA_GRUPPO, sm63_NOTE_GEN_WSPROXY, sm63_SOCIETA_CHE_ESPONE_SERVIZIO, sm63_FLG_RICHIAMABILE_DA_CICS, sm63_FLG_CONTROPARTE_DSI, sm63_FLG_CONTROPARTE_INTERNET, sm63_Timeout]";
 		final String MQ_MANUAL="[type, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, sm63_serviceVersion, sm63_DATA_ULTIMO_UTILIZZO_MQM, sm63_PRODOTTO, sm63_DIR_ID_TGT_DES, sm63_serviceName, sm63_serviceNamespace, sm63_responseQMgr, sm63_portName, sm63_requestQMgr, sm63_MOD_COLLOQUIO_MQM, sm63_PROC_DEST, sm63_ID_MACCHINA, sm63_requestQName, sm63_DATA_PRIMO_UTILIZZO_MQM, sm63_PGM_AREE, sm63_responseQName]";
 		String target = "UNDEF";
 
-
-		TWObject NBP_BO = null;
+		TWObject CURRENT_BO = null;
 
 		if (data == null)
 			return null;
@@ -474,7 +843,7 @@ public class WSRRToBusinessObject {
 		String value_ = null;
 
 		try {
-			NBP_BO = (TWObject) TWObjectFactory.createObject();
+			CURRENT_BO = (TWObject) TWObjectFactory.createObject();
 
 			doc = (Document) xpath.evaluate("/", source, XPathConstants.NODE);
 			count = Integer.parseInt(xpath.evaluate("count(/resources/resource/properties/property)", doc));
@@ -500,6 +869,12 @@ public class WSRRToBusinessObject {
 			if (type != null && type.indexOf("Organization") != -1 && target.equals("UNDEF"))
 				target = ACRONIMO;
 			
+			if (type != null && type.indexOf("Interface") != -1 && target.equals("UNDEF"))
+				target = INTERF;
+			
+			if (type != null && type.indexOf("SLD") != -1 && target.equals("UNDEF"))
+				target = SLD;
+						
 			if (type != null && type.indexOf("SOAP") != -1 && target.equals("UNDEF"))
 				target = SOAP_PROXY;
 			
@@ -512,9 +887,9 @@ public class WSRRToBusinessObject {
 			if (type != null && type.indexOf("MQMANUAL") != -1 && target.equals("UNDEF"))
 				target = MQ_MANUAL;
 
-			if( type != null) NBP_BO.setPropertyValue("type", type);
+			if( type != null) CURRENT_BO.setPropertyValue("type", type);
 
-			if (subType != null) NBP_BO.setPropertyValue("subType", subType);
+			if (subType != null) CURRENT_BO.setPropertyValue("subType", subType);
 
 			System.out.println(target);
 
@@ -525,8 +900,8 @@ public class WSRRToBusinessObject {
 				current_ = (String) xpath.evaluate(current, doc);
 				value_ = (String) xpath.evaluate(value, doc);
 
-				if (target.indexOf(current_) != -1) {
-				//if (true) {
+				 if (target.indexOf(current_) != -1) {
+				 //if (true) {
 
 					if (current_.equals("namespace"))
 						current_ = "nspace";
@@ -535,7 +910,7 @@ public class WSRRToBusinessObject {
 						value_ = "";
 
 					//System.out.println("********>>>>> "+current_+"="+value_);
-					NBP_BO.setPropertyValue(current_, value_);
+					CURRENT_BO.setPropertyValue(current_, value_);
 
 					current = null;
 					current_ = null;
@@ -546,21 +921,23 @@ public class WSRRToBusinessObject {
 
 					System.out.println("Bypass_for "+current_ +" 4 type "+type);
 				}
-
 			}
+			
+			System.out.println("THETYPE"+type);
 
-			System.out.println(">>>" +NBP_BO.getPropertyNames());
+			System.out.println(">>>" +CURRENT_BO.getPropertyNames());
 
 
 		} catch (Exception e) {
 
 			System.out.println("*********************************************KO************************************+");
 			System.out.println(e.getMessage());
+			System.out.println("GRAVIE");
 			System.out.println("*********************************************KO************************************+");
 			e.printStackTrace();
 		}
 
-		return NBP_BO;
+		return CURRENT_BO;
 	}
 
 
