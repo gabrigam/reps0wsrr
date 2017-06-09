@@ -470,27 +470,23 @@ public class WSRRToBusinessObject {
 							
 							EP_BO.setPropertyValue("PROXY", PROXY_BO); //collego proxy/MQManual a endpoint
 						}
-						
 						////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////77
 
 						int a=0;
 						
-						if (type.equals(SOAP_EP)) {
+						if (type.equals("SOAP_EP")) {
 							
 							switch(environment) {
 							
 							case "Application":
-								System.out.println("PASSO!");
 								EP_BO_SOAP_APPL.addArrayData(EP_BO_SOAP_APPL.getArraySize(), EP_BO);
 								 break;
 								 
 							case "SystemTest":
-								System.out.println("PASSO!");
 								EP_BO_SOAP_SYST.addArrayData(EP_BO_SOAP_SYST.getArraySize(), EP_BO);
 								 break;
 								 
 							case "Produzione":
-								System.out.println("PASSO!");
 								EP_BO_SOAP_PROD.addArrayData(EP_BO_SOAP_PROD.getArraySize(), EP_BO);
 								 break;
 								 
@@ -507,160 +503,160 @@ public class WSRRToBusinessObject {
 							}							
 						}
 
-						if (type.equals(REST_EP)) {
+						if (type.equals("REST_EP")) {
 							
 							switch(environment) {
 							
 							case "Application":
-								System.out.println("PASSO!");
+								
 								EP_BO_REST_APPL.addArrayData(EP_BO_REST_APPL.getArraySize(), EP_BO);
 								 break;
 								 
 							case "SystemTest":
-								System.out.println("PASSO!");
+								
 								EP_BO_REST_SYST.addArrayData(EP_BO_REST_SYST.getArraySize(), EP_BO);
 								 break;
 								 
 							case "Produzione":
-								System.out.println("PASSO!");
+							
 								EP_BO_REST_PROD.addArrayData(EP_BO_REST_PROD.getArraySize(), EP_BO);
 								 break;
 								 
 							case "UserAcceptanceTest":
-								System.out.println("PASSO!");
+								
 								EP_BO_REST_UAT.addArrayData(EP_BO_REST_UAT.getArraySize(), EP_BO);
 								 break;
 
 							case "IndipendentTest":
-								System.out.println("PASSO!");
+								
 								EP_BO_REST_INDEP.addArrayData(EP_BO_REST_INDEP.getArraySize(), EP_BO);
 								 break;
 								 
 							}						
 						}
 
-						if (type.equals(CALLABLE_EP)) {
+						if (type.equals("CALLABLE_EP")) {
 							
 							switch(environment) {
 							
 							case "Application":
-								System.out.println("PASSO!");
+							
 								EP_BO_CALLABLE_APPL.addArrayData(EP_BO_CALLABLE_APPL.getArraySize(), EP_BO);
 								 break;
 								 
 							case "SystemTest":
-								System.out.println("PASSO!");
+								
 								EP_BO_CALLABLE_SYST.addArrayData(EP_BO_CALLABLE_SYST.getArraySize(), EP_BO);
 								 break;
 								 
 							case "Produzione":
-								System.out.println("PASSO!");
+							
 								EP_BO_CALLABLE_PROD.addArrayData(EP_BO_CALLABLE_PROD.getArraySize(), EP_BO);
 								 break;
 								 
 							case "UserAcceptanceTest":
-								System.out.println("PASSO!");
+								
 								EP_BO_CALLABLE_UAT.addArrayData(EP_BO_CALLABLE_UAT.getArraySize(), EP_BO);
 								 break;
 
 							case "IndipendentTest":
-								System.out.println("PASSO!");
+								
 								EP_BO_CALLABLE_INDEP.addArrayData(EP_BO_CALLABLE_INDEP.getArraySize(), EP_BO);
 								 break;
 								 
 							}							
 						}
 						
-						if (type.equals(WOLA_EP)) {
+						if (type.equals("WOLA_EP")) {
 							
 							switch(environment) {
 							
 							case "Application":
-								System.out.println("PASSO!");
+								
 								EP_BO_WOLA_APPL.addArrayData(EP_BO_WOLA_APPL.getArraySize(), EP_BO);
 								 break;
 								 
 							case "SystemTest":
-								System.out.println("PASSO!");
+								
 								EP_BO_WOLA_SYST.addArrayData(EP_BO_WOLA_SYST.getArraySize(), EP_BO);
 								 break;
 								 
 							case "Produzione":
-								System.out.println("PASSO!");
+								
 								EP_BO_WOLA_PROD.addArrayData(EP_BO_WOLA_PROD.getArraySize(), EP_BO);
 								 break;
 								 
 							case "UserAcceptanceTest":
-								System.out.println("PASSO!");
+								
 								EP_BO_WOLA_UAT.addArrayData(EP_BO_WOLA_UAT.getArraySize(), EP_BO);
 								 break;
 
 							case "IndipendentTest":
-								System.out.println("PASSO!");
+								
 								EP_BO_WOLA_INDEP.addArrayData(EP_BO_WOLA_INDEP.getArraySize(), EP_BO);
 								 break;
 								 
 							}								
 						}
 
-						if (type.equals(ZRES_EP)) {
+						if (type.equals("ZRES_EP")) {
 							
 							switch(environment) {
 							
 							case "Application":
-								System.out.println("PASSO!");
+								
 								EP_BO_ZRES_APPL.addArrayData(EP_BO_ZRES_APPL.getArraySize(), EP_BO);
 								 break;
 								 
 							case "SystemTest":
-								System.out.println("PASSO!");
+								
 								EP_BO_ZRES_SYST.addArrayData(EP_BO_ZRES_SYST.getArraySize(), EP_BO);
 								 break;
 								 
 							case "Produzione":
-								System.out.println("PASSO!");
+								
 								EP_BO_ZRES_PROD.addArrayData(EP_BO_ZRES_PROD.getArraySize(), EP_BO);
 								 break;
 								 
 							case "UserAcceptanceTest":
-								System.out.println("PASSO!");
+								
 								EP_BO_ZRES_UAT.addArrayData(EP_BO_ZRES_UAT.getArraySize(), EP_BO);
 								 break;
 
 							case "IndipendentTest":
-								System.out.println("PASSO!");
+								
 								EP_BO_ZRES_INDEP.addArrayData(EP_BO_ZRES_INDEP.getArraySize(), EP_BO);
 								 break;
 								 
 							}						
 						}
 
-						if (type.equals(CICS_EP)) {
+						if (type.equals("CICS_EP")) {
 							
 							switch(environment) {
 							
 							case "Application":
-								System.out.println("PASSO!");
+								
 								EP_BO_CICS_APPL.addArrayData(EP_BO_CICS_APPL.getArraySize(), EP_BO);
 								 break;
 								 
 							case "SystemTest":
-								System.out.println("PASSO!");
+								
 								EP_BO_CICS_SYST.addArrayData(EP_BO_CICS_SYST.getArraySize(), EP_BO);
 								 break;
 								 
 							case "Produzione":
-								System.out.println("PASSO!");
+								
 								EP_BO_CICS_PROD.addArrayData(EP_BO_CICS_PROD.getArraySize(), EP_BO);
 								 break;
 								 
 							case "UserAcceptanceTest":
-								System.out.println("PASSO!");
+								
 								EP_BO_CICS_UAT.addArrayData(EP_BO_CICS_UAT.getArraySize(), EP_BO);
 								 break;
 
 							case "IndipendentTest":
-								System.out.println("PASSO!");
+								
 								EP_BO_CICS_INDEP.addArrayData(EP_BO_CICS_INDEP.getArraySize(), EP_BO);
 								 break;
 								 
@@ -668,32 +664,32 @@ public class WSRRToBusinessObject {
 
 						}
 						
-						if (type.equals(MQ_EP) ) {
+						if (type.equals("MQ_EP") ) {
 							
 							switch(environment) {
 							
 							case "Application":
-								System.out.println("PASSO!");
+								
 								EP_BO_MQ_APPL.addArrayData(EP_BO_MQ_APPL.getArraySize(), EP_BO);
 								 break;
 								 
 							case "SystemTest":
-								System.out.println("PASSO!");
+								
 								EP_BO_MQ_SYST.addArrayData(EP_BO_MQ_SYST.getArraySize(), EP_BO);
 								 break;
 								 
 							case "Produzione":
-								System.out.println("PASSO!");
+								
 								EP_BO_MQ_PROD.addArrayData(EP_BO_MQ_PROD.getArraySize(), EP_BO);
 								 break;
 								 
 							case "UserAcceptanceTest":
-								System.out.println("PASSO!");
+								
 								EP_BO_MQ_UAT.addArrayData(EP_BO_MQ_UAT.getArraySize(), EP_BO);
 								 break;
 
 							case "IndipendentTest":
-								System.out.println("PASSO!");
+								
 								EP_BO_MQ_INDEP.addArrayData(EP_BO_MQ_INDEP.getArraySize(), EP_BO);
 								 break;
 								 
@@ -749,6 +745,7 @@ public class WSRRToBusinessObject {
 					System.out.println(NBP_BO.toXMLString().toString());
 					System.out.println("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
 					System.out.println(EP_BO_SOAP_APPL.getArraySize());
+					System.out.println(EP_BO_SOAP_APPL.toString());
 					System.out.println(EP_BO_SOAP_SYST.getArraySize());
 					System.out.println(EP_BO_SOAP_PROD.getArraySize());
 					System.out.println(EP_BO_SOAP_UAT.getArraySize());
