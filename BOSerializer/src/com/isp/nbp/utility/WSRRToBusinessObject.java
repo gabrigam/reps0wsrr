@@ -214,10 +214,20 @@ public class WSRRToBusinessObject {
 				}
 				current = null;
 			}
-
+			
 			SV_BO=WSRRToBusinessObject.makeBO(result, type, subType, url, user, password);
 			
-			NBP_BO.setPropertyValue("SV",SV_BO);
+
+			NBP_BO.setPropertyValue("SOPEN", null);
+			NBP_BO.setPropertyValue("SCOPEN", null);
+			NBP_BO.setPropertyValue("SHOST", null);
+			NBP_BO.setPropertyValue("SCHOST", null);
+			
+			if (type.equals("SOPENServiceVersion")) NBP_BO.setPropertyValue("SOPEN", SV_BO);
+			if (type.equals("SCOPENServiceVersion")) NBP_BO.setPropertyValue("SCOPEN", SV_BO);
+			if (type.equals("SHOSTServiceVersion")) NBP_BO.setPropertyValue("SHOST", SV_BO);
+			if (type.equals("SCHOSTServiceVersion")) NBP_BO.setPropertyValue("SCHOST", SV_BO);
+
 
 			//Ho trovato il Service Version ora recupero il Business Service
 
@@ -227,7 +237,7 @@ public class WSRRToBusinessObject {
 
 			BS_BO=WSRRToBusinessObject.makeBO(result, type.substring(0, type.length()-7), subType, url, user, password);
 			
-			NBP_BO.setPropertyValue("BS",SV_BO);
+			NBP_BO.setPropertyValue("BS",BS_BO);
 			
 			//Ricavo acronimo
 
@@ -245,9 +255,9 @@ public class WSRRToBusinessObject {
 			
 			result = wsrrutility.generalWSRRQuery(query7, url, user, password);
 			
-			INT_BO=WSRRToBusinessObject.makeBO(result, "Interface", null, url, user, password);
+			//////INT_BO=WSRRToBusinessObject.makeBO(result, "Interface", null, url, user, password);
 			
-			NBP_BO.setPropertyValue("INT",INT_BO);
+			///NBP_BO.setPropertyValue("INT",INT_BO);
 			
 			//Ricavo SLD
 			
@@ -257,8 +267,52 @@ public class WSRRToBusinessObject {
 			
 			SLD_BO=WSRRToBusinessObject.makeBO(result, "SLD", null, url, user, password);
 			
-			SLD_BO.setPropertyValue("SLD",ACR_BO);
+			//////SLD_BO.setPropertyValue("SLD",ACR_BO);
+			
+			
+			
+			NBP_BO.setPropertyValue("ENDPOINT_SOAP_APPL",null);
+			NBP_BO.setPropertyValue("ENDPOINT_SOAP_SYST",null);
+			NBP_BO.setPropertyValue("ENDPOINT_SOAP_PROD",null);
+			NBP_BO.setPropertyValue("ENDPOINT_SOAP_UAT",null);
+			NBP_BO.setPropertyValue("ENDPOINT_SOAP_INDEP",null);
+			
+			NBP_BO.setPropertyValue("ENDPOINT_REST_APPL",null);
+			NBP_BO.setPropertyValue("ENDPOINT_REST_SYST",null);
+			NBP_BO.setPropertyValue("ENDPOINT_REST_PROD",null);
+			NBP_BO.setPropertyValue("ENDPOINT_REST_UAT",null);
+			NBP_BO.setPropertyValue("ENDPOINT_REST_INDEP",null);
+			
+			NBP_BO.setPropertyValue("ENDPOINT_ZRES_APPL",null);
+			NBP_BO.setPropertyValue("ENDPOINT_ZRES_SYST",null);
+			NBP_BO.setPropertyValue("ENDPOINT_ZRES_PROD",null);
+			NBP_BO.setPropertyValue("ENDPOINT_ZRES_UAT",null);
+			NBP_BO.setPropertyValue("ENDPOINT_ZRES_INDEP",null);
+			
+			NBP_BO.setPropertyValue("ENDPOINT_WOLA_APPL",null);
+			NBP_BO.setPropertyValue("ENDPOINT_WOLA_SYST",null);
+			NBP_BO.setPropertyValue("ENDPOINT_WOLA_PROD",null);
+			NBP_BO.setPropertyValue("ENDPOINT_WOLA_UAT",null);
+			NBP_BO.setPropertyValue("ENDPOINT_WOLA_INDEP",null);
+			
+			NBP_BO.setPropertyValue("ENDPOINT_CICS_APPL",null);
+			NBP_BO.setPropertyValue("ENDPOINT_CICS_SYST",null);
+			NBP_BO.setPropertyValue("ENDPOINT_CICS_PROD",null);
+			NBP_BO.setPropertyValue("ENDPOINT_CICS_UAT",null);
+			NBP_BO.setPropertyValue("ENDPOINT_CICS_INDEP",null);
+						
+			NBP_BO.setPropertyValue("ENDPOINT_MQ_APPL",null);
+			NBP_BO.setPropertyValue("ENDPOINT_MQ_SYST",null);
+			NBP_BO.setPropertyValue("ENDPOINT_MQ_PROD",null);
+			NBP_BO.setPropertyValue("ENDPOINT_MQ_UAT",null);
+			NBP_BO.setPropertyValue("ENDPOINT_MQ_INDEP",null);
 
+			NBP_BO.setPropertyValue("ENDPOINT_CALLABLE_APPL",null);
+			NBP_BO.setPropertyValue("ENDPOINT_CALLABLE_SYST",null);
+			NBP_BO.setPropertyValue("ENDPOINT_CALLABLE_PROD",null);
+			NBP_BO.setPropertyValue("ENDPOINT_CALLABLE_UAT",null);
+			NBP_BO.setPropertyValue("ENDPOINT_CALLABLE_INDEP",null);
+			
 			//Ricavo Endpoint
 
 			query4=query4.replaceAll("%BSRURI%", (String) SV_BO.getPropertyValue("bsrURI"));
@@ -466,8 +520,9 @@ public class WSRRToBusinessObject {
 						
 						System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
-						if (proxy !=null) {
+						if (proxybsrURI !=null && proxybsrURI.length() !=0) {
 							
+							System.out.println("THEWEB "+proxy);
 							EP_BO.setPropertyValue("PROXY", PROXY_BO); //collego proxy/MQManual a endpoint
 						}
 						////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////77
@@ -698,13 +753,13 @@ public class WSRRToBusinessObject {
 						}
 
 					}
-					//aggancio all'oggetto NBP_BO tutte li tipologia di endpoint
+					
 					NBP_BO.setPropertyValue("ENDPOINT_SOAP_APPL",EP_BO_SOAP_APPL);
 					NBP_BO.setPropertyValue("ENDPOINT_SOAP_SYST",EP_BO_SOAP_SYST);
 					NBP_BO.setPropertyValue("ENDPOINT_SOAP_PROD",EP_BO_SOAP_PROD);
 					NBP_BO.setPropertyValue("ENDPOINT_SOAP_UAT",EP_BO_SOAP_UAT);
 					NBP_BO.setPropertyValue("ENDPOINT_SOAP_INDEP",EP_BO_SOAP_INDEP);
-
+					
 					NBP_BO.setPropertyValue("ENDPOINT_REST_APPL",EP_BO_REST_APPL);
 					NBP_BO.setPropertyValue("ENDPOINT_REST_SYST",EP_BO_REST_SYST);
 					NBP_BO.setPropertyValue("ENDPOINT_REST_PROD",EP_BO_REST_PROD);
@@ -735,21 +790,12 @@ public class WSRRToBusinessObject {
 					NBP_BO.setPropertyValue("ENDPOINT_CICS_UAT",EP_BO_CICS_UAT);
 					NBP_BO.setPropertyValue("ENDPOINT_CICS_INDEP",EP_BO_CICS_INDEP);
 					
-					NBP_BO.setPropertyValue("ENDPOINT_MQ_APPL",EP_BO_CICS_APPL);
-					NBP_BO.setPropertyValue("ENDPOINT_MQ_SYST",EP_BO_CICS_SYST);
-					NBP_BO.setPropertyValue("ENDPOINT_MQ_PROD",EP_BO_CICS_PROD);
-					NBP_BO.setPropertyValue("ENDPOINT_MQ_UAT",EP_BO_CICS_UAT);
-					NBP_BO.setPropertyValue("ENDPOINT_MQ_INDEP",EP_BO_CICS_INDEP);
-					
-					System.out.println("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
-					System.out.println(NBP_BO.toXMLString().toString());
-					System.out.println("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
-					System.out.println(EP_BO_SOAP_APPL.getArraySize());
-					System.out.println(EP_BO_SOAP_APPL.toString());
-					System.out.println(EP_BO_SOAP_SYST.getArraySize());
-					System.out.println(EP_BO_SOAP_PROD.getArraySize());
-					System.out.println(EP_BO_SOAP_UAT.getArraySize());
-					System.out.println(EP_BO_SOAP_INDEP.getArraySize());
+					NBP_BO.setPropertyValue("ENDPOINT_MQ_APPL",EP_BO_MQ_APPL);
+					NBP_BO.setPropertyValue("ENDPOINT_MQ_SYST",EP_BO_MQ_SYST);
+					NBP_BO.setPropertyValue("ENDPOINT_MQ_PROD",EP_BO_MQ_PROD);
+					NBP_BO.setPropertyValue("ENDPOINT_MQ_UAT",EP_BO_MQ_UAT);
+					NBP_BO.setPropertyValue("ENDPOINT_MQ_INDEP",EP_BO_MQ_INDEP);
+		
 					/*
 					System.out.println(EP_BO_ZRES_APPL.getArraySize());
 					System.out.println(EP_BO_ZRES_APPL.getArraySize());
@@ -801,8 +847,12 @@ public class WSRRToBusinessObject {
 			System.out.println("*********************************************KO************************************+");
 			e.printStackTrace();
 		}
+		
+		System.out.println(">>>" +NBP_BO.getPropertyNames());
+		
+		System.out.println(">>>" +NBP_BO.toXMLString());
 
-		return SV_BO;
+		return NBP_BO;
 	}
 
 
@@ -920,9 +970,9 @@ public class WSRRToBusinessObject {
 				}
 			}
 			
-			System.out.println("THETYPE"+type);
+			//System.out.println("THETYPE"+type);
 
-			System.out.println(">>>" +CURRENT_BO.getPropertyNames());
+			//System.out.println(">>>" +CURRENT_BO.getPropertyNames());
 
 
 		} catch (Exception e) {
