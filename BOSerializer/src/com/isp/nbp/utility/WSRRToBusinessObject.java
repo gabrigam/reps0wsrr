@@ -49,7 +49,7 @@ public class WSRRToBusinessObject {
 		TWObject SV_BO = null;
 		TWObject BS_BO = null;
 		TWObject ACR_BO = null;
-		TWObject INT_BO=null;
+		TWObject INTERF_BO=null;
 		TWObject SLD_BO=null;
 		
 		TWObject EP_BO = null;
@@ -152,7 +152,7 @@ public class WSRRToBusinessObject {
 			BS_BO = (TWObject) TWObjectFactory.createObject();
 			SV_BO = (TWObject) TWObjectFactory.createObject();
 			ACR_BO =(TWObject) TWObjectFactory.createObject();
-			INT_BO =(TWObject) TWObjectFactory.createObject();
+			INTERF_BO =(TWObject) TWObjectFactory.createObject();
 			SLD_BO =(TWObject) TWObjectFactory.createObject();
 			
 			EP_BO_REST_APPL=TWObjectFactory.createList();
@@ -255,9 +255,9 @@ public class WSRRToBusinessObject {
 			
 			result = wsrrutility.generalWSRRQuery(query7, url, user, password);
 			
-			//////INT_BO=WSRRToBusinessObject.makeBO(result, "Interface", null, url, user, password);
+			INTERF_BO=WSRRToBusinessObject.makeBO(result, "Interface", null, url, user, password);
 			
-			///NBP_BO.setPropertyValue("INT",INT_BO);
+			NBP_BO.setPropertyValue("INTERF",INTERF_BO);
 			
 			//Ricavo SLD
 			
@@ -267,8 +267,7 @@ public class WSRRToBusinessObject {
 			
 			SLD_BO=WSRRToBusinessObject.makeBO(result, "SLD", null, url, user, password);
 			
-			//////SLD_BO.setPropertyValue("SLD",ACR_BO);
-			
+			SLD_BO.setPropertyValue("SLD",SLD_BO);
 			
 			
 			NBP_BO.setPropertyValue("ENDPOINT_SOAP_APPL",null);
@@ -956,9 +955,9 @@ public class WSRRToBusinessObject {
 				}
 			}
 			
-			//System.out.println("THETYPE"+type);
+			System.out.println("THETYPE"+type);
 
-			//System.out.println(">>>" +CURRENT_BO.getPropertyNames());
+			System.out.println(">>>" +CURRENT_BO.getPropertyNames());
 
 
 		} catch (Exception e) {
