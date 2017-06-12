@@ -6,13 +6,14 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import com.lombardisoftware.core.TWObject;
 import teamworks.TWList;
 import teamworks.TWObjectFactory;
+public class WSRRToBusinessObjectCompactEP {
 
-public class WSRRToBusinessObjectCompact {
 
 	String query1 = "/Metadata/XML/GraphQuery?query=/WSRR/GenericObject[@name='%CATALOGNAME%'%20and%20@version='%VERSION%']";
 	String query2 = "/Metadata/XML/GraphQuery?query=/WSRR/GenericObject[@name='%CATALOGNAME%'%20and%20@primaryType='http://www.ibm.com/xmlns/prod/serviceregistry/profile/v6r3/GovernanceEnablementModel%23%TYPE%']";
@@ -23,7 +24,7 @@ public class WSRRToBusinessObjectCompact {
 	String query7 = "/Metadata/XML/GraphQuery?query=/WSRR/GenericObject[@bsrURI='%BSRURI%']/gep63_provides(.)/gep63_serviceInterface(.)"; // interfaccia
 	String query8 = "/Metadata/XML/GraphQuery?query=/WSRR/GenericObject[@bsrURI='%BSRURI%']/gep63_provides(.)";
 
-	public WSRRToBusinessObjectCompact() {
+	public WSRRToBusinessObjectCompactEP() {
 
 	}
 
@@ -32,10 +33,6 @@ public class WSRRToBusinessObjectCompact {
 
 		TWObject NBP_BO = null;
 		TWObject SV_BO = null;
-		TWObject BS_BO = null;
-		TWObject ACR_BO = null;
-		TWObject INTERF_BO = null;
-		TWObject SLD_BO = null;
 
 		TWObject EP_BO = null;
 		TWObject PROXY_BO = null;
@@ -88,12 +85,7 @@ public class WSRRToBusinessObjectCompact {
 
 		try {
 			NBP_BO = (TWObject) TWObjectFactory.createObject();
-			BS_BO = (TWObject) TWObjectFactory.createObject();
 			SV_BO = (TWObject) TWObjectFactory.createObject();
-			ACR_BO = (TWObject) TWObjectFactory.createObject();
-			INTERF_BO = (TWObject) TWObjectFactory.createObject();
-			SLD_BO = (TWObject) TWObjectFactory.createObject();
-
 			EP_BO_REST = TWObjectFactory.createList();
 			EP_BO_SOAP = TWObjectFactory.createList();
 			EP_BO_CALLABLE = TWObjectFactory.createList();
@@ -126,68 +118,6 @@ public class WSRRToBusinessObjectCompact {
 			NBP_BO.setPropertyValue("SCOPEN", null);
 			NBP_BO.setPropertyValue("SHOST", null);
 			NBP_BO.setPropertyValue("SCHOST", null);
-
-			if (type.equals("SOPENServiceVersion")) NBP_BO.setPropertyValue("SOPEN", SV_BO);
-			if (type.equals("SCOPENServiceVersion")) NBP_BO.setPropertyValue("SCOPEN", SV_BO);
-			if (type.equals("SHOSTServiceVersion")) NBP_BO.setPropertyValue("SHOST", SV_BO);
-			if (type.equals("SCHOSTServiceVersion"))NBP_BO.setPropertyValue("SCHOST", SV_BO);
-
-			// Ho trovato il Service Version ora recupero il Business Service
-
-			query2 = query2.replaceAll("%CATALOGNAME%", name).replaceAll("%TYPE%",
-					type.substring(0, type.length() - 7));
-
-			result = wsrrutility.generalWSRRQuery(query2, url, user, password);
-
-			BS_BO = WSRRToBusinessObjectCompact.makeBO(result, type.substring(0, type.length() - 7), subType, url, user,password);
-			NBP_BO.setPropertyValue("BS", BS_BO);
-
-			// Ricavo acronimo
-
-			if (BS_BO ==null) {
-				NBP_BO.setPropertyValue("ACRO", BS_BO);
-			} else {
-				query3 = query3.replaceAll("%BSRURI%", (String) BS_BO.getPropertyValue("bsrURI"));
-
-				result = wsrrutility.generalWSRRQuery(query3, url, user, password);
-
-				ACR_BO = WSRRToBusinessObjectCompact.makeBO(result, "Organization", null, url, user, password);
-				NBP_BO.setPropertyValue("ACRO", ACR_BO);
-			}
-
-			// Ricavo Interfaccia
-
-			if (BS_BO==null) {
-
-				NBP_BO.setPropertyValue("INTERF", BS_BO);
-
-			} else {
-
-				query7 = query7.replaceAll("%BSRURI%", (String) SV_BO.getPropertyValue("bsrURI"));
-
-				result = wsrrutility.generalWSRRQuery(query7, url, user, password);
-
-				INTERF_BO = WSRRToBusinessObjectCompact.makeBO(result, "Interface", null, url, user, password);
-				NBP_BO.setPropertyValue("INTERF", INTERF_BO);
-			}
-
-			// Ricavo SLD
-
-			if (BS_BO ==null){
-
-				NBP_BO.setPropertyValue("SLD", BS_BO);
-
-			} else {
-
-				query8 = query8.replaceAll("%BSRURI%", (String) SV_BO.getPropertyValue("bsrURI"));
-
-				result = wsrrutility.generalWSRRQuery(query8, url, user, password);
-
-				SLD_BO = WSRRToBusinessObjectCompact.makeBO(result, "SLD", null, url, user, password);
-				SLD_BO.setPropertyValue("SLD", SLD_BO);
-
-			}
-
 			NBP_BO.setPropertyValue("ENDPOINT_SOAP", null);
 			NBP_BO.setPropertyValue("ENDPOINT_REST", null);
 			NBP_BO.setPropertyValue("ENDPOINT_ZRES", null);
@@ -523,7 +453,6 @@ public class WSRRToBusinessObjectCompact {
 				System.out.println(
 						"*********************************************KO************************************+");
 				e.printStackTrace();
-				NBP_BO= null;
 			}
 
 
@@ -533,7 +462,7 @@ public class WSRRToBusinessObjectCompact {
 			System.out.println(e.getMessage());
 			System.out.println("*********************************************KO************************************+");
 			e.printStackTrace();
-			NBP_BO= null;
+			NBP_BO=null;
 		}
 
 		// System.out.println(">>>" +NBP_BO.getPropertyNames());
@@ -651,8 +580,6 @@ public class WSRRToBusinessObjectCompact {
 					System.out.println("Bypass_for " + current_ + " 4 type " + type);
 				}
 			}
-
-			// System.out.println(">>>" +CURRENT_BO.getPropertyNames());
 
 		} catch (Exception e) {
 
