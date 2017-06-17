@@ -112,7 +112,7 @@ public class WSRRToBusinessObjectCompactEP {
 				current = null;
 			}
 
-			SV_BO = WSRRToBusinessObjectCompact.makeBO(result, type, subType, url, user, password);
+			SV_BO = WSRRToBusinessObjectCompactEP.makeBO(result, type, subType, url, user, password);
 
 			NBP_BO.setPropertyValue("SOPEN", null);
 			NBP_BO.setPropertyValue("SCOPEN", null);
@@ -146,7 +146,7 @@ public class WSRRToBusinessObjectCompactEP {
 			String value_ = null;
 
 			try {
-				int specializzazioniConatatore = 0;
+				int specializzazioniContatore = 0;
 				boolean specializzazioneTrovata = false;
 				boolean scrittoRecord=false;
 
@@ -249,7 +249,7 @@ public class WSRRToBusinessObjectCompactEP {
 									query6 = query5;
 									query6 = query6.replaceAll("%BSRURI%", proxybsrURI);
 									result = wsrrutility.generalWSRRQuery(query6, url, user, password);
-									PROXY_BO = WSRRToBusinessObjectCompact.makeBO(result, proxy, null, url, user,
+									PROXY_BO = WSRRToBusinessObjectCompactEP.makeBO(result, proxy, null, url, user,
 											password);
 								}
 
@@ -265,7 +265,7 @@ public class WSRRToBusinessObjectCompactEP {
 									query6 = query5;
 									query6 = query6.replaceAll("%BSRURI%", proxybsrURI);
 									result = wsrrutility.generalWSRRQuery(query6, url, user, password);
-									PROXY_BO = WSRRToBusinessObjectCompact.makeBO(result, proxy, null, url, user,
+									PROXY_BO = WSRRToBusinessObjectCompactEP.makeBO(result, proxy, null, url, user,
 											password);
 								}
 							}
@@ -280,7 +280,7 @@ public class WSRRToBusinessObjectCompactEP {
 									query6 = query5;
 									query6 = query6.replaceAll("%BSRURI%", proxybsrURI);
 									result = wsrrutility.generalWSRRQuery(query6, url, user, password);
-									PROXY_BO = WSRRToBusinessObjectCompact.makeBO(result, proxy, null, url, user,
+									PROXY_BO = WSRRToBusinessObjectCompactEP.makeBO(result, proxy, null, url, user,
 											password);
 								}
 							}
@@ -295,7 +295,7 @@ public class WSRRToBusinessObjectCompactEP {
 									query6 = query5;
 									query6 = query6.replaceAll("%BSRURI%", proxybsrURI);
 									result = wsrrutility.generalWSRRQuery(query6, url, user, password);
-									PROXY_BO = WSRRToBusinessObjectCompact.makeBO(result, proxy, null, url, user,
+									PROXY_BO = WSRRToBusinessObjectCompactEP.makeBO(result, proxy, null, url, user,
 											password);
 								}
 							}
@@ -345,7 +345,7 @@ public class WSRRToBusinessObjectCompactEP {
 									}
 
 									if (value_ != null && value_.equals(specializzazione)) {
-										specializzazioniConatatore++;
+										specializzazioniContatore++;
 									}
 
 								}
@@ -431,7 +431,7 @@ public class WSRRToBusinessObjectCompactEP {
 						scrittoRecord=false;
 					}
 
-					if (specializzazioniConatatore>1 && usoSpecializzazione) {
+					if (specializzazioniContatore !=1 && usoSpecializzazione) {
 
 						NBP_BO.setPropertyValue("ENDPOINT_SOAP", null);
 						NBP_BO.setPropertyValue("ENDPOINT_REST", null);

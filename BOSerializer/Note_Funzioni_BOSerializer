@@ -1,0 +1,51 @@
+descrizione metodi:
+
+WSRRToBusinessObject
+BO: BO_NBP_OBJECT
+
+recupera a partire dal SV i seguenti oggetti:
+
+BS + SV + ACR + INTERF + SLD + ENDPOINT (gli endpoint sono raggruppati per : TIPO.AMBIENTE_OPERATIVO es: SOAP.APPL, SOAP.SYST ettc
+)
+In questa modalità NON viene  presa in considerazione la classificazione.
+Utilizzare questa modalità quando si vogliono tutti i dati quindi in un ambiente di governance
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+WSRRToBusinessObjectCompact
+BO: BO_NBP_OBJECT_COMPACT
+
+recupera a partire dal SV i seguenti oggetti:
+
+BS + SV + ACR + INTERF + SLD + ENDPOINT gli endpoint sono raggruppati per TIPO l'ambiente è determinato dal contenuto della variabile environment
+
+In questa modalità viene presa in considerazione la classificazione.
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+WSRRToBusinessObjectCompactEP
+BO_NBP_OBJECT_COMPACT_ENDPOINT
+
+recupera a partire dal SV i seguenti oggetti:
+
+SV + ENDPOINT gli endpoint sono raggruppati per TIPO l'ambiente è determinato dal contenuto della variabile environment.
+
+In questa modalità viene presa in considerazione la classificazione.
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+WSRRToBusinessObjectCompactEPMQ
+BO_NBP_OBJECT_COMPACT_ENDPOINT_MQ
+
+recupera a partire dal SV i seguenti oggetti:
+
+ENDPOINT (solo MQ) l'ambiente è determinato dal contenuto della variabile environment.
+
+In questa modalità viene presa in considerazione la classificazione.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+WSRRToBusinessObjectEPMQ
+nessun BO associato
+
+riceve in input una stringa che rappresenta il risultato di una query che recupera tutti gli EP MQ associati ad un particolare SV e genera
+in uscita una Stringa contenente la rappresentazione XML del EP MQ e del realtivo Manual (definito nel Tag Prox)
+
+In questa modalità viene presa in considerazione la classificazione.
+
+Questa classe viene utilizzata nel TKT_WSRR in : GSS_WSRR_NBP_Int

@@ -142,7 +142,7 @@ public class WSRRToBusinessObjectEPMQ {
 									query6 = query6.replaceAll("%BSRURI%", proxybsrURI);
 
 									result = wsrrutility.generalWSRRQuery(query6, url, user, password);
-									PROXY_BO = WSRRToBusinessObjectCompact.makeBO(result, proxy, null, url, user,
+									PROXY_BO = WSRRToBusinessObjectEPMQ.makeBO(result, proxy, null, url, user,
 											password);
 
 								}

@@ -216,7 +216,7 @@ public class WSRRToBusinessObjectCompact {
 			String value_ = null;
 
 			try {
-				int specializzazioniConatatore = 0;
+				int specializzazioniContatore = 0;
 				boolean specializzazioneTrovata = false;
 				boolean scrittoRecord=false;
 
@@ -415,7 +415,7 @@ public class WSRRToBusinessObjectCompact {
 									}
 
 									if (value_ != null && value_.equals(specializzazione)) {
-										specializzazioniConatatore++;
+										specializzazioniContatore++;
 									}
 
 								}
@@ -501,7 +501,7 @@ public class WSRRToBusinessObjectCompact {
 						scrittoRecord=false;
 					}
 
-					if (specializzazioniConatatore>1 && usoSpecializzazione) {
+					if (specializzazioniContatore != 1 && usoSpecializzazione) {
 
 						NBP_BO.setPropertyValue("ENDPOINT_SOAP", null);
 						NBP_BO.setPropertyValue("ENDPOINT_REST", null);
