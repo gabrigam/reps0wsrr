@@ -12,7 +12,7 @@ import org.xml.sax.InputSource;
 import com.lombardisoftware.core.TWObject;
 import teamworks.TWList;
 import teamworks.TWObjectFactory;
-
+//test
 public class WSRRToBusinessObjectEPMQ {
 
 	//String query1 = "/Metadata/XML/GraphQuery?query=/WSRR/GenericObject[@name='%CATALOGNAME%'%20and%20@version='%VERSION%']";
