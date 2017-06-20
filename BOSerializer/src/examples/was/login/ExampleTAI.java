@@ -10,6 +10,7 @@ package examples.was.login;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -25,8 +26,10 @@ import com.ibm.websphere.security.CustomRegistryException;
 import com.ibm.websphere.security.EntryNotFoundException;
 import com.ibm.websphere.security.PasswordCheckFailedException;
 import com.ibm.websphere.security.UserRegistry;
+import com.ibm.websphere.security.WSSecurityException;
 import com.ibm.websphere.security.WebTrustAssociationException;
 import com.ibm.websphere.security.WebTrustAssociationFailedException;
+import com.ibm.websphere.security.auth.WSSubject;
 import com.ibm.wsspi.security.tai.TAIResult;
 import com.ibm.wsspi.security.tai.TrustAssociationInterceptor;
 import com.ibm.wsspi.security.token.AttributeNameConstants;
@@ -91,6 +94,14 @@ public class ExampleTAI implements TrustAssociationInterceptor {
 		System.out.println("TAI using password " + password);
 
 		String uniqueid = null;
+	try {
+		if (WSSubject.getCallerSubject() != null)
+			System.out.println("*********************Principal Name************  " +WSSubject.getCallerSubject().getPrincipals().toString());
+	} catch (WSSecurityException e2) {
+		// TODO Auto-generated catch block
+		System.out.println("Security exception..GABBBBB");
+		e2.printStackTrace();
+	}
 
 		try {
 			boolean customGroups = false;
@@ -259,6 +270,13 @@ public class ExampleTAI implements TrustAssociationInterceptor {
 
 	private Subject createSubject(String userid, String uniqueid, List groups,
 			String key) {
+		
+		Properties prop =new Properties(); //todo
+		
+		HashMap token=new HashMap();
+		token.put("SMSSESSION", "gfghfr675675yhhvhvhgjgubggggghggghhgbgbhgjgjgbgj");
+		
+		System.out.println("Subject creation *******************************************************>>>>>>>");
 		Subject subject = new Subject();
 		Hashtable hashtable = new Hashtable();
 		hashtable.put(AttributeNameConstants.WSCREDENTIAL_UNIQUEID, uniqueid);
@@ -274,6 +292,11 @@ public class ExampleTAI implements TrustAssociationInterceptor {
 		System.out.println("TAI using word " + word1);
 		stuff.setWord1(word1);
 		subject.getPublicCredentials().add(stuff);
+		
+		//////
+		
+		subject.getPublicCredentials().add(prop);
+		
 
 		return subject;
 	}
