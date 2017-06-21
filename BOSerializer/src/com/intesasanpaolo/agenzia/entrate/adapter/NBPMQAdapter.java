@@ -17,6 +17,7 @@ import com.ibm.mq.MQMessage;
 import com.ibm.mq.MQPutMessageOptions;
 import com.ibm.mq.MQQueue;
 import com.ibm.mq.MQQueueManager;
+import com.ibm.mq.pcf.CMQC;
 import com.intesasanpaolo.nbp.mq.QDHMQClient;
 
 import teamworks.TWObjectFactory;
@@ -25,9 +26,11 @@ import teamworks.TWList;
 import teamworks.TWObjectFactory;
 
 /**
- * @author U0H2438
+ * @author U0H2438 modified U0H1963
  * 
  */
+@SuppressWarnings({ "deprecation", "unused" })
+
 public class NBPMQAdapter {
 
 	private String _queueMngName = null;
@@ -35,13 +38,15 @@ public class NBPMQAdapter {
 	private int _port = 0;
 	private String _channel = null;
 	private String _queueName = null;
-	//private Logger _logger = null;
 	private String _msgId = null;
 	private MQQueueManager _mqQueueManager = null;
 	private MQQueue _queue = null;
 	private int _maxConnRetry = 0;
 	private String _message = null;
-	
+
+	//
+	private boolean _operationInError = false;
+	private int _returnCode = 0;
 
 	/* Gestione Errori : CompCode e ReasonCode MQ - Return code generale */
 	/**
@@ -79,7 +84,8 @@ public class NBPMQAdapter {
 	public static final int TWS_ADAPTER_ROLLBACK_KO = 70999;
 
 	private static final int TWS_ADAPTER_IOEXC_KO = 99999;
-
+	private static final int TWS_ADAPTER_INITIALIZATION_KO = 78000; // new
+	private static final int TWS_ADAPTER_SETMESSAGECONTENT_KO = 79000; // new
 
 	/**
 	 * @param _connectionString
@@ -87,21 +93,20 @@ public class NBPMQAdapter {
 	 * @param _maxConnRetry
 	 */
 	public NBPMQAdapter(TWObject connectionData) {
-		
+
 		System.out.println("NBPMQAdapter(costruttore start...");
 
 		try {
-			this._queueMngName = (String) connectionData.getPropertyValue("QMGR"); 
-			this._hostName = (String) connectionData.getPropertyValue("HOST"); 
-			this._port = Integer.parseInt((String) connectionData.getPropertyValue("PORT")); 
+			this._queueMngName = (String) connectionData.getPropertyValue("QMGR");
+			this._hostName = (String) connectionData.getPropertyValue("HOST");
+			this._port = Integer.parseInt((String) connectionData.getPropertyValue("PORT"));
 			this._channel = (String) connectionData.getPropertyValue("CHANNEL");
 			this._queueName = (String) connectionData.getPropertyValue("QUEUE");
 			this._msgId = new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss.SSSSSS").format(new Date());
-			int maxConnRetry=Integer.parseInt((String)connectionData.getPropertyValue("MAXCONNRETRY"));
-			
+			int maxConnRetry = Integer.parseInt((String) connectionData.getPropertyValue("MAXCONNRETRY"));
+
 			if (maxConnRetry < 0) {
-				System.out.println("maxConnRetry = "
-						+ new Integer(maxConnRetry).toString()
+				System.out.println("maxConnRetry = " + new Integer(maxConnRetry).toString()
 						+ ". Non sono accettabili valori Negativi viene impostato  il valore 0.");
 				this._maxConnRetry = 0;
 			}
@@ -117,27 +122,18 @@ public class NBPMQAdapter {
 			if (this._port != MQEnvironment.port) {
 				MQEnvironment.port = this._port;
 			}
-			
+
 			System.out.println("NBPMQAdapter(costruttore end");
 
 		} catch (Exception e) {
+			this.setOperationInError(true);
+			this.setReturnCode(TWS_ADAPTER_INITIALIZATION_KO); // new
 			System.out.println("Errore durante recupero dati di connessione da strato BPM NBP");
 			System.out.println(e.toString());
 			System.out.println("END");
 		}
 
-
 	}
-
-
-
-	/**
-	 * @param catalogOut
-	 * @param fileTransfOut
-	 * @param dirOut
-	 * @param _connectionString
-	 */
-
 
 	/**
 	 * init method
@@ -184,8 +180,9 @@ public class NBPMQAdapter {
 		System.out.println("openMqConnection() start...");
 
 		try {
-			this._mqQueueManager = new MQQueueManager(this._queueMngName);
-			//MDC.put("SessId", this._mqQueueManager.toString().split("@")[1]);
+			this._mqQueueManager = new MQQueueManager(this._queueMngName); // nuovo
+
+			// MDC.put("SessId", this._mqQueueManager.toString().split("@")[1]);
 			this.twsAdapterCompletionCode = MQException.MQCC_OK;
 			this.twsAdapterReasonCode = MQException.MQRC_NONE;
 
@@ -217,13 +214,11 @@ public class NBPMQAdapter {
 		System.out.println("openMqQueues(flags) start...");
 
 		try {
-			queueOpenOptions = MQC.MQOO_OUTPUT | MQC.MQOO_FAIL_IF_QUIESCING
-					| flags;
+			queueOpenOptions = MQC.MQOO_OUTPUT | MQC.MQOO_FAIL_IF_QUIESCING | flags;
 			// | MQC.MQOO_SET_IDENTITY_CONTEXT
 			// MQC.MQOO_SAVE_ALL_CONTEXT
 
-			this._queue = this._mqQueueManager.accessQueue(this._queueName,
-					queueOpenOptions);
+			this._queue = this._mqQueueManager.accessQueue(this._queueName, queueOpenOptions);
 			this.twsAdapterCompletionCode = MQException.MQCC_OK;
 			this.twsAdapterReasonCode = MQException.MQRC_NONE;
 
@@ -265,95 +260,95 @@ public class NBPMQAdapter {
 		if (newMessage != null) {
 			// adding the length of the tws msg to the length of the headers
 
-
 			MQMessage twsMsg = new MQMessage();
 			try {
 				twsMsg.writeString(newMessage);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			
-			MQPutMessageOptions twsPutMsgOptions = new MQPutMessageOptions();
 
-			twsPutMsgOptions.options = MQC.MQPMO_FAIL_IF_QUIESCING
-					| MQC.MQPMO_SYNCPOINT; // | MQC.MQPMO_SET_IDENTITY_CONTEXT;
+				MQPutMessageOptions twsPutMsgOptions = new MQPutMessageOptions();
 
-			twsMsg.replyToQueueManagerName = this._queueMngName;
-			twsMsg.persistence = MQC.MQPER_PERSISTENT;
-			twsMsg.messageType = MQC.MQMT_DATAGRAM;
-			twsMsg.messageId = MQC.MQMI_NONE;
-			twsMsg.characterSet = MQC.MQCCSI_Q_MGR;
+				twsPutMsgOptions.options = MQC.MQPMO_FAIL_IF_QUIESCING | MQC.MQPMO_SYNCPOINT;
+				// twsPutMsgOptions.options = MQC.MQPMO_FAIL_IF_QUIESCING
+				// QC.MQPMO_SYNCPOINT;
+				// twsPutMsgOptions.options = MQC.MQPMO_FAIL_IF_QUIESCING;
 
-			try {
+				twsMsg.replyToQueueManagerName = this._queueMngName;
+				twsMsg.persistence = MQC.MQPER_PERSISTENT;
+				twsMsg.messageType = MQC.MQMT_DATAGRAM;
+				twsMsg.messageId = MQC.MQMI_NONE;
+				twsMsg.characterSet = MQC.MQCCSI_Q_MGR;
 
-				twsMsg.format = MQC.MQFMT_STRING;
-				/* restoring of connection if necessary */
-				if ((this._queue == null) || (this._mqQueueManager == null)) {
-					int retInit = init();
-					if (retInit == TWS_ADAPTER_INIT_KO) {
-						System.out.println("twsWriteString() end");
-						return TWS_ADAPTER_WRITE_KO;
+				try {
+
+					twsMsg.format = MQC.MQFMT_STRING;
+					/* restoring of connection if necessary */
+					if ((this._queue == null) || (this._mqQueueManager == null)) {
+						int retInit = init();
+						if (retInit == TWS_ADAPTER_INIT_KO) {
+							System.out.println("twsWriteString() end");
+							return TWS_ADAPTER_WRITE_KO;
+						}
 					}
-				}
 
-				System.out.println("Data length = "
-						+ new Integer(twsMsg.getDataLength()).toString());
-				System.out.println("Message length = "
-						+ new Integer(twsMsg.getMessageLength()).toString());
-				System.out.println("Total message length = "
-						+ new Integer(twsMsg.getTotalMessageLength())
-								.toString());
+					System.out.println("Data length = " + new Integer(twsMsg.getDataLength()).toString());
+					System.out.println("Message length = " + new Integer(twsMsg.getMessageLength()).toString());
+					System.out.println(
+							"Total message length = " + new Integer(twsMsg.getTotalMessageLength()).toString());
 
-				this._queue.put(twsMsg, twsPutMsgOptions);
-				this._mqQueueManager.commit();
+					this._queue.put(twsMsg, twsPutMsgOptions);
 
-				this.twsAdapterCompletionCode = MQException.MQCC_OK;
-				this.twsAdapterReasonCode = MQException.MQRC_NONE;
+					// this._mqQueueManager.commit();
 
-				System.out.println("writeString() end");
-				return TWS_ADAPTER_WRITE_OK;
-
-			} catch (MQException mqExc) {
-				this.twsAdapterCompletionCode = mqExc.completionCode;
-				this.twsAdapterReasonCode = mqExc.reasonCode;
-				this.twsAdapterErrorCode = mqExc.reasonCode;
-
-				/* check if error code related to connection */
-				if (checkMQException(mqExc.reasonCode) == TWS_ADAPTER_RESTORABLE_CONNECTION) {
-					/* reconnect */
-					int retInit = init();
-					if (retInit == TWS_ADAPTER_INIT_KO) {
-						System.out.println("writeString() end");
-						return TWS_ADAPTER_WRITE_KO;
-					}
-					writeString(newMessage); // send again
+					this.twsAdapterCompletionCode = MQException.MQCC_OK;
+					this.twsAdapterReasonCode = MQException.MQRC_NONE;
 
 					System.out.println("writeString() end");
 					return TWS_ADAPTER_WRITE_OK;
 
-					/* delete of msg from queue */
-				} else {
+				} catch (MQException mqExc) {
+					this.twsAdapterCompletionCode = mqExc.completionCode;
+					this.twsAdapterReasonCode = mqExc.reasonCode;
+					this.twsAdapterErrorCode = mqExc.reasonCode;
+
+					/* check if error code related to connection */
+					if (checkMQException(mqExc.reasonCode) == TWS_ADAPTER_RESTORABLE_CONNECTION) {
+						/* reconnect */
+						int retInit = init();
+						if (retInit == TWS_ADAPTER_INIT_KO) {
+							System.out.println("writeString() end");
+							return TWS_ADAPTER_WRITE_KO;
+						}
+						writeString(newMessage); // send again
+
+						System.out.println("writeString() end");
+						return TWS_ADAPTER_WRITE_OK;
+
+						/* delete of msg from queue */
+					} else {
+						try {
+							this._mqQueueManager.backout();
+						} catch (MQException e) {
+							e.printStackTrace();
+							System.out.println(e.getMessage());
+						}
+
+						System.out.println("writeString() end");
+						return TWS_ADAPTER_WRITE_KO;
+					}
+				} catch (IOException ioExc) {
 					try {
 						this._mqQueueManager.backout();
 					} catch (MQException e) {
-						e.printStackTrace();
 						System.out.println(e.getMessage());
+						e.printStackTrace();
 					}
 
 					System.out.println("writeString() end");
-					return TWS_ADAPTER_WRITE_KO;
+					return TWS_ADAPTER_IOEXC_KO;
 				}
-			} catch (IOException ioExc) {
-				try {
-					this._mqQueueManager.backout();
-				} catch (MQException e) {
-					System.out.println(e.getMessage());
-					e.printStackTrace();
-				}
-
-				System.out.println("writeString() end");
-				return TWS_ADAPTER_IOEXC_KO;
+			} catch (IOException e1) {
+				System.out.println(e1.getMessage());
+				return TWS_ADAPTER_SETMESSAGECONTENT_KO; ////////////////// errore
+				////////////////// dati
 			}
 		} else { // newMessage == null
 			try {
@@ -367,7 +362,6 @@ public class NBPMQAdapter {
 			return TWS_ADAPTER_WRITE_KO;
 		}
 	}
-
 
 	public int close() {
 
@@ -524,21 +518,16 @@ public class NBPMQAdapter {
 	/**
 	 * @return the _logger
 	 */
-	/*g
-	public Logger get_logger() {
-		return _logger;
-	}
-	*/
+	/*
+	 * g public Logger get_logger() { return _logger; }
+	 */
 
 	/**
 	 * @param _logger
-	 *            the _logger to set
-	 *G
-	public void set_logger(Logger _logger) {
-		this._logger = _logger;
-	}
-
-	/**
+	 *            the _logger to set G public void set_logger(Logger _logger) {
+	 *            this._logger = _logger; }
+	 * 
+	 *            /**
 	 * @return the _msgId
 	 */
 	public String get_msgId() {
@@ -583,66 +572,97 @@ public class NBPMQAdapter {
 		this._message = _message;
 	}
 
+	public boolean isOperationInError() {
+		return _operationInError;
+	}
 
-	/**
-	 * @param applidTWSName
-	 *            contains the name of applid TWS that must be executed
-	 * @param filePath
-	 *            contains the path of file that must be transferred by means
-	 *            TWS
-	 * @param fileName
-	 *            name of file that must be transferred by means TWS
-	 */
+	public void setOperationInError(boolean operationInError) {
+		this._operationInError = operationInError;
+	}
 
-	/**
-	 * @param applidTWSName
-	 *            contains the name of applid TWS that must be executed
-	 * @param filePath
-	 *            contains the path of the files that must be transferred by
-	 *            means TWS
-	 * @param fileName
-	 *            name of first file that must be transferred by means TWS
-	 * @param fileName2
-	 *            name of second file that must be transferred by means TWS
-	 */
-	
+	public int getReturnCode() {
+		return _returnCode;
+	}
 
-	/**
-	 * @param applidTWSName
-	 *            contains the name of applid TWS that must be executed
-	 * @param filePath
-	 *            contains the path of the files that must be transferred by
-	 *            means TWS
-	 * @param fileName[]
-	 *            array that contains the names of files that must be transferred by means TWS
-	 */
+	public void setReturnCode(int returnCode) {
+		this._returnCode = returnCode;
+	}
 
+	public static int sendNBPMMeesage(TWObject NBPApplData, TWObject NBPQDHData) {
 
-	/**
-	 * @return the _twsHeader
-	 */
-	  public static void sendNBPMMeesage(TWObject connectionData,String message) {
-		  
-		  System.out.println("Il messaggio : "+message);
-		  NBPMQAdapter adapter_Instance = new NBPMQAdapter(connectionData);
-		  adapter_Instance.init();
-		  //adapter_Instance.set_message(message);
-		  System.out.println("RC = "+adapter_Instance.writeString(message));
-	   
-		  	/**
-		  	 * 
-		  	 * 	TK_MQAppChannel=SYSTEM.DEF.SVRCONN
-				TK_MQAppHost=WIN-M248F5G0EIC
-				TK_MQAppPassword=
-				TK_MQAppPort=1414
-				TK_MQAppQueueManager=SQL00001
-				TK_MQAppQueueName=DATAGRAM.ZXI.WBPMBSMI
-				TK_MQAppUserName=
-		  	 */
-		 
-		  
-		 
-	    	
-	  }
+		int rc = -1;
+
+		NBPMQAdapter adapter_Appl_Instance = new NBPMQAdapter(NBPApplData);
+
+		if (adapter_Appl_Instance != null && !adapter_Appl_Instance.isOperationInError()) {
+
+			rc = adapter_Appl_Instance.init();
+
+			if (rc == 0) {
+
+				rc = adapter_Appl_Instance.writeString((String) NBPApplData.getPropertyValue("MESSAGE"));
+
+				if (rc == 0) {
+
+					NBPMQAdapter adapter_QDH_Instance = new NBPMQAdapter(NBPQDHData);
+
+					if (adapter_QDH_Instance != null && !adapter_QDH_Instance.isOperationInError()) {
+					
+						rc = adapter_QDH_Instance.init();
+
+						if (rc == 0) {
+
+							rc = adapter_QDH_Instance.writeString((String) NBPQDHData.getPropertyValue("MESSAGE"));
+
+							if (rc == 0) {
+
+								try {
+									
+									adapter_Appl_Instance._mqQueueManager.commit();
+
+									try {
+
+										adapter_QDH_Instance._mqQueueManager.commit();
+
+									} catch (MQException mqExc1) {
+
+										rc = mqExc1.completionCode;
+
+										// rollback messaggio QDH
+
+										rc = adapter_QDH_Instance.rollback();
+
+									}
+								} catch (MQException mqExc2) {
+
+									rc = mqExc2.completionCode;
+
+									// rollback messaggio Applicativo
+
+									rc = adapter_Appl_Instance.rollback();
+
+								}
+
+							} else {
+
+								// eseguo rollback messaggio applicativo
+								
+							    adapter_Appl_Instance.rollback();
+								
+							}
+
+						}
+
+					} else rc = adapter_QDH_Instance.getReturnCode();
+
+				}
+			}
+		} else  rc = adapter_Appl_Instance.getReturnCode();
+
+		System.out.println("RC::::::::::::::::::::: PF " + rc);
+
+		return rc;
+
+	}
 
 }
