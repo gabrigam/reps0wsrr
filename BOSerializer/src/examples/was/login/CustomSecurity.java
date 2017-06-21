@@ -50,11 +50,16 @@ public class CustomSecurity {
 	public static String getRawToken() {
 		Properties prop = getTaiProperties();
 		
+		if (prop==null) return null;
+		
 		return prop.getProperty("rawToken");
 	}
 	
 	public static String getClearToken() {
+			
 		Properties prop = getTaiProperties();
+		
+		if (prop==null) return null;
 		
 		return prop.getProperty("clearToken");
 	}
