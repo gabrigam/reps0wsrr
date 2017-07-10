@@ -97,29 +97,44 @@ public class NBPMQAdapter {
 		System.out.println("NBPMQAdapter(costruttore start...");
 
 		try {
+			
+			
 			this._queueMngName = (String) connectionData.getPropertyValue("QMGR");
+			
 			this._hostName = (String) connectionData.getPropertyValue("HOST");
+			
 			this._port = Integer.parseInt((String) connectionData.getPropertyValue("PORT"));
+			
 			this._channel = (String) connectionData.getPropertyValue("CHANNEL");
+			
 			this._queueName = (String) connectionData.getPropertyValue("QUEUE");
+			
 			this._msgId = new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss.SSSSSS").format(new Date());
+			
 			int maxConnRetry = Integer.parseInt((String) connectionData.getPropertyValue("MAXCONNRETRY"));
-
+			
 			if (maxConnRetry < 0) {
 				System.out.println("maxConnRetry = " + new Integer(maxConnRetry).toString()
 						+ ". Non sono accettabili valori Negativi viene impostato  il valore 0.");
 				this._maxConnRetry = 0;
 			}
+
 			this._maxConnRetry = maxConnRetry;
+
 
 			/* Impostazione Ambiente MQ */ // Serve ????
 			if (this._hostName.equalsIgnoreCase(MQEnvironment.hostname) == false) {
+
 				MQEnvironment.hostname = this._hostName;
 			}
+
 			if (this._channel.equalsIgnoreCase(MQEnvironment.channel) == false) {
+
 				MQEnvironment.channel = this._channel;
 			}
+
 			if (this._port != MQEnvironment.port) {
+
 				MQEnvironment.port = this._port;
 			}
 
@@ -596,8 +611,6 @@ public class NBPMQAdapter {
 
 		try {
 
-			NBPMQAdapter.logIn("P1");
-
 			if (adapter_Appl_Instance != null && !adapter_Appl_Instance.isOperationInError()) {
 
 				rc = adapter_Appl_Instance.init();
@@ -631,11 +644,11 @@ public class NBPMQAdapter {
 
 										} catch (MQException mqExc1) {
 
-											NBPMQAdapter.logIn(mqExc1.getMessage());
+											System.out.println(mqExc1.getMessage());
 
 											rc = mqExc1.completionCode;
 
-											NBPMQAdapter.logIn("Errore Commit messaggio QDH  "+rc);
+											System.out.println("Errore Commit messaggio QDH  "+rc);
 
 											// rollback messaggio QDH
 
@@ -644,11 +657,11 @@ public class NBPMQAdapter {
 										}
 									} catch (MQException mqExc2) {
 
-										NBPMQAdapter.logIn(mqExc2.getMessage());
+										System.out.println(mqExc2.getMessage());
 
 										rc = mqExc2.completionCode;
 
-										NBPMQAdapter.logIn("Errore Commit messaggio applicativo "+rc);
+										System.out.println("Errore Commit messaggio applicativo "+rc);
 
 										// rollback messaggio Applicativo
 
@@ -673,13 +686,13 @@ public class NBPMQAdapter {
 			} else  rc = adapter_Appl_Instance.getReturnCode();
 
 
-			NBPMQAdapter.logIn("Result RC : "+rc);
+			System.out.println("Result RC : "+rc);
 
 		}
 
 		catch( Exception ex) {
 			
-			NBPMQAdapter.logIn(ex.getMessage());
+			System.out.println(ex.getMessage());
 
 		}
 		
@@ -687,10 +700,5 @@ public class NBPMQAdapter {
 
 	}
 
-	private static void logIn(String msg) {
-		System.out.println("****************************************************************************************************************");
-		System.out.println(msg);
-		System.out.println("****************************************************************************************************************");
-	}
 
 }
