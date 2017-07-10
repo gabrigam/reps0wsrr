@@ -290,11 +290,13 @@ public class NBPMQAdapter {
 				twsMsg.persistence = MQC.MQPER_PERSISTENT;
 				twsMsg.messageType = MQC.MQMT_DATAGRAM;
 				twsMsg.messageId = MQC.MQMI_NONE;
-				twsMsg.characterSet = MQC.MQCCSI_Q_MGR;
+				twsMsg.characterSet = 500;
+				twsMsg.encoding=785;
 
 				try {
 
-					twsMsg.format = MQC.MQFMT_STRING;
+					//twsMsg.format = MQC.MQFMT_STRING; NON RICHIESTA
+					
 					/* restoring of connection if necessary */
 					if ((this._queue == null) || (this._mqQueueManager == null)) {
 						int retInit = init();
