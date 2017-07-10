@@ -2,6 +2,7 @@ package com.intesasanpaolo.nbp.utility;
 
 import java.io.StringReader;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 
@@ -68,6 +69,8 @@ public class ISPHeaderUtility {
 			return null;
 
 	}
+	
+	/** da attivare in caso di test locale
 
 	@SuppressWarnings("unchecked")
 	private static HashMap ISPHeaderScompositionLocal(String ispHeader) {
@@ -146,6 +149,8 @@ public class ISPHeaderUtility {
 		return tokenMap;
 	}
 
+    */
+	
 	@SuppressWarnings("unchecked")
 
 	public static TWObject ISPHeaderTagValues(String ispHeader) {
@@ -254,6 +259,8 @@ public class ISPHeaderUtility {
 		return ISPHeaderValues;
 
 	}
+	
+	/** main da attivare solo per test locale
 
 	public static void main(String[] args) {
 
@@ -262,6 +269,8 @@ public class ISPHeaderUtility {
 		String timeStamp = null;
 		String timeStamp_ = null;
 		boolean error = false;
+		
+		
 
 		HashMap ispHeaderMap = new HashMap();
 
@@ -286,6 +295,24 @@ public class ISPHeaderUtility {
 		// <CodABI>[CodABI]</CodABI><CodOperatività>[CodOperarività]</CodOperatività><CodTerminaleCics>[CodTerminaleCics]</CodTerminaleCics></AdditionalBusinessInfo></ISPWebservicesHeader>";
 		String ispHeader = "<ISPWebservicesHeader><!--You may enter the following 6 items in any order--> <RequestInfo><!--You may enter the following 5 items in any order--><TransactionId>TID</TransactionId><Timestamp>20170630125040000252</Timestamp><ServiceID_>SID</ServiceID_><ServiceVersion>SERVICEVERION</ServiceVersion><!--Optional:--><Language>IT</Language></RequestInfo><OperatorInfo UserID=\"U0H1963\" IsVirtualUser=\"VIUSER\" NotISPUserID=\"NOTVIU\"/><CompanyInfo><!--You may enter the following 4 items in any order--><ISPCallerCompanyIDCode>[ISPCallerCompanyIDCode]</ISPCallerCompanyIDCode><!--Optional:--><NotISPCompanyIDCode>[NotISPCompanyIDCode]</NotISPCompanyIDCode><!--Optional:--><ISPBranchCode>[ISPBranchCode]</ISPBranchCode><ISPServiceCompanyIDCode>[ISPServiceCompanyIDCode]</ISPServiceCompanyIDCode></CompanyInfo><BusinessInfo><!--You may enter the following 5 items in any order--><CustomerID>[CustomerID]</CustomerID><!--Optional:--><BusinessProcessName>[BusinessProcessName]</BusinessProcessName><!--Optional:--><BusinessProcessID>[BusinessProcessID]</BusinessProcessID><!--Optional:--><BusinessOperation>[BusinessOperation]</BusinessOperation><!--Optional:--><BusinessFileID>[BusinessFileID]</BusinessFileID></BusinessInfo>         <TechnicalInfo>            <!--You may enter the following 4 items in any order-->            <ChannelIDCode>[ChannelIDCode]</ChannelIDCode>            <ApplicationID>[ApplicationID]</ApplicationID>            <CallerServerName>[CallerServerName]</CallerServerName>            <CallerProgramName>[CallerProgramName]</CallerProgramName>         </TechnicalInfo>         <AdditionalBusinessInfo>            <!--1 or more repetitions:-->            <CodUnitaOperativa>[CodUnitaOperativa]</CodUnitaOperativa><DataContabile>[DataContabile]</DataContabile><FlagPaperless>[FlagPaperless>]</FlagPaperless>	<CodABI>[CodABI]</CodABI><CodOperatività>[CodOperarività]</CodOperatività><CodTerminaleCics>[CodTerminaleCics]</CodTerminaleCics></AdditionalBusinessInfo></ISPWebservicesHeader>";
 
+		String K="20170630125040000252";
+		
+		String y=K.substring(0,4)+"-"+K.substring(4,6)+"-"+K.substring(6,8)+"-"+K.substring(8,10)+"."+K.substring(10,12)+"."+K.substring(12,14)+"."+K.substring(14,K.length());
+		String M=K.substring(4,6);
+		String d=K.substring(6,8);
+		String H=K.substring(8,10);
+		String m=K.substring(10,12);
+		String s=K.substring(12,14);
+		String ss=K.substring(14,K.length());
+		int h=0;
+		
+		try {
+			System.out.println(new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss.SSSSSS").parse(K).toString());
+			int f=0;
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		// ispHeader=null;
 		ispHeaderMap = ISPHeaderUtility.ISPHeaderScompositionLocal(ispHeader);
 
@@ -321,5 +348,6 @@ public class ISPHeaderUtility {
 		}
 
 	}
-
+	
+  */
 }
