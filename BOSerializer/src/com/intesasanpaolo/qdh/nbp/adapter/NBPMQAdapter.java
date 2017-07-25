@@ -3,9 +3,14 @@
  */
 package com.intesasanpaolo.qdh.nbp.adapter;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.StringTokenizer;
 
 //import org.apache.log4j.Logger;
 //import org.apache.log4j.MDC;
@@ -97,22 +102,22 @@ public class NBPMQAdapter {
 		System.out.println("NBPMQAdapter(costruttore start...");
 
 		try {
-			
-			
+
+
 			this._queueMngName = (String) connectionData.getPropertyValue("QMGR");
-			
+
 			this._hostName = (String) connectionData.getPropertyValue("HOST");
-			
+
 			this._port = Integer.parseInt((String) connectionData.getPropertyValue("PORT"));
-			
+
 			this._channel = (String) connectionData.getPropertyValue("CHANNEL");
-			
+
 			this._queueName = (String) connectionData.getPropertyValue("QUEUE");
-			
+
 			this._msgId = new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss.SSSSSS").format(new Date());
-			
+
 			int maxConnRetry = Integer.parseInt((String) connectionData.getPropertyValue("MAXCONNRETRY"));
-			
+
 			if (maxConnRetry < 0) {
 				System.out.println("maxConnRetry = " + new Integer(maxConnRetry).toString()
 						+ ". Non sono accettabili valori Negativi viene impostato  il valore 0.");
@@ -203,6 +208,10 @@ public class NBPMQAdapter {
 
 			return connStatus = TWS_ADAPTER_MQCONN_OK;
 		} catch (MQException mqExc) {
+			
+			System.out.println("Error completioncode "+mqExc.completionCode);
+			System.out.println("Error reasoncode "+mqExc.reasonCode);
+			
 			this.twsAdapterCompletionCode = mqExc.completionCode;
 			this.twsAdapterReasonCode = mqExc.reasonCode;
 			this.twsAdapterErrorCode = mqExc.reasonCode;
@@ -240,6 +249,10 @@ public class NBPMQAdapter {
 			return openQueueStatus = TWS_ADAPTER_MQOPEN_OK;
 
 		} catch (MQException mqExc) {
+			
+			System.out.println("Error completioncode "+mqExc.completionCode);
+			System.out.println("Error reasoncode "+mqExc.reasonCode);
+			
 			this.twsAdapterCompletionCode = mqExc.completionCode;
 			this.twsAdapterReasonCode = mqExc.reasonCode;
 			this.twsAdapterErrorCode = mqExc.reasonCode;
@@ -264,8 +277,10 @@ public class NBPMQAdapter {
 	 *         verificato un errore di scrittura a livello MQ -
 	 *         TWSAdapter.TWS_ADAPTER_IOEXC_KO se operazione non completata con
 	 *         errori di conversione dati Stringa
+	 * @throws EncodingException 
+	 * @throws UnsupportedEncodingException 
 	 */
-	public int writeString(String newMessage) {
+	public int writeString(String newMessage) throws EncodingException, UnsupportedEncodingException {
 
 		this.twsAdapterCompletionCode = MQException.MQCC_OK;
 		this.twsAdapterReasonCode = MQException.MQRC_NONE;
@@ -273,11 +288,20 @@ public class NBPMQAdapter {
 		System.out.println("writeString() start...");
 
 		if (newMessage != null) {
-			// adding the length of the tws msg to the length of the headers
+			
+			System.out.println("message encoded " + newMessage);
 
-			MQMessage twsMsg = new MQMessage();
 			try {
-				twsMsg.writeString(newMessage);
+
+				byte [] bytesEBCDIC = NBPMQAdapter.creatByteArrayFromTokenizer(newMessage);
+
+				MQMessage twsMsg = new MQMessage();
+
+				//twsMsg.writeString(new String(bytesEBCDIC));
+				
+				twsMsg.write(bytesEBCDIC, 0, bytesEBCDIC.length);
+				
+				//twsMsg.writeString(NBPMQAdapter.toHex(bytesEBCDIC));
 
 				MQPutMessageOptions twsPutMsgOptions = new MQPutMessageOptions();
 
@@ -290,13 +314,19 @@ public class NBPMQAdapter {
 				twsMsg.persistence = MQC.MQPER_PERSISTENT;
 				twsMsg.messageType = MQC.MQMT_DATAGRAM;
 				twsMsg.messageId = MQC.MQMI_NONE;
+
+				twsMsg.characterSet=MQC.MQCCSI_Q_MGR;
+				
 				twsMsg.characterSet = 500;
 				twsMsg.encoding=785;
+				twsMsg.format = MQC.MQFMT_NONE;			
+			
 
 				try {
 
-					//twsMsg.format = MQC.MQFMT_STRING; NON RICHIESTA
-					
+					//twsMsg.format = MQC.MQFMT_STRING;
+					//twsMsg.format = MQC.MQFMT_STRING;
+
 					/* restoring of connection if necessary */
 					if ((this._queue == null) || (this._mqQueueManager == null)) {
 						int retInit = init();
@@ -325,6 +355,9 @@ public class NBPMQAdapter {
 					this.twsAdapterCompletionCode = mqExc.completionCode;
 					this.twsAdapterReasonCode = mqExc.reasonCode;
 					this.twsAdapterErrorCode = mqExc.reasonCode;
+					
+					System.out.println("Error completioncode "+mqExc.completionCode);
+					System.out.println("Error reasoncode "+mqExc.reasonCode);
 
 					/* check if error code related to connection */
 					if (checkMQException(mqExc.reasonCode) == TWS_ADAPTER_RESTORABLE_CONNECTION) {
@@ -394,6 +427,8 @@ public class NBPMQAdapter {
 			}
 			return TWS_ADAPTER_CLOSE_OK;
 		} catch (MQException mqExc) {
+			System.out.println("Error completioncode "+mqExc.completionCode);
+			System.out.println("Error reasoncode "+mqExc.reasonCode);
 			System.out.println(mqExc.getMessage());
 			mqExc.printStackTrace();
 			return TWS_ADAPTER_CLOSE_KO;
@@ -421,6 +456,8 @@ public class NBPMQAdapter {
 			}
 			retval = TWS_ADAPTER_ROLLBACK_OK;
 		} catch (MQException mqExc) {
+			System.out.println("Error completioncode "+mqExc.completionCode);
+			System.out.println("Error reasoncode "+mqExc.reasonCode);
 			System.out.println(mqExc.getMessage());
 			mqExc.printStackTrace();
 			retval = TWS_ADAPTER_ROLLBACK_KO;
@@ -693,14 +730,78 @@ public class NBPMQAdapter {
 		}
 
 		catch( Exception ex) {
-			
+
 			System.out.println(ex.getMessage());
 
 		}
-		
+
 		return rc;
 
 	}
+	
+	private static byte[] creatByteArrayFromTokenizer(String input) {
+		
+		StringTokenizer stk = new StringTokenizer(input,"_");
+		byte[] byteData=new byte[stk.countTokens()];
+		int i=0;
+		while (stk.hasMoreElements()) {
+			byteData[i]=Byte.parseByte((String) stk.nextToken());
+			i++;
+		}
+		
+		return byteData;
+	}
+	/**
+	public static void main(String [] args) throws EncodingException, UnsupportedEncodingException {
 
+		byte ffff=0;
+		
+	
+		byte a[]="A0".getBytes("Cp500");
+		byte[] qq=NBPMQAdapter.intToBytes(48);
+		//Byte.decode("223");
+		
+		
+		byte[] AA = "ciao".getBytes();
+		byte[] data=NBPMQAdapter.creatByteArrayFromTokenizer("1_2_3_4_0_0_0_0_0_0_0_0_100_101");
+		System.out.println(new String(data));
+		
+		String newMessage= "T:";
+		byte[] bytesEBCDIC = newMessage.getBytes("Cp500");
+		String  base = NBPMQAdapter.toHex(bytesEBCDIC);
+		byte[] bytesEBCDIC__ = newMessage.getBytes("UTF-8"); 
+		byte[] bytesEBCDIC___ = newMessage.getBytes("UTF-16"); 
+		int[] intEBCDIC= new int[bytesEBCDIC.length];
+		byte[] bytesEBCDIC____ =new String(bytesEBCDIC__).getBytes("Cp500"); 
+		
+	       for(int i=0; i<newMessage.length(); i++){
+	    	    byte b=bytesEBCDIC[i];
+	    	    if (b<0) intEBCDIC[i]=(bytesEBCDIC[i]+256);
+	    	    else intEBCDIC[i]=bytesEBCDIC[i];
+	            System.out.println("ASCII "+newMessage.charAt(i)+"  <-->  "+b +"  <-->  "+intEBCDIC[i]);
+	       }
+	       
+	    
+	       
+	       String KK=Arrays.toString(intEBCDIC).toString();
+	       String KK1=new String(bytesEBCDIC,"Cp500");
+	       //String KK1g=new String()
+	       
+	       int j=0;
+
+
+
+		//byte[] bytes=Encoder.stringToBytes("ciao", "Cp500");
+
+
+
+		//System.out.println(new String(data, "Cp1047")); // convert into readable string       
+
+		//String data_coverted=Encoder.bytesToString(data, "Cp500");
+		//System.out.println("DOPO C "+data.toString());
+		
+	}
+	
+	**/
 
 }
