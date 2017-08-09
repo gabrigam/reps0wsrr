@@ -6,7 +6,6 @@ package com.intesasanpaolo.qdh.nbp.adapter;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -23,7 +22,7 @@ import com.ibm.mq.MQPutMessageOptions;
 import com.ibm.mq.MQQueue;
 import com.ibm.mq.MQQueueManager;
 import com.ibm.mq.pcf.CMQC;
-import com.intesasanpaolo.nbp.mq.QDHMQClient;
+////////import com.intesasanpaolo.nbp.mq.QDHMQClient; ho tolto questa classe che non serviva
 
 import teamworks.TWObjectFactory;
 import com.lombardisoftware.core.TWObject;
@@ -280,7 +279,7 @@ public class NBPMQAdapter {
 	 * @throws EncodingException 
 	 * @throws UnsupportedEncodingException 
 	 */
-	public int writeString(String newMessage) throws EncodingException, UnsupportedEncodingException {
+	public int writeString(String newMessage)  {
 
 		this.twsAdapterCompletionCode = MQException.MQCC_OK;
 		this.twsAdapterReasonCode = MQException.MQRC_NONE;

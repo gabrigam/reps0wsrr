@@ -70,7 +70,6 @@ public class ISPHeaderUtility {
 
 	}
 	
-	/** da attivare in caso di test locale
 
 	@SuppressWarnings("unchecked")
 	private static HashMap ISPHeaderScompositionLocal(String ispHeader) {
@@ -149,7 +148,6 @@ public class ISPHeaderUtility {
 		return tokenMap;
 	}
 
-    */
 	
 	@SuppressWarnings("unchecked")
 
@@ -259,6 +257,12 @@ public class ISPHeaderUtility {
 		return ISPHeaderValues;
 
 	}
+	
+	
+	public static Object testByte(String data) throws Exception {
+		return data.getBytes();
+	}
+	
 	
 	/** main da attivare solo per test locale
 
