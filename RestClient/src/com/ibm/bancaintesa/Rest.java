@@ -18,6 +18,8 @@ import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -39,7 +41,7 @@ import org.xml.sax.InputSource;
 import com.ibm.wsspi.security.auth.callback.WSMappingCallbackHandlerFactory;
 
 public class Rest {
-	//public static boolean debug = false;
+	// public static boolean debug = false;
 
 	private static String keyResponseMessage = "responseMessage";
 	private static String keycodeMessage = "codeMessage";
@@ -48,7 +50,6 @@ public class Rest {
 	private static String USER_NAME = "USER_NAME";
 	private static String USER_PASSWORD = "USER_PASSWORD";
 
-
 	@SuppressWarnings("static-access")
 	public static void main(String args[]) {
 
@@ -56,8 +57,8 @@ public class Rest {
 		String url = "http://linuxbpm85:9080/rest/bpm/wle/v1/systems";
 
 		/*
-		String command = "DELETE";
-		String url = "http://linuxbpm85:9080/rest/bpm/wle/v1/process/1?action=delete&parts=all";
+		 * String command = "DELETE"; String url =
+		 * "http://linuxbpm85:9080/rest/bpm/wle/v1/process/1?action=delete&parts=all";
 		 */
 		String contentFile = null;
 		String content = null;
@@ -68,8 +69,8 @@ public class Rest {
 
 		try {
 
-			System.out.println( doRest(command, url, content, headerMap, userid, password,false,100));
-		} catch(Exception e) {
+			System.out.println(doRest(command, url, content, headerMap, userid, password, false, 100));
+		} catch (Exception e) {
 			e.printStackTrace(System.out);
 		}
 	} // End of main
@@ -83,13 +84,13 @@ public class Rest {
 			super(arg0);
 		}
 
-
-		public RestException(String cod,String mess){
+		public RestException(String cod, String mess) {
 
 			codice = cod;
 			messaggio = mess;
 
 		}
+
 		/**
 		 * 
 		 */
@@ -114,137 +115,200 @@ public class Rest {
 	 * @return
 	 * @throws Exception
 	 */
-	public static HashMap<String,String> doRest(String command, String urlString,
-			String content, HashMap<String, String> headerMap, String userid,
-			String password,boolean debug,int timeout) throws Exception {
+	public static HashMap<String, String> doRest(String command, String urlString, String content,
+			HashMap<String, String> headerMap, String userid, String password, boolean debug, int timeout)
+			throws Exception {
 
-		HashMap<String,String> returnVal = new HashMap<String,String>();
-
+		HashMap<String, String> returnVal = new HashMap<String, String>();
 
 		// Check that the command type is known
-		if (!command.equals("GET") && !command.equals("POST")
-				&& !command.equals("PUT")&& !command.equals("DELETE")) {
-			throw new RestException("Unsupported command: " + command
-					+ ".  Supported commands are GET, POST, PUT");
+		if (!command.equals("GET") && !command.equals("POST") && !command.equals("PUT") && !command.equals("DELETE")) {
+			throw new RestException("Unsupported command: " + command + ".  Supported commands are GET, POST, PUT");
 		}
 
 		{
 			try {
 
 				URL url = new URL(urlString);
-				HttpURLConnection httpUrlConnection = (HttpURLConnection) url
-						.openConnection();
+				HttpURLConnection httpUrlConnection = (HttpURLConnection) url.openConnection();
 				httpUrlConnection.setRequestMethod(command);
-								
+
 				if (timeout > 0) {
-					
-					httpUrlConnection.setReadTimeout(timeout*1000); //timeout is in seconds 
+
+					httpUrlConnection.setReadTimeout(timeout * 1000); // timeout
+																		// is in
+																		// milliseconds
 				}
-					
-				////////////////////////////////////////////////////////////////////////
-				
-				String ispHeader=headerMap.get("X-ISPWebServicesHeader");
-				
-				HashMap<String,String> ispHeaderMap=Rest.ISPHeaderScomposition(ispHeader);
-				
-				System.out.println("-------TokenMap----------- " + ispHeaderMap);
-				
-				if (ispHeaderMap ==null) {	
-					
-					System.out.println("-------TokenMap---------NULL");
-					
+
+				String ispHeader = headerMap.get("X-ISPWebServicesHeader");
+
+				HashMap<String, String> ispHeaderMap = Rest.ISPHeaderScomposition(ispHeader, debug);
+
+				if (ispHeaderMap == null) {
+					System.out.println("###################################################################################################");
+					System.out.println("Error ISPHeader : " + ispHeader + " is Malformed or mandatory fields are missing or invalid (enable debug on caller for more information");
+					System.out.println("###################################################################################################");
 					throw new RestException("Error ISPHeader : " + ispHeader
-							+ ".  is Malformed or mandatory fields are missing or invalid");
+							+ " is Malformed or mandatory fields are missing or invalid");
 				}
-				
+
 				if (debug) {
-					if (timeout != -1)
-					System.out.println(">> doRest: command=" + command + ", urlString="
-							+ urlString + ", content=" + content + ", userid=" + userid+ ", +, X-ISPWebServicesHeader=" + ispHeader+" , timeout="+timeout);
-					else
-						System.out.println(">> doRest: command=" + command + ", urlString="
-								+ urlString + ", content=" + content + ", userid=" + userid+ ", , X-ISPWebServicesHeader=" + ispHeader+" , timeout=-999 Not Applicable");	
+					if (timeout != -1) {
+						System.out.println("###################################################################################################");
+						System.out.println(">> doRest: command=" + command + ", urlString=" + urlString + ", content="
+								+ content + ", userid=" + userid + ", +, X-ISPWebServicesHeader=" + ispHeader
+								+ " , timeout=" + timeout);
+						System.out.println("###################################################################################################");
+					}
+					else {
+						System.out.println("###################################################################################################");
+						System.out.println(">> doRest: command=" + command + ", urlString=" + urlString + ", content="
+								+ content + ", userid=" + userid + ", , X-ISPWebServicesHeader=" + ispHeader);
+						System.out.println("###################################################################################################");
+					}
 				}
-					
-				////////////////////////////////////////////////////////////////////////
 
 				// If a header map was supplied, add the map name=value pairs as
 				// HTTP header values
+				if (debug) {
+					System.out.println("###################################################################################################");
+					System.out.println(">> doRest MAP  key -value http-header-request-property list ; ");
+					System.out.println("###################################################################################################");
+				}
 				if (headerMap != null) {
 					Set<String> keySet = headerMap.keySet();
 					Iterator<String> it = keySet.iterator();
 					while (it.hasNext()) {
 						String key = it.next();
-						if (!key.equals("X-ISPWebServicesHeader"))
-							//skip X-ISPWebServicesHeader
-						httpUrlConnection.addRequestProperty(key,
-								headerMap.get(key));
+						if (!key.equals("X-ISPWebServicesHeader") && !key.equals("X-ISP-Security") && !key.equals("Authorization"))
+							// skip X-ISPWebServicesHeader
+							httpUrlConnection.addRequestProperty(key, headerMap.get(key));
+						if (debug)
+							System.out.println(">> doRest requestProperty : " + key + " = " + headerMap.get(key));
 					}
-										
-					
-					//add single ISPHeader field as single requestProperty				
+					// add single ISPHeader field as single requestProperty
+					if (debug) {
+						System.out.println("###################################################################################################");
+						System.out.println(">> doRest ISPHEADER key -value http-header-request-property list ; ");
+						System.out.println("###################################################################################################");
+					}
 					keySet = ispHeaderMap.keySet();
 					it = keySet.iterator();
 					while (it.hasNext()) {
 						String key = it.next();
-						String value=headerMap.get(key);
-						if (value==null) value="";
-						httpUrlConnection.addRequestProperty(key,value);
+						String value = ispHeaderMap.get(key);
+						if (value == null)
+							value = "";
+						httpUrlConnection.addRequestProperty(key, value);
+
+						if (debug)
+							System.out.println(">> doRest requestProperty : " + key + " = " + value);
 					}
-					
+
 				}
 
-				// If a userid (and password) have been supplied, set the basic Auth
+				// If a userid (and password) have been supplied, set the basic
+				// Auth
 				// info
 				if (userid != null && !userid.isEmpty()) {
-					String authorization = "Basic "
-							+ new String(
-									org.apache.commons.codec.binary.Base64
-									.encodeBase64(new String(userid + ":"
-											+ password).getBytes()));
-					httpUrlConnection.setRequestProperty("Authorization",
-							authorization);
+					String authorization = "Basic " + new String(org.apache.commons.codec.binary.Base64
+							.encodeBase64(new String(userid + ":" + password).getBytes()));
+					httpUrlConnection.setRequestProperty("Authorization", authorization);
 
+					System.out.println("###################################################################################################");
+					System.out.println(
+							">> doRest: service invoked with user/password , Security Token IF present will be ignored");
+					System.out.println("###################################################################################################");
+
+				} else {
+
+					String clearToken = headerMap.get("X-ISP-Security");
+					String clearTokenb64 = null;
+
+					if (clearToken != null) {
+						clearTokenb64 = new String(
+								org.apache.commons.codec.binary.Base64.encodeBase64(clearToken.getBytes()));
+						
+						httpUrlConnection.setRequestProperty("X-ISP-Security", clearTokenb64);
+
+						if (debug) {
+							System.out.println("###################################################################################################");
+							System.out.println(">> doRest FOUND - Security Clear Token \n" + clearToken );
+							System.out.println(">> doRest FOUND - Security Clear Token \n" + clearToken );
+							System.out.println("###################################################################################################");
+							System.out.println(">> doRest B64   - Security ClearToken \n" + clearTokenb64 );
+							System.out.println("###################################################################################################");							
+						}
+
+					} else {
+						
+						if (debug) {
+							System.out.println("###################################################################################################");
+							System.out.println(">> doRest Security Clear Token NOT Present");
+							System.out.println("###################################################################################################");
+						}
+																
+					}
+					
+					String rawToken=headerMap.get("Authorization");
+					
+					if (rawToken!=null){
+						
+						httpUrlConnection.setRequestProperty("Authorization", rawToken);
+						
+						if (debug) {
+							System.out.println("###################################################################################################");
+							System.out.println(">> doRest FOUND - Security Raw Token \n" + rawToken );	
+							System.out.println("###################################################################################################");
+						}
+						
+					} else 
+					
+						if (debug) {
+							System.out.println("###################################################################################################");
+							System.out.println(">> doRest Security Raw Token NOT Present");
+							System.out.println("###################################################################################################");
+						}
 				}
 
-				// If there is content AND the command is either POST or PUT, then
+				// If there is content AND the command is either POST or PUT,
+				// then
 				// send the request content
-				if (content != null
-						&& (command.equals("POST") || command.equals("PUT"))) {
+				if (content != null && (command.equals("POST") || command.equals("PUT"))) {
 					httpUrlConnection.setDoOutput(true);
-					OutputStreamWriter wr = new OutputStreamWriter(
-							httpUrlConnection.getOutputStream());
+					OutputStreamWriter wr = new OutputStreamWriter(httpUrlConnection.getOutputStream());
 					wr.write(content);
 					wr.flush();
 					wr.close();
-				}else if(command.equals("DELETE")){
+				} else if (command.equals("DELETE")) {
 
 					httpUrlConnection.setDoOutput(true);
 
-					/*httpUrlConnection.setRequestProperty(
-					    "Content-Type", "application/x-www-form-urlencoded" );*/
+					/*
+					 * httpUrlConnection.setRequestProperty( "Content-Type",
+					 * "application/x-www-form-urlencoded" );
+					 */
 				}
 
 				int responseCode = httpUrlConnection.getResponseCode();
 				returnVal.put(keycodeMessage, "" + responseCode);
-				returnVal.put(keyErrorMessage, "" + httpUrlConnection.getResponseMessage());	
+				returnVal.put(keyErrorMessage, "" + httpUrlConnection.getResponseMessage());
 
-
-				returnVal.put(keyResponseMessage, "" );
+				returnVal.put(keyResponseMessage, "");
 
 				// Now we wait for the response data
 				InputStreamReader inReader = null;
 
-				try{
+				try {
 
 					inReader = new InputStreamReader(httpUrlConnection.getInputStream());
 
-				}catch (IOException e) {
+				} catch (IOException e) {
 
-					InputStream in = 	httpUrlConnection.getErrorStream();
+					InputStream in = httpUrlConnection.getErrorStream();
 
-					if(in == null  ){
-						if(httpUrlConnection.getResponseCode() == 401)
+					if (in == null) {
+						if (httpUrlConnection.getResponseCode() == 401)
 							return returnVal;
 						else
 							throw e;
@@ -268,321 +332,372 @@ public class Rest {
 					System.out.println("doRest: result is " + sb.toString());
 				}
 
-				returnVal.put(keyResponseMessage, "" +  sb.toString());
+				returnVal.put(keyResponseMessage, "" + sb.toString());
 
 				return returnVal;
 
-			}catch(IOException e){
+			} catch (IOException e) {
 				e.printStackTrace();
 				throw e;
 			}
 		}
 
-
 		// Never reached. We should never reach this line.
 	} // End of doRest
 
+	public static HashMap<String, String> doRest(String command, String urlString, String content,
+			HashMap<String, String> headerMap, String aliasAuthName, boolean debug, int timeout) throws Exception {
 
-
-	public static HashMap<String,String> doRest(String command, String urlString,
-			String content, HashMap<String, String> headerMap,String aliasAuthName,boolean debug,int timeout) throws Exception {
-
-		HashMap<String,String> returnVal = new HashMap<String,String>();
+		HashMap<String, String> returnVal = new HashMap<String, String>();
 		String userid = "";
 		String password = "";
-		
-		returnVal.put(keycodeMessage, "" );
-		returnVal.put(keyErrorMessage, "" );	
-		returnVal.put(keyResponseMessage, "" );
-		try{
-			Map<String,String> userCredentials = getUserCredentials(aliasAuthName);
+
+		returnVal.put(keycodeMessage, "");
+		returnVal.put(keyErrorMessage, "");
+		returnVal.put(keyResponseMessage, "");
+		try {
+			Map<String, String> userCredentials = getUserCredentials(aliasAuthName);
 			userid = userCredentials.get(USER_NAME);
 			password = userCredentials.get(USER_PASSWORD);
-		}catch(Exception ex){
-			returnVal.put(keyResponseMessage, "Impossibile recuperare l'alias. " + ex.getMessage() );
-			returnVal.put(keycodeMessage, "9999"  );
+		} catch (Exception ex) {
+			returnVal.put(keyResponseMessage, "Impossibile recuperare l'alias. " + ex.getMessage());
+			returnVal.put(keycodeMessage, "9999");
 			return returnVal;
 		}
 
-		return doRest(command, urlString,
-				content, headerMap,  userid,
-				password, debug,timeout);
+		return doRest(command, urlString, content, headerMap, userid, password, debug, timeout);
 
 		// Never reached. We should never reach this line.
 	} // End of doRest
 
-
-	private static Map<String, String> getUserCredentials(String aliasName)
-			throws Exception {
+	private static Map<String, String> getUserCredentials(String aliasName) throws Exception {
 
 		Map<String, String> userCredentials = new HashMap<String, String>();
 
 		try {
 			Map<String, String> map = new HashMap<String, String>();
 
-
 			map.put(MAPPING_ALIAS, aliasName);
 			CallbackHandler handler;
 
-			handler = WSMappingCallbackHandlerFactory.getInstance()
-					.getCallbackHandler(map, null);
+			handler = WSMappingCallbackHandlerFactory.getInstance().getCallbackHandler(map, null);
 
 			Subject subject = new Subject();
-			LoginContext lc = new LoginContext("DefaultPrincipalMapping",
-					subject, handler);
+			LoginContext lc = new LoginContext("DefaultPrincipalMapping", subject, handler);
 			lc.login();
 			subject = lc.getSubject();
 
-			Set<PasswordCredential> pwdCredentialSet = subject
-					.getPrivateCredentials(PasswordCredential.class);
-			PasswordCredential cred = (PasswordCredential) pwdCredentialSet
-					.iterator().next();
+			Set<PasswordCredential> pwdCredentialSet = subject.getPrivateCredentials(PasswordCredential.class);
+			PasswordCredential cred = (PasswordCredential) pwdCredentialSet.iterator().next();
 			if (cred != null) {
 				userCredentials.put(USER_NAME, new String(cred.getUserName()));
-				userCredentials.put(USER_PASSWORD,
-						new String(cred.getPassword()));
+				userCredentials.put(USER_PASSWORD, new String(cred.getPassword()));
 				return userCredentials;
 			} else {
 				return null;
 			}
 		} catch (Exception e) {
 
-			System.out.println("eRestClient : Error while retrieving user alias named "
-					+ aliasName);
+			System.out.println("RestClient : Error while retrieving user alias named " + aliasName);
 
 			throw e;
 		}
 	}
 	/*
-	private static String sendDelete(String url, HashMap<String, String> headerMap, String userid,
-			String password) throws IOException, AuthenticationException {
-		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-		//We just change HttpPost > HttpDelete
-		HttpDelete deleteRequest = new HttpDelete(url);
+	 * private static String sendDelete(String url, HashMap<String, String>
+	 * headerMap, String userid, String password) throws IOException,
+	 * AuthenticationException { CloseableHttpClient httpClient =
+	 * HttpClientBuilder.create().build(); //We just change HttpPost >
+	 * HttpDelete HttpDelete deleteRequest = new HttpDelete(url);
+	 * 
+	 * if (headerMap != null) { Set<String> keySet = headerMap.keySet();
+	 * Iterator<String> it = keySet.iterator(); while (it.hasNext()) { String
+	 * key = it.next(); deleteRequest.addHeader(key, headerMap.get(key)); } }
+	 * 
+	 * // If a userid (and password) have been supplied, set the basic Auth //
+	 * info if (userid != null && !userid.isEmpty()) { String authorization =
+	 * "Basic " + new String( org.apache.commons.codec.binary.Base64
+	 * .encodeBase64(new String(userid + ":" + password).getBytes()));
+	 * UsernamePasswordCredentials credentials = new
+	 * UsernamePasswordCredentials(userid, password); BasicScheme scheme = new
+	 * BasicScheme();
+	 * 
+	 * Header authorizationHeader = scheme.authenticate(credentials,
+	 * deleteRequest); deleteRequest.addHeader(authorizationHeader);
+	 * 
+	 * }
+	 * 
+	 * HttpResponse response = httpClient.execute(deleteRequest);
+	 * 
+	 * // if (response.getStatusLine().getStatusCode() != 200) {
+	 * 
+	 * 
+	 * 
+	 * // throw new RuntimeException("Failed : HTTP error code : " // +
+	 * response.getStatusLine().getStatusCode()); //}
+	 * 
+	 * BufferedReader br = new BufferedReader( new
+	 * InputStreamReader((response.getEntity().getContent())));
+	 * 
+	 * System.out.println("Output from Server .... \n"); StringBuffer result =
+	 * new StringBuffer(); String output = ""; while ((output = br.readLine())
+	 * != null) { result.append(output); } httpClient.close(); return
+	 * result.toString(); }
+	 */
 
-		if (headerMap != null) {
-			Set<String> keySet = headerMap.keySet();
-			Iterator<String> it = keySet.iterator();
-			while (it.hasNext()) {
-				String key = it.next();
-				deleteRequest.addHeader(key,
-						headerMap.get(key));
-			}
-		}
-
-		// If a userid (and password) have been supplied, set the basic Auth
-		// info
-		if (userid != null && !userid.isEmpty()) {
-			String authorization = "Basic "
-					+ new String(
-							org.apache.commons.codec.binary.Base64
-							.encodeBase64(new String(userid + ":"
-									+ password).getBytes()));
-			   UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(userid, password);
-				BasicScheme scheme = new BasicScheme();
-
-				Header authorizationHeader = scheme.authenticate(credentials, deleteRequest);
-				deleteRequest.addHeader(authorizationHeader);
-
-		}
-
-		HttpResponse response = httpClient.execute(deleteRequest);
-
-	//	if (response.getStatusLine().getStatusCode() != 200) {
-
-
-
-		//	throw new RuntimeException("Failed : HTTP error code : "
-			//		+ response.getStatusLine().getStatusCode());
-		//}
-
-		BufferedReader br = new BufferedReader(
-				new InputStreamReader((response.getEntity().getContent())));
-
-		System.out.println("Output from Server .... \n");
-		StringBuffer result = new StringBuffer();
-		String output = "";
-		while ((output = br.readLine()) != null) {
-			result.append(output);
-		}
-		httpClient.close();
-		return result.toString();
-	}*/
-	
-	 //u0h1963
-	private static HashMap<String, String> ISPHeaderScomposition(String ispHeader) {
+	// u0h1963
+	private static HashMap<String, String> ISPHeaderScomposition(String ispHeader, boolean logMe) {
 
 		Document doc = null;
 		XPathFactory xpathFactory = XPathFactory.newInstance();
 		XPath xpath = xpathFactory.newXPath();
 		InputSource source = new InputSource(new StringReader(ispHeader));
 		HashMap<String, String> tokenMap = new HashMap<String, String>();
+		String tagValue = null;
+
+		if (logMe) {
+
+			System.out.println("######################################  ISPHEADER ###################################");
+			System.out.println(ispHeader);
+			System.out.println("######################################  ISPHEADER ###################################");
+		}
+
 		try {
 			doc = (Document) xpath.evaluate("/", source, XPathConstants.NODE);
-			
+
 			try {
-				tokenMap.put("ISPWebservicesHeader.RequestInfo.TransactionId",
-						xpath.evaluate("/ISPWebservicesHeader/RequestInfo/TransactionId/text()", doc));
-				
-				tokenMap.put("ISPWebservicesHeader.RequestInfo.Timestamp", xpath.evaluate("/ISPWebservicesHeader/RequestInfo/Timestamp/text()", doc));
-				
-				tokenMap.put("ISPWebservicesHeader.RequestInfo.ServiceID", xpath.evaluate("/ISPWebservicesHeader/RequestInfo/ServiceID/text()", doc));
-				
-				tokenMap.put("ISPWebservicesHeader.RequestInfo.ServiceVersion",
-						xpath.evaluate("/ISPWebservicesHeader/RequestInfo/ServiceVersion/text()", doc));
-				
-				tokenMap.put("ISPWebservicesHeader.RequestInfo.Language", xpath.evaluate("/ISPWebservicesHeader/RequestInfo/Language/text()", doc));
 
-				tokenMap.put("ISPWebservicesHeader.OperatorInfo.UserID", xpath.evaluate("/ISPWebservicesHeader/OperatorInfo/@UserID", doc));
-				
-				tokenMap.put("ISPWebservicesHeader.OperatorInfo.ISVirtualUser", xpath.evaluate("/ISPWebservicesHeader/OperatorInfo/@IsVirtualUser", doc));
-				
-				tokenMap.put("ISPWebservicesHeader.OperatorInfo.NotISPUserID", xpath.evaluate("/ISPWebservicesHeader/OperatorInfo/@NotISPUserID", doc));
+				tagValue = xpath.evaluate("/ISPWebservicesHeader/RequestInfo/TransactionId/text()", doc);
+				tokenMap.put("ISPWebservicesHeader.RequestInfo.TransactionId", tagValue);
+				if (logMe)
+					System.out.println("TransactionId --> " + tagValue);
 
-				tokenMap.put("ISPWebservicesHeader.CompanyInfo.ISPCallerCompanyIDCode",
-						xpath.evaluate("/ISPWebservicesHeader/CompanyInfo/ISPCallerCompanyIDCode/text()", doc));
-				
-				tokenMap.put("ISPWebservicesHeader.CompanyInfo.NotISPCompanyIDCode",	
-						xpath.evaluate("/ISPWebservicesHeader/CompanyInfo/NotISPCompanyIDCode/text()", doc));
-				
-				tokenMap.put("ISPWebservicesHeader.CompanyInfo.ISPBranchCode",
-						xpath.evaluate("/ISPWebservicesHeader/CompanyInfo/ISPBranchCode/text()", doc));
-				
-				tokenMap.put("ISPWebservicesHeader.CompanyInfo.ISPServiceCompanyIDCode",
-						xpath.evaluate("/ISPWebservicesHeader/CompanyInfo/ISPServiceCompanyIDCode/text()", doc));
+				tagValue = xpath.evaluate("/ISPWebservicesHeader/RequestInfo/Timestamp/text()", doc);
+				if (logMe)
+					System.out.println("Timestamp --> " + tagValue);
+				if (tagValue == null || tagValue.length() == 0) {
+					System.out.println(
+							"######################################  ISPHEADER ###################################");
+					System.out.println(ispHeader);
+					System.out.println(
+							"######################################  ISPHEADER ###################################");
+					System.out.println("Timestamp --> value is mandatory");
+					throw new Exception();
+				}
+				if (Rest.checkTimestamp(tagValue) == null) {
+					System.out.println(
+							"######################################  ISPHEADER ###################################");
+					System.out.println(ispHeader);
+					System.out.println(
+							"######################################  ISPHEADER ###################################");
+					System.out.println("Timestamp --> " + tagValue + " invalid value detected");
+					throw new Exception();
+				}
+				tokenMap.put("ISPWebservicesHeader.RequestInfo.Timestamp", tagValue);
 
-				
-				tokenMap.put("ISPWebservicesHeader.BusinessInfo.CustomerID", xpath.evaluate("/ISPWebservicesHeader/BusinessInfo/CustomerID/text()", doc));
-				
-				tokenMap.put("ISPWebservicesHeader.BusinessInfo.BusinessProcessName",
-						xpath.evaluate("/ISPWebservicesHeader/BusinessInfo/BusinessProcessName/text()", doc));
-				
-				tokenMap.put("ISPWebservicesHeader.BusinessInfo.BusinessProcessID",
-						xpath.evaluate("/ISPWebservicesHeader/BusinessInfo/BusinessProcessID/text()", doc));
-				
-				tokenMap.put("ISPWebservicesHeader.BusinessInfo.BusinessOperation",
-						xpath.evaluate("/ISPWebservicesHeader/BusinessInfo/BusinessOperation/text()", doc));
-				
-				tokenMap.put("ISPWebservicesHeader.BusinessInfo.BusinessFileID",
-						xpath.evaluate("/ISPWebservicesHeader/BusinessInfo/BusinessFileID/text()", doc));
+				tagValue = xpath.evaluate("/ISPWebservicesHeader/RequestInfo/ServiceID/text()", doc);
+				if (logMe)
+					System.out.println("ServiceID --> " + tagValue);
+				if (tagValue == null || tagValue.length() == 0) {
+					System.out.println(
+							"######################################  ISPHEADER ###################################");
+					System.out.println(ispHeader);
+					System.out.println(
+							"######################################  ISPHEADER ###################################");
+					System.out.println("ServiceID --> value is mandatory");
+					throw new Exception();
+				}
+				tokenMap.put("ISPWebservicesHeader.RequestInfo.ServiceID", tagValue);
 
-				
-				tokenMap.put("ISPWebservicesHeader.TechnicalInfo.ChannelIDCode",
-						xpath.evaluate("/ISPWebservicesHeader/TechnicalInfo/ChannelIDCode/text()", doc));
-				
-				tokenMap.put("ISPWebservicesHeader.TechnicalInfo.ApplicationID",
-						xpath.evaluate("/ISPWebservicesHeader/TechnicalInfo/ApplicationID/text()", doc));
-				
-				tokenMap.put("ISPWebservicesHeader.TechnicalInfo.CallerServerName",
-						xpath.evaluate("/ISPWebservicesHeader/TechnicalInfo/CallerServerName/text()", doc));
-				
-				tokenMap.put("ISPWebservicesHeader.TechnicalInfo.CallerProgramName",
-						xpath.evaluate("/ISPWebservicesHeader/TechnicalInfo/CallerProgramName/text()", doc));
+				tagValue = xpath.evaluate("/ISPWebservicesHeader/RequestInfo/ServiceVersion/text()", doc);
+				if (logMe)
+					System.out.println("ServiceVersion --> " + tagValue);
+				tokenMap.put("ISPWebservicesHeader.RequestInfo.ServiceVersion", tagValue);
 
-				
-				tokenMap.put("ISPWebservicesHeader.AdditionalBusinessInfo.CodUnitaOperativa",
-						xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/CodUnitaOperativa/text()", doc));
-				
-				tokenMap.put("ISPWebservicesHeader.AdditionalBusinessInfo.DataContabile",
-						xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/DataContabile/text()", doc));
-				
-				tokenMap.put("ISPWebservicesHeader.AdditionalBusinessInfo.FlagPaperless",
-						xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/FlagPaperless/text()", doc));
-				
-				tokenMap.put("ISPWebservicesHeader.AdditionalBusinessInfo.CodABI", xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/CodABI/text()", doc));
-				
-				tokenMap.put("ISPWebservicesHeader.AdditionalBusinessInfo.CodOperatività",
-						xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/CodOperatività/text()", doc));
-				
-				tokenMap.put("ISPWebservicesHeader.AdditionalBusinessInfo.CodTerminaleCics",
-						xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/CodTerminaleCics/text()", doc));
+				tagValue = xpath.evaluate("/ISPWebservicesHeader/RequestInfo/Language/text()", doc);
+				if (logMe)
+					System.out.println("Language --> " + tagValue);
+				tokenMap.put("ISPWebservicesHeader.RequestInfo.Language", tagValue);
 
-			} catch (XPathExpressionException e) {
-				tokenMap=null;
+				tagValue = xpath.evaluate("/ISPWebservicesHeader/OperatorInfo/@UserID", doc);
+				if (logMe)
+					System.out.println("UserID --> " + tagValue);
+				tokenMap.put("ISPWebservicesHeader.OperatorInfo.UserID", tagValue);
+
+				tagValue = xpath.evaluate("/ISPWebservicesHeader/OperatorInfo/@IsVirtualUser", doc);
+				if (logMe)
+					System.out.println("IsVirtualUser --> " + tagValue);
+				tokenMap.put("ISPWebservicesHeader.OperatorInfo.ISVirtualUser", tagValue);
+
+				tagValue = xpath.evaluate("/ISPWebservicesHeader/OperatorInfo/@NotISPUserID", doc);
+				if (logMe)
+					System.out.println("NotISPUserID --> " + tagValue);
+				tokenMap.put("ISPWebservicesHeader.OperatorInfo.NotISPUserID", tagValue);
+
+				tagValue = xpath.evaluate("/ISPWebservicesHeader/CompanyInfo/ISPCallerCompanyIDCode/text()", doc);
+				if (logMe)
+					System.out.println("ISPCallerCompanyIDCode --> " + tagValue);
+				tokenMap.put("ISPWebservicesHeader.CompanyInfo.ISPCallerCompanyIDCode", tagValue);
+
+				tagValue = xpath.evaluate("/ISPWebservicesHeader/CompanyInfo/NotISPCompanyIDCode/text()", doc);
+				if (logMe)
+					System.out.println("NotISPCompanyIDCode --> " + tagValue);
+				tokenMap.put("ISPWebservicesHeader.CompanyInfo.NotISPCompanyIDCode", tagValue);
+
+				tagValue = xpath.evaluate("/ISPWebservicesHeader/CompanyInfo/ISPBranchCode/text()", doc);
+				if (logMe)
+					System.out.println("ISPBranchCode --> " + tagValue);
+				tokenMap.put("ISPWebservicesHeader.CompanyInfo.ISPBranchCode", tagValue);
+
+				tagValue = xpath.evaluate("/ISPWebservicesHeader/CompanyInfo/ISPServiceCompanyIDCode/text()", doc);
+				if (logMe)
+					System.out.println("ISPServiceCompanyIDCode --> " + tagValue);
+				tokenMap.put("ISPWebservicesHeader.CompanyInfo.ISPServiceCompanyIDCode", tagValue);
+
+				tagValue = xpath.evaluate("/ISPWebservicesHeader/BusinessInfo/CustomerID/text()", doc);
+				if (logMe)
+					System.out.println("CustomerID --> " + tagValue);
+				tokenMap.put("ISPWebservicesHeader.BusinessInfo.CustomerID", tagValue);
+
+				tagValue = xpath.evaluate("/ISPWebservicesHeader/BusinessInfo/BusinessProcessName/text()", doc);
+				if (logMe)
+					System.out.println("BusinessProcessName --> " + tagValue);
+				tokenMap.put("ISPWebservicesHeader.BusinessInfo.BusinessProcessName", tagValue);
+
+				tagValue = xpath.evaluate("/ISPWebservicesHeader/BusinessInfo/BusinessProcessID/text()", doc);
+				if (logMe)
+					System.out.println("BusinessProcessID --> " + tagValue);
+				tokenMap.put("ISPWebservicesHeader.BusinessInfo.BusinessProcessID", tagValue);
+
+				tagValue = xpath.evaluate("/ISPWebservicesHeader/BusinessInfo/BusinessOperation/text()", doc);
+				if (logMe)
+					System.out.println("BusinessOperation --> " + tagValue);
+				tokenMap.put("ISPWebservicesHeader.BusinessInfo.BusinessOperation", tagValue);
+
+				tagValue = xpath.evaluate("/ISPWebservicesHeader/BusinessInfo/BusinessFileID/text()", doc);
+				if (logMe)
+					System.out.println("BusinessFileID --> " + tagValue);
+				tokenMap.put("ISPWebservicesHeader.BusinessInfo.BusinessFileID", tagValue);
+
+				tagValue = xpath.evaluate("/ISPWebservicesHeader/TechnicalInfo/ChannelIDCode/text()", doc);
+				if (logMe)
+					System.out.println("ChannelIDCode --> " + tagValue);
+				tokenMap.put("ISPWebservicesHeader.TechnicalInfo.ChannelIDCode", tagValue);
+
+				tagValue = xpath.evaluate("/ISPWebservicesHeader/TechnicalInfo/ApplicationID/text()", doc);
+				if (logMe)
+					System.out.println("ApplicationID --> " + tagValue);
+				if (tagValue == null || tagValue.length() == 0) {
+					System.out.println(
+							"######################################  ISPHEADER ###################################");
+					System.out.println(ispHeader);
+					System.out.println(
+							"######################################  ISPHEADER ###################################");
+					System.out.println("ApplicationID --> value is mandatory");
+					throw new Exception();
+				}
+				tokenMap.put("ISPWebservicesHeader.TechnicalInfo.ApplicationID", tagValue);
+
+				tagValue = xpath.evaluate("/ISPWebservicesHeader/TechnicalInfo/CallerServerName/text()", doc);
+				if (logMe)
+					System.out.println("CallerServerName --> " + tagValue);
+				tokenMap.put("ISPWebservicesHeader.TechnicalInfo.CallerServerName", tagValue);
+
+				tagValue = xpath.evaluate("/ISPWebservicesHeader/TechnicalInfo/CallerProgramName/text()", doc);
+				if (logMe)
+					System.out.println("CallerProgramName --> " + tagValue);
+				tokenMap.put("ISPWebservicesHeader.TechnicalInfo.CallerProgramName", tagValue);
+
+				tagValue = xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/CodUnitaOperativa/text()", doc);
+				if (logMe)
+					System.out.println("CodUnitaOperativa --> " + tagValue);
+				tokenMap.put("ISPWebservicesHeader.AdditionalBusinessInfo.CodUnitaOperativa", tagValue);
+
+				tagValue = xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/DataContabile/text()", doc);
+				if (logMe)
+					System.out.println("DataContabile --> " + tagValue);
+				tokenMap.put("ISPWebservicesHeader.AdditionalBusinessInfo.DataContabile", tagValue);
+
+				tagValue = xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/FlagPaperless/text()", doc);
+				if (logMe)
+					System.out.println("FlagPaperless --> " + tagValue);
+				tokenMap.put("ISPWebservicesHeader.AdditionalBusinessInfo.FlagPaperless", tagValue);
+
+				tagValue = xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/CodABI/text()", doc);
+				if (logMe)
+					System.out.println("CodABI --> " + tagValue);
+				tokenMap.put("ISPWebservicesHeader.AdditionalBusinessInfo.CodABI", tagValue);
+
+				tagValue = xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/CodOperatività/text()", doc);
+				if (logMe)
+					System.out.println("CodOperatività --> " + tagValue);
+				tokenMap.put("ISPWebservicesHeader.AdditionalBusinessInfo.CodOperatività", tagValue);
+
+				tagValue = xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/CodTerminaleCics/text()", doc);
+				if (logMe)
+					System.out.println("CodTerminaleCics --> " + tagValue);
+				tokenMap.put("ISPWebservicesHeader.AdditionalBusinessInfo.CodTerminaleCics", tagValue);
+
+			} catch (Exception e) {
+				tokenMap = null;
 				e.printStackTrace();
 			}
 
-		} catch (XPathExpressionException e) {
-			tokenMap=null;
+		} catch (Exception e) {
+			tokenMap = null;
 			e.printStackTrace();
 		}
 
 		return tokenMap;
 	}
 
-	/*
-	private static HashMap<String, String> ISPHeaderScomposition(String ispHeader) {
+	private static String checkTimestamp(String input) {
 
-		Document doc = null;
-		XPathFactory xpathFactory = XPathFactory.newInstance();
-		XPath xpath = xpathFactory.newXPath();
-		InputSource source = new InputSource(new StringReader(ispHeader));
-		try {
-			doc = (Document) xpath.evaluate("/", source, XPathConstants.NODE);
-		} catch (XPathExpressionException e) {
-			e.printStackTrace();
-		}
-		HashMap<String, String> tokenMap = new HashMap<String, String>();
+		boolean iscorrect = false;
 
-		try {
-			tokenMap.put("TransactionID",
-					xpath.evaluate("/ISPWebservicesHeader/RequestInfo/TransactionId/text()", doc));
-			tokenMap.put("Timestamp", xpath.evaluate("/ISPWebservicesHeader/RequestInfo/Timestamp/text()", doc));
-			tokenMap.put("ServiceID", xpath.evaluate("/ISPWebservicesHeader/RequestInfo/ServiceID/text()", doc));
-			tokenMap.put("ServiceVersion",
-					xpath.evaluate("/ISPWebservicesHeader/RequestInfo/ServiceVersion/text()", doc));
-			tokenMap.put("Language", xpath.evaluate("/ISPWebservicesHeader/RequestInfo/Language/text()", doc));
+		String ts = null;
 
-			tokenMap.put("UserID", xpath.evaluate("/ISPWebservicesHeader/OperatorInfo/@UserID", doc));
-			tokenMap.put("ISVirtualUser", xpath.evaluate("/ISPWebservicesHeader/OperatorInfo/@IsVirtualUser", doc));
-			tokenMap.put("NotISPUserID", xpath.evaluate("/ISPWebservicesHeader/OperatorInfo/@NotISPUserID", doc));
+		String other = null;
 
-			tokenMap.put("ISPCallerCompanyIDCode",
-					xpath.evaluate("/ISPWebservicesHeader/CompanyInfo/ISPCallerCompanyIDCode/text()", doc));
-			tokenMap.put("NotISPCompanyIDCode",
-					xpath.evaluate("/ISPWebservicesHeader/CompanyInfo/NotISPCompanyIDCode/text()", doc));
-			tokenMap.put("ISPBranchCode",
-					xpath.evaluate("/ISPWebservicesHeader/CompanyInfo/ISPBranchCode/text()", doc));
-			tokenMap.put("ISPServiceCompanyIDCode",
-					xpath.evaluate("/ISPWebservicesHeader/CompanyInfo/ISPServiceCompanyIDCode/text()", doc));
+		if (input != null && input.length() >= 17 & input.length() <= 20) {
 
-			tokenMap.put("CustomerID", xpath.evaluate("/ISPWebservicesHeader/BusinessInfo/CustomerID/text()", doc));
-			tokenMap.put("BusinessProcessName",
-					xpath.evaluate("/ISPWebservicesHeader/BusinessInfo/BusinessProcessName/text()", doc));
-			tokenMap.put("BusinessProcessID",
-					xpath.evaluate("/ISPWebservicesHeader/BusinessInfo/BusinessProcessID/text()", doc));
-			tokenMap.put("BusinessOperation",
-					xpath.evaluate("/ISPWebservicesHeader/BusinessInfo/BusinessOperation/text()", doc));
-			tokenMap.put("BusinessFileID",
-					xpath.evaluate("/ISPWebservicesHeader/BusinessInfo/BusinessFileID/text()", doc));
+			String zero = "00000000";
 
-			tokenMap.put("ChannelIDCode",
-					xpath.evaluate("/ISPWebservicesHeader/TechnicalInfo/ChannelIDCode/text()", doc));
-			tokenMap.put("ApplicationID",
-					xpath.evaluate("/ISPWebservicesHeader/TechnicalInfo/ApplicationID/text()", doc));
-			tokenMap.put("CallerServerName",
-					xpath.evaluate("/ISPWebservicesHeader/TechnicalInfo/CallerServerName/text()", doc));
-			tokenMap.put("CallerProgramName",
-					xpath.evaluate("/ISPWebservicesHeader/TechnicalInfo/CallerProgramName/text()", doc));
+			ts = input.substring(0, 14);
 
-			tokenMap.put("CodUnitaOperativa",
-					xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/CodUnitaOperativa/text()", doc));
-			tokenMap.put("DataContabile",
-					xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/DataContabile/text()", doc));
-			tokenMap.put("FlagPaperless",
-					xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/FlagPaperless/text()", doc));
-			tokenMap.put("CodABI", xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/CodABI/text()", doc));
-			tokenMap.put("CodOperatività",
-					xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/CodOperatività/text()", doc));
-			tokenMap.put("CodTerminaleCics",
-					xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/CodTerminaleCics/text()", doc));
+			other = input.substring(14, input.length());
 
-		} catch (XPathExpressionException e) {
-			tokenMap=null;
-			e.printStackTrace();
+			DateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+
+			formatter.setLenient(false);
+
+			try {
+
+				formatter.parse(ts);
+
+				Integer.parseInt(other);
+
+				ts = ts + other;
+
+				int difflen = 20 - ts.length();
+
+				ts = ts.concat(zero.substring(0, difflen));
+
+				iscorrect = true;
+
+			} catch (Exception e) {
+
+				iscorrect = false;
+
+			}
+
 		}
 
-		return tokenMap;
+		if (iscorrect)
+			return ts;
+
+		else
+			return null;
+
 	}
-	*/	
 } // End of File
