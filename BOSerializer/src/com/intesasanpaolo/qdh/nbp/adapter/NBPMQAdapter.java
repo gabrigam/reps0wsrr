@@ -666,6 +666,7 @@ public class NBPMQAdapter {
 							rc = adapter_QDH_Instance.init();
 
 							if (rc == 0) {
+								
 
 								rc = adapter_QDH_Instance.writeString((String) NBPQDHData.getPropertyValue("DATA"));
 
@@ -715,7 +716,11 @@ public class NBPMQAdapter {
 
 								}
 
-							}
+							} else {
+								
+								adapter_Appl_Instance.rollback();
+							  }
+							
 
 						} else rc = adapter_QDH_Instance.getReturnCode();
 
