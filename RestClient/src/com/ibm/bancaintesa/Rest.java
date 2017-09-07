@@ -608,6 +608,23 @@ public class Rest {
 					System.out.println("CallerProgramName --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.TechnicalInfo.CallerProgramName", tagValue);
 
+				int countag= Integer.parseInt(xpath.evaluate("count(/ISPWebservicesHeader/AdditionalBusinessInfo/Param)", doc));
+				String tagName=null;
+				
+				for (int ii = 1; ii <= countag; ii++) {
+					
+					tagName=xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/Param["+String.valueOf(ii)+"]/@Name", doc);
+					if (tagName !=null && tagName.length()!=0) {
+					tagValue=xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/Param["+String.valueOf(ii)+"]/@Value", doc);
+					tokenMap.put("ISPWebservicesHeader.AdditionalBusinessInfo."+tagName, tagValue);
+					if (logMe)
+						System.out.println(tagName+" --> " + tagValue);
+					}				
+				}
+				
+				/*
+				
+				non serve +
 				tagValue = xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/CodUnitaOperativa/text()", doc);
 				if (logMe)
 					System.out.println("CodUnitaOperativa --> " + tagValue);
@@ -637,6 +654,8 @@ public class Rest {
 				if (logMe)
 					System.out.println("CodTerminaleCics --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.AdditionalBusinessInfo.CodTerminaleCics", tagValue);
+				
+				*/
 
 			} catch (Exception e) {
 				tokenMap = null;
