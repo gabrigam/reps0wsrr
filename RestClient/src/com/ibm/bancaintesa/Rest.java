@@ -18,6 +18,7 @@ import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -142,45 +143,62 @@ public class Rest {
 
 				String ispHeader = headerMap.get("X-ISPWebServicesHeader");
 
-				HashMap<String, String> ispHeaderMap = Rest.ISPHeaderScomposition(ispHeader, debug);
+				HashMap<String, String> ispHeaderMap = null;
 
-				if (ispHeaderMap == null) {
-					System.out.println("###################################################################################################");
-					System.out.println("Error ISPHeader : " + ispHeader + " is Malformed or mandatory fields are missing or invalid (enable debug on caller for more information");
-					System.out.println("###################################################################################################");
-					throw new RestException("Error ISPHeader : " + ispHeader
-							+ " is Malformed or mandatory fields are missing or invalid");
+				if (ispHeader != null && !ispHeader.equals("#NOTREQUIRED#")) {
+
+					ispHeaderMap = Rest.ISPHeaderScomposition(ispHeader, debug);
+
+					if (ispHeaderMap == null) {
+						System.out.println(
+								"###################################################################################################");
+						System.out.println("Error ISPHeader : " + ispHeader
+								+ " is Malformed or mandatory fields are missing or invalid (enable debug on caller for more information");
+						System.out.println(
+								"###################################################################################################");
+						throw new RestException("Error ISPHeader : " + ispHeader
+								+ " is Malformed or mandatory fields are missing or invalid");
+					}
+
+					// If a header map was supplied, add the map name=value
+					// pairs as
+					// HTTP header values
+					if (debug) {
+						System.out.println(
+								"###################################################################################################");
+						System.out.println(">> doRest MAP  key -value http-header-request-property list ; ");
+						System.out.println(
+								"###################################################################################################");
+					}
+
 				}
 
 				if (debug) {
 					if (timeout != -1) {
-						System.out.println("###################################################################################################");
+						System.out.println(
+								"###################################################################################################");
 						System.out.println(">> doRest: command=" + command + ", urlString=" + urlString + ", content="
 								+ content + ", userid=" + userid + ", +, X-ISPWebServicesHeader=" + ispHeader
 								+ " , timeout=" + timeout);
-						System.out.println("###################################################################################################");
-					}
-					else {
-						System.out.println("###################################################################################################");
+						System.out.println(
+								"###################################################################################################");
+					} else {
+						System.out.println(
+								"###################################################################################################");
 						System.out.println(">> doRest: command=" + command + ", urlString=" + urlString + ", content="
 								+ content + ", userid=" + userid + ", , X-ISPWebServicesHeader=" + ispHeader);
-						System.out.println("###################################################################################################");
+						System.out.println(
+								"###################################################################################################");
 					}
 				}
 
-				// If a header map was supplied, add the map name=value pairs as
-				// HTTP header values
-				if (debug) {
-					System.out.println("###################################################################################################");
-					System.out.println(">> doRest MAP  key -value http-header-request-property list ; ");
-					System.out.println("###################################################################################################");
-				}
 				if (headerMap != null) {
 					Set<String> keySet = headerMap.keySet();
 					Iterator<String> it = keySet.iterator();
 					while (it.hasNext()) {
 						String key = it.next();
-						if (!key.equals("X-ISPWebServicesHeader") && !key.equals("X-ISP-Security") && !key.equals("Authorization"))
+						if (!key.equals("X-ISPWebServicesHeader") && !key.equals("X-ISP-Security")
+								&& !key.equals("Authorization"))
 							// skip X-ISPWebServicesHeader
 							httpUrlConnection.addRequestProperty(key, headerMap.get(key));
 						if (debug)
@@ -188,21 +206,32 @@ public class Rest {
 					}
 					// add single ISPHeader field as single requestProperty
 					if (debug) {
-						System.out.println("###################################################################################################");
+						System.out.println(
+								"###################################################################################################");
 						System.out.println(">> doRest ISPHEADER key -value http-header-request-property list ; ");
-						System.out.println("###################################################################################################");
+						System.out.println(
+								"###################################################################################################");
 					}
-					keySet = ispHeaderMap.keySet();
-					it = keySet.iterator();
-					while (it.hasNext()) {
-						String key = it.next();
-						String value = ispHeaderMap.get(key);
-						if (value == null)
-							value = "";
-						httpUrlConnection.addRequestProperty(key, value);
+                
+					if (ispHeaderMap != null) {
+                        String encodedValue=null;
+                        String encodedKey=null;
+						keySet = ispHeaderMap.keySet();
+						it = keySet.iterator();
+						while (it.hasNext()) {
+							String key = it.next();
+							String value = ispHeaderMap.get(key);
+							if (value == null)
+								value = "";
+							      //if (key !=null && key.contains("CodOperativit")) key="ISPWebservicesHeader.AdditionalBusinessInfo.CodOperativit%E0";
+							      encodedValue=URLEncoder.encode(value, "UTF-8");
+							      encodedKey=URLEncoder.encode(key, "UTF-8");
+								httpUrlConnection.addRequestProperty(encodedKey, encodedValue);
 
-						if (debug)
-							System.out.println(">> doRest requestProperty : " + key + " = " + value);
+							if (debug)
+								System.out.println(">> doRest requestProperty : " + key + " = " + value);
+						}
+
 					}
 
 				}
@@ -215,10 +244,12 @@ public class Rest {
 							.encodeBase64(new String(userid + ":" + password).getBytes()));
 					httpUrlConnection.setRequestProperty("Authorization", authorization);
 
-					System.out.println("###################################################################################################");
+					System.out.println(
+							"###################################################################################################");
 					System.out.println(
 							">> doRest: service invoked with user/password , Security Token IF present will be ignored");
-					System.out.println("###################################################################################################");
+					System.out.println(
+							"###################################################################################################");
 
 				} else {
 
@@ -228,47 +259,56 @@ public class Rest {
 					if (clearToken != null) {
 						clearTokenb64 = new String(
 								org.apache.commons.codec.binary.Base64.encodeBase64(clearToken.getBytes()));
-						
+
 						httpUrlConnection.setRequestProperty("X-ISP-Security", clearTokenb64);
 
 						if (debug) {
-							System.out.println("###################################################################################################");
-							System.out.println(">> doRest FOUND - Security Clear Token \n" + clearToken );
-							System.out.println(">> doRest FOUND - Security Clear Token \n" + clearToken );
-							System.out.println("###################################################################################################");
-							System.out.println(">> doRest B64   - Security ClearToken \n" + clearTokenb64 );
-							System.out.println("###################################################################################################");							
+							System.out.println(
+									"###################################################################################################");
+							System.out.println(">> doRest FOUND - Security Clear Token \n" + clearToken);
+							System.out.println(">> doRest FOUND - Security Clear Token \n" + clearToken);
+							System.out.println(
+									"###################################################################################################");
+							System.out.println(">> doRest B64   - Security ClearToken \n" + clearTokenb64);
+							System.out.println(
+									"###################################################################################################");
 						}
 
 					} else {
-						
+
 						if (debug) {
-							System.out.println("###################################################################################################");
+							System.out.println(
+									"###################################################################################################");
 							System.out.println(">> doRest Security Clear Token NOT Present");
-							System.out.println("###################################################################################################");
+							System.out.println(
+									"###################################################################################################");
 						}
-																
+
 					}
-					
-					String rawToken=headerMap.get("Authorization");
-					
-					if (rawToken!=null){
-						
+
+					String rawToken = headerMap.get("Authorization");
+
+					if (rawToken != null) {
+
 						httpUrlConnection.setRequestProperty("Authorization", rawToken);
-						
+
 						if (debug) {
-							System.out.println("###################################################################################################");
-							System.out.println(">> doRest FOUND - Security Raw Token \n" + rawToken );	
-							System.out.println("###################################################################################################");
+							System.out.println(
+									"###################################################################################################");
+							System.out.println(">> doRest FOUND - Security Raw Token \n" + rawToken);
+							System.out.println(
+									"###################################################################################################");
 						}
-						
-					} else 
-					
-						if (debug) {
-							System.out.println("###################################################################################################");
-							System.out.println(">> doRest Security Raw Token NOT Present");
-							System.out.println("###################################################################################################");
-						}
+
+					} else
+
+					if (debug) {
+						System.out.println(
+								"###################################################################################################");
+						System.out.println(">> doRest Security Raw Token NOT Present");
+						System.out.println(
+								"###################################################################################################");
+					}
 				}
 
 				// If there is content AND the command is either POST or PUT,
@@ -608,54 +648,70 @@ public class Rest {
 					System.out.println("CallerProgramName --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.TechnicalInfo.CallerProgramName", tagValue);
 
-				int countag= Integer.parseInt(xpath.evaluate("count(/ISPWebservicesHeader/AdditionalBusinessInfo/Param)", doc));
-				String tagName=null;
-				
+				int countag = Integer
+						.parseInt(xpath.evaluate("count(/ISPWebservicesHeader/AdditionalBusinessInfo/Param)", doc));
+				String tagName = null;
+
 				for (int ii = 1; ii <= countag; ii++) {
-					
-					tagName=xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/Param["+String.valueOf(ii)+"]/@Name", doc);
-					if (tagName !=null && tagName.length()!=0) {
-					tagValue=xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/Param["+String.valueOf(ii)+"]/@Value", doc);
-					tokenMap.put("ISPWebservicesHeader.AdditionalBusinessInfo."+tagName, tagValue);
-					if (logMe)
-						System.out.println(tagName+" --> " + tagValue);
-					}				
+
+					tagName = xpath.evaluate(
+							"/ISPWebservicesHeader/AdditionalBusinessInfo/Param[" + String.valueOf(ii) + "]/@Name",
+							doc);
+					if (tagName != null && tagName.length() != 0) {
+						tagValue = xpath.evaluate(
+								"/ISPWebservicesHeader/AdditionalBusinessInfo/Param[" + String.valueOf(ii) + "]/@Value",
+								doc);
+						tokenMap.put("ISPWebservicesHeader.AdditionalBusinessInfo." + tagName, tagValue);
+						if (logMe)
+							System.out.println(tagName + " --> " + tagValue);
+					}
 				}
-				
+
 				/*
-				
-				non serve +
-				tagValue = xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/CodUnitaOperativa/text()", doc);
-				if (logMe)
-					System.out.println("CodUnitaOperativa --> " + tagValue);
-				tokenMap.put("ISPWebservicesHeader.AdditionalBusinessInfo.CodUnitaOperativa", tagValue);
-
-				tagValue = xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/DataContabile/text()", doc);
-				if (logMe)
-					System.out.println("DataContabile --> " + tagValue);
-				tokenMap.put("ISPWebservicesHeader.AdditionalBusinessInfo.DataContabile", tagValue);
-
-				tagValue = xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/FlagPaperless/text()", doc);
-				if (logMe)
-					System.out.println("FlagPaperless --> " + tagValue);
-				tokenMap.put("ISPWebservicesHeader.AdditionalBusinessInfo.FlagPaperless", tagValue);
-
-				tagValue = xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/CodABI/text()", doc);
-				if (logMe)
-					System.out.println("CodABI --> " + tagValue);
-				tokenMap.put("ISPWebservicesHeader.AdditionalBusinessInfo.CodABI", tagValue);
-
-				tagValue = xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/CodOperatività/text()", doc);
-				if (logMe)
-					System.out.println("CodOperatività --> " + tagValue);
-				tokenMap.put("ISPWebservicesHeader.AdditionalBusinessInfo.CodOperatività", tagValue);
-
-				tagValue = xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/CodTerminaleCics/text()", doc);
-				if (logMe)
-					System.out.println("CodTerminaleCics --> " + tagValue);
-				tokenMap.put("ISPWebservicesHeader.AdditionalBusinessInfo.CodTerminaleCics", tagValue);
-				
-				*/
+				 * 
+				 * non serve + tagValue = xpath.evaluate(
+				 * "/ISPWebservicesHeader/AdditionalBusinessInfo/CodUnitaOperativa/text()",
+				 * doc); if (logMe) System.out.println("CodUnitaOperativa --> "
+				 * + tagValue); tokenMap.put(
+				 * "ISPWebservicesHeader.AdditionalBusinessInfo.CodUnitaOperativa",
+				 * tagValue);
+				 * 
+				 * tagValue = xpath.evaluate(
+				 * "/ISPWebservicesHeader/AdditionalBusinessInfo/DataContabile/text()",
+				 * doc); if (logMe) System.out.println("DataContabile --> " +
+				 * tagValue); tokenMap.put(
+				 * "ISPWebservicesHeader.AdditionalBusinessInfo.DataContabile",
+				 * tagValue);
+				 * 
+				 * tagValue = xpath.evaluate(
+				 * "/ISPWebservicesHeader/AdditionalBusinessInfo/FlagPaperless/text()",
+				 * doc); if (logMe) System.out.println("FlagPaperless --> " +
+				 * tagValue); tokenMap.put(
+				 * "ISPWebservicesHeader.AdditionalBusinessInfo.FlagPaperless",
+				 * tagValue);
+				 * 
+				 * tagValue = xpath.evaluate(
+				 * "/ISPWebservicesHeader/AdditionalBusinessInfo/CodABI/text()",
+				 * doc); if (logMe) System.out.println("CodABI --> " +
+				 * tagValue); tokenMap.put(
+				 * "ISPWebservicesHeader.AdditionalBusinessInfo.CodABI",
+				 * tagValue);
+				 * 
+				 * tagValue = xpath.evaluate(
+				 * "/ISPWebservicesHeader/AdditionalBusinessInfo/CodOperatività/text()",
+				 * doc); if (logMe) System.out.println("CodOperatività --> " +
+				 * tagValue); tokenMap.put(
+				 * "ISPWebservicesHeader.AdditionalBusinessInfo.CodOperatività",
+				 * tagValue);
+				 * 
+				 * tagValue = xpath.evaluate(
+				 * "/ISPWebservicesHeader/AdditionalBusinessInfo/CodTerminaleCics/text()",
+				 * doc); if (logMe) System.out.println("CodTerminaleCics --> " +
+				 * tagValue); tokenMap.put(
+				 * "ISPWebservicesHeader.AdditionalBusinessInfo.CodTerminaleCics",
+				 * tagValue);
+				 * 
+				 */
 
 			} catch (Exception e) {
 				tokenMap = null;
