@@ -67,15 +67,14 @@ public class Rest {
 		String password = "Password01";
 		HashMap<String, String> headerMap = new HashMap<String, String>();
 		Options options = null;
-		
-		
-		String ISPHeader="<int:ISPWebservicesHeader xmlns:int=\"http://eric.van-der-vlist.com/ns/person\">         <RequestInfo>            <TransactionId>GKBG0_20170913113655000769</TransactionId>            <Timestamp>20170913113655000769</Timestamp>            <ServiceID>GKMGDECPLF</ServiceID>            <ServiceVersion>00</ServiceVersion>              <Language>it</Language>         </RequestInfo>         <OperatorInfo UserID=\"U0G4356\" IsVirtualUser=\"false\"     NotISPUserID=\"\"   />         <CompanyInfo>            <ISPCallerCompanyIDCode>01</ISPCallerCompanyIDCode>            <ISPServiceCompanyIDCode>01</ISPServiceCompanyIDCode>            <ISPBranchCode>00700</ISPBranchCode>            <NotISPCompanyIDCode></NotISPCompanyIDCode>         </CompanyInfo>         <BusinessInfo>            <CustomerID>U0G4356</CustomerID>            <BusinessProcessName>Richiesta Pratica Mogeni</BusinessProcessName>            <BusinessProcessID>76828</BusinessProcessID>            <BusinessOperation></BusinessOperation>            <BusinessFileID></BusinessFileID>         </BusinessInfo>         <TechnicalInfo>            <ChannelIDCode>01</ChannelIDCode>            <ApplicationID>GKBG0</ApplicationID>            <CallerServerName>localhost</CallerServerName>            <CallerProgramName>GKBG0-BPM</CallerProgramName>         </TechnicalInfo>         <AdditionalBusinessInfo>    <Param Name=\"CodABI\" Value=\"01025\"/>  </AdditionalBusinessInfo></int:ISPWebservicesHeader>";
-		
+
+		String ISPHeader = "<int:ISPWebservicesHeader xmlns:int=\"http://eric.van-der-vlist.com/ns/person\">         <RequestInfo>            <TransactionId>GKBG0_20170913113655000769</TransactionId>            <Timestamp>20170913113655000769</Timestamp>            <ServiceID>GKMGDECPLF</ServiceID>            <ServiceVersion>00</ServiceVersion>              <Language>it</Language>         </RequestInfo>         <OperatorInfo UserID=\"U0G4356\" IsVirtualUser=\"false\"     NotISPUserID=\"\"   />         <CompanyInfo>            <ISPCallerCompanyIDCode>01</ISPCallerCompanyIDCode>            <ISPServiceCompanyIDCode>01</ISPServiceCompanyIDCode>            <ISPBranchCode>00700</ISPBranchCode>            <NotISPCompanyIDCode></NotISPCompanyIDCode>         </CompanyInfo>         <BusinessInfo>            <CustomerID>U0G4356</CustomerID>            <BusinessProcessName>Richiesta Pratica Mogeni</BusinessProcessName>            <BusinessProcessID>76828</BusinessProcessID>            <BusinessOperation></BusinessOperation>            <BusinessFileID></BusinessFileID>         </BusinessInfo>         <TechnicalInfo>            <ChannelIDCode>01</ChannelIDCode>            <ApplicationID>GKBG0</ApplicationID>            <CallerServerName>localhost</CallerServerName>            <CallerProgramName>GKBG0-BPM</CallerProgramName>         </TechnicalInfo>         <AdditionalBusinessInfo>    <Param Name=\"CodABI\" Value=\"01025\"/>  </AdditionalBusinessInfo></int:ISPWebservicesHeader>";
+
 		Rest.ISPHeaderScomposition(ISPHeader, true);
 
 		try {
 
-			System.out.println(doRest(command, url, content, headerMap, userid, password, false, 100,"",false));
+			System.out.println(doRest(command, url, content, headerMap, userid, password, false, 100, "", false));
 		} catch (Exception e) {
 			e.printStackTrace(System.out);
 		}
@@ -122,12 +121,12 @@ public class Rest {
 	 * @throws Exception
 	 */
 	public static HashMap<String, String> doRest(String command, String urlString, String content,
-			HashMap<String, String> headerMap, String userid, String password, boolean debug, int timeout,String interfaccia,boolean servizioIIB)
-			throws Exception {
+			HashMap<String, String> headerMap, String userid, String password, boolean debug, int timeout,
+			String interfaccia, boolean servizioIIB) throws Exception {
 
 		HashMap<String, String> returnVal = new HashMap<String, String>();
-		
-		System.out.println("fxVer 01 Parametri passati :  Interfaccia="+interfaccia+" ServizioIIB="+servizioIIB );
+
+		System.out.println("fxVer 01 Parametri passati :  Interfaccia=" + interfaccia + " ServizioIIB=" + servizioIIB);
 
 		// Check that the command type is known
 		if (!command.equals("GET") && !command.equals("POST") && !command.equals("PUT") && !command.equals("DELETE")) {
@@ -144,7 +143,9 @@ public class Rest {
 				if (timeout > 0) {
 
 					httpUrlConnection.setReadTimeout(timeout * 1000); // timeout
-																		// is in																	// milliseconds
+					// is in
+					// //
+					// milliseconds
 				}
 
 				String ispHeader = headerMap.get("X-ISPWebServicesHeader");
@@ -172,7 +173,8 @@ public class Rest {
 					if (debug) {
 						System.out.println(
 								"###################################################################################################");
-						System.out.println(">> doRest MAP  key -value http-header-request-property alpahbetical list order; ");
+						System.out.println(
+								">> doRest MAP  key -value http-header-request-property alpahbetical list order; ");
 						System.out.println(
 								"###################################################################################################");
 					}
@@ -185,14 +187,16 @@ public class Rest {
 								"###################################################################################################");
 						System.out.println(">> doRest: command=" + command + ", urlString=" + urlString + ", content="
 								+ content + ", userid=" + userid + ", +, X-ISPWebServicesHeader=" + ispHeader
-								+ " , timeout=" + timeout + " , isIIBService="+servizioIIB+" , ServiceInterface="+interfaccia);
+								+ " , timeout=" + timeout + " , isIIBService=" + servizioIIB + " , ServiceInterface="
+								+ interfaccia);
 						System.out.println(
 								"###################################################################################################");
 					} else {
 						System.out.println(
 								"###################################################################################################");
 						System.out.println(">> doRest: command=" + command + ", urlString=" + urlString + ", content="
-								+ content + ", userid=" + userid + ", , X-ISPWebServicesHeader=" + ispHeader+ " , isIIBService="+servizioIIB+" , ServiceInterface="+interfaccia);
+								+ content + ", userid=" + userid + ", , X-ISPWebServicesHeader=" + ispHeader
+								+ " , isIIBService=" + servizioIIB + " , ServiceInterface=" + interfaccia);
 						System.out.println(
 								"###################################################################################################");
 					}
@@ -210,7 +214,7 @@ public class Rest {
 						if (debug)
 							System.out.println(">> doRest requestProperty : " + key + " = " + headerMap.get(key));
 					}
-					//add single ISPHeader field as single requestProperty
+					// add single ISPHeader field as single requestProperty
 					if (debug) {
 						System.out.println(
 								"###################################################################################################");
@@ -218,10 +222,10 @@ public class Rest {
 						System.out.println(
 								"###################################################################################################");
 					}
-                
+
 					if (ispHeaderMap != null) {
-                        String encodedValue=null;
-                        String encodedKey=null;
+						String encodedValue = null;
+						String encodedKey = null;
 						keySet = ispHeaderMap.keySet();
 						it = keySet.iterator();
 						while (it.hasNext()) {
@@ -229,9 +233,9 @@ public class Rest {
 							String value = ispHeaderMap.get(key);
 							if (value == null)
 								value = "";
-							      encodedValue=URLEncoder.encode(value, "UTF-8");
-							      encodedKey=URLEncoder.encode(key, "UTF-8");
-								httpUrlConnection.addRequestProperty(encodedKey, encodedValue);
+							encodedValue = URLEncoder.encode(value, "UTF-8");
+							encodedKey = URLEncoder.encode(key, "UTF-8");
+							httpUrlConnection.addRequestProperty(encodedKey, encodedValue);
 
 							if (debug)
 								System.out.println(">> doRest requestProperty : " + key + " = " + value);
@@ -259,26 +263,27 @@ public class Rest {
 				} else {
 
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-					//   IIB         Interface       Clear Token b64            Raw token             EnvelopSoap
-					//                             Header X-ISP-Security     Header Authorization        
-					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
-					//   yes           REST              yes			            yes                    NA
-					//    no           REST               no                        yes                    NA
-					//   yes           SOAP               no                        yes              ISPHeader + WsseSecurity
-					//    no           SOAP               no                         no              ISPHeader + WsseSecurity
+					// IIB Interface Clear Token b64 Raw token EnvelopSoap
+					// Header X-ISP-Security Header Authorization
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-					
+					// yes REST yes yes NA
+					// no REST no yes NA
+					// yes SOAP no yes ISPHeader + WsseSecurity
+					// no SOAP no no ISPHeader + WsseSecurity
+					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 					String clearToken = headerMap.get("X-ISP-Security");
 					String clearTokenb64 = null;
 
-					//if present clear Token execute b64 trasformation and pass it in header only if is IIB service of type REST
+					// if present clear Token execute b64 trasformation and pass
+					// it in header only if is IIB service of type REST
 					if (clearToken != null) {
 						clearTokenb64 = new String(
 								org.apache.commons.codec.binary.Base64.encodeBase64(clearToken.getBytes()));
-						
+
 						if (servizioIIB & interfaccia.equalsIgnoreCase("REST"))
-							
-						httpUrlConnection.setRequestProperty("X-ISP-Security", clearTokenb64);
+
+							httpUrlConnection.setRequestProperty("X-ISP-Security", clearTokenb64);
 
 						if (debug) {
 							System.out.println(
@@ -289,10 +294,10 @@ public class Rest {
 							System.out.println(">> doRest B64   - Security ClearToken \n" + clearTokenb64);
 							System.out.println(
 									"###################################################################################################");
-							
-						if (servizioIIB & interfaccia.equalsIgnoreCase("REST"))
-							
-							System.out.println("created http header: X-ISP-Security with Clear Token b64");
+
+							if (servizioIIB & interfaccia.equalsIgnoreCase("REST"))
+
+								System.out.println("created http header: X-ISP-Security with Clear Token b64");
 						}
 
 					} else {
@@ -308,13 +313,14 @@ public class Rest {
 					}
 
 					String rawToken = headerMap.get("Authorization");
-					
-					//If present raw Token then creation of http header only if is a IIB Service or interface is of type Rest
-					
+
+					// If present raw Token then creation of http header only if
+					// is a IIB Service or interface is of type Rest
+
 					if (rawToken != null) {
 
-						if (servizioIIB | interfaccia.equalsIgnoreCase("REST")) httpUrlConnection.setRequestProperty("Authorization", rawToken);
-						
+						if (servizioIIB | interfaccia.equalsIgnoreCase("REST"))
+							httpUrlConnection.setRequestProperty("Authorization", rawToken);
 
 						if (debug) {
 							System.out.println(
@@ -322,22 +328,22 @@ public class Rest {
 							System.out.println(">> doRest FOUND - Security Raw Token \n" + rawToken);
 							System.out.println(
 									"###################################################################################################");
-							
-						if (servizioIIB | interfaccia.equalsIgnoreCase("REST"))
-							
-							System.out.println("Aggiunto header Authorization con Raw Token");
-							
+
+							if (servizioIIB | interfaccia.equalsIgnoreCase("REST"))
+
+								System.out.println("Aggiunto header Authorization con Raw Token");
+
 						}
 
 					} else
 
-					if (debug) {
-						System.out.println(
-								"###################################################################################################");
-						System.out.println(">> doRest Security Raw Token NOT Present");
-						System.out.println(
-								"###################################################################################################");
-					}
+						if (debug) {
+							System.out.println(
+									"###################################################################################################");
+							System.out.println(">> doRest Security Raw Token NOT Present");
+							System.out.println(
+									"###################################################################################################");
+						}
 				}
 
 				// If there is content AND the command is either POST or PUT,
@@ -415,7 +421,8 @@ public class Rest {
 	} // End of doRest
 
 	public static HashMap<String, String> doRest(String command, String urlString, String content,
-			HashMap<String, String> headerMap, String aliasAuthName, boolean debug, int timeout,String interfaccia,boolean servizioIIB) throws Exception {
+			HashMap<String, String> headerMap, String aliasAuthName, boolean debug, int timeout, String interfaccia,
+			boolean servizioIIB) throws Exception {
 
 		HashMap<String, String> returnVal = new HashMap<String, String>();
 		String userid = "";
@@ -434,7 +441,8 @@ public class Rest {
 			return returnVal;
 		}
 
-		return doRest(command, urlString, content, headerMap, userid, password, debug, timeout,interfaccia,servizioIIB);
+		return doRest(command, urlString, content, headerMap, userid, password, debug, timeout, interfaccia,
+				servizioIIB);
 
 		// Never reached. We should never reach this line.
 	} // End of doRest
@@ -536,14 +544,19 @@ public class Rest {
 
 			try {
 
-				//tokenMap.put("TransactionId",xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='RequestInfo']//*[local-name()='TransactionId']", doc));
-				
-				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='RequestInfo']//*[local-name()='TransactionId']", doc);
+				// tokenMap.put("TransactionId",xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='RequestInfo']//*[local-name()='TransactionId']",
+				// doc));
+
+				tagValue = xpath.evaluate(
+						"//*[local-name()='ISPWebservicesHeader']//*[local-name()='RequestInfo']//*[local-name()='TransactionId']",
+						doc);
 				tokenMap.put("ISPWebservicesHeader.RequestInfo.TransactionId", tagValue);
 				if (logMe)
 					System.out.println("TransactionId --> " + tagValue);
 
-				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='RequestInfo']//*[local-name()='Timestamp']", doc);
+				tagValue = xpath.evaluate(
+						"//*[local-name()='ISPWebservicesHeader']//*[local-name()='RequestInfo']//*[local-name()='Timestamp']",
+						doc);
 				if (logMe)
 					System.out.println("Timestamp --> " + tagValue);
 				if (tagValue == null || tagValue.length() == 0) {
@@ -566,7 +579,9 @@ public class Rest {
 				}
 				tokenMap.put("ISPWebservicesHeader.RequestInfo.Timestamp", tagValue);
 
-				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='RequestInfo']//*[local-name()='ServiceID']", doc);
+				tagValue = xpath.evaluate(
+						"//*[local-name()='ISPWebservicesHeader']//*[local-name()='RequestInfo']//*[local-name()='ServiceID']",
+						doc);
 				if (logMe)
 					System.out.println("ServiceID --> " + tagValue);
 				if (tagValue == null || tagValue.length() == 0) {
@@ -580,83 +595,115 @@ public class Rest {
 				}
 				tokenMap.put("ISPWebservicesHeader.RequestInfo.ServiceID", tagValue);
 
-				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='RequestInfo']//*[local-name()='ServiceVersion']", doc);
+				tagValue = xpath.evaluate(
+						"//*[local-name()='ISPWebservicesHeader']//*[local-name()='RequestInfo']//*[local-name()='ServiceVersion']",
+						doc);
 				if (logMe)
 					System.out.println("ServiceVersion --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.RequestInfo.ServiceVersion", tagValue);
 
-				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='RequestInfo']//*[local-name()='Language']", doc);
+				tagValue = xpath.evaluate(
+						"//*[local-name()='ISPWebservicesHeader']//*[local-name()='RequestInfo']//*[local-name()='Language']",
+						doc);
 				if (logMe)
 					System.out.println("Language --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.RequestInfo.Language", tagValue);
 
-				///@*[local-name()='UserID']
-				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='OperatorInfo']/@*[local-name()='UserID']", doc);
+				/// @*[local-name()='UserID']
+				tagValue = xpath.evaluate(
+						"//*[local-name()='ISPWebservicesHeader']//*[local-name()='OperatorInfo']/@*[local-name()='UserID']",
+						doc);
 				if (logMe)
 					System.out.println("UserID --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.OperatorInfo.UserID", tagValue);
 
-				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='OperatorInfo']/@*[local-name()='IsVirtualUser']", doc);
+				tagValue = xpath.evaluate(
+						"//*[local-name()='ISPWebservicesHeader']//*[local-name()='OperatorInfo']/@*[local-name()='IsVirtualUser']",
+						doc);
 				if (logMe)
 					System.out.println("IsVirtualUser --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.OperatorInfo.ISVirtualUser", tagValue);
 
-				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='OperatorInfo']/@*[local-name()='NotISPUserID']", doc);
+				tagValue = xpath.evaluate(
+						"//*[local-name()='ISPWebservicesHeader']//*[local-name()='OperatorInfo']/@*[local-name()='NotISPUserID']",
+						doc);
 				if (logMe)
 					System.out.println("NotISPUserID --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.OperatorInfo.NotISPUserID", tagValue);
 
-				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='CompanyInfo']//*[local-name()='ISPCallerCompanyIDCode']", doc);
+				tagValue = xpath.evaluate(
+						"//*[local-name()='ISPWebservicesHeader']//*[local-name()='CompanyInfo']//*[local-name()='ISPCallerCompanyIDCode']",
+						doc);
 				if (logMe)
 					System.out.println("ISPCallerCompanyIDCode --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.CompanyInfo.ISPCallerCompanyIDCode", tagValue);
 
-				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='CompanyInfo']//*[local-name()='NotISPCompanyIDCode']", doc);
+				tagValue = xpath.evaluate(
+						"//*[local-name()='ISPWebservicesHeader']//*[local-name()='CompanyInfo']//*[local-name()='NotISPCompanyIDCode']",
+						doc);
 				if (logMe)
 					System.out.println("NotISPCompanyIDCode --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.CompanyInfo.NotISPCompanyIDCode", tagValue);
 
-				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='CompanyInfo']//*[local-name()='ISPBranchCode']", doc);
+				tagValue = xpath.evaluate(
+						"//*[local-name()='ISPWebservicesHeader']//*[local-name()='CompanyInfo']//*[local-name()='ISPBranchCode']",
+						doc);
 				if (logMe)
 					System.out.println("ISPBranchCode --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.CompanyInfo.ISPBranchCode", tagValue);
 
-				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='CompanyInfo']//*[local-name()='ISPServiceCompanyIDCode']", doc);
+				tagValue = xpath.evaluate(
+						"//*[local-name()='ISPWebservicesHeader']//*[local-name()='CompanyInfo']//*[local-name()='ISPServiceCompanyIDCode']",
+						doc);
 				if (logMe)
 					System.out.println("ISPServiceCompanyIDCode --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.CompanyInfo.ISPServiceCompanyIDCode", tagValue);
 
-				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='BusinessInfo']//*[local-name()='CustomerID']", doc);
+				tagValue = xpath.evaluate(
+						"//*[local-name()='ISPWebservicesHeader']//*[local-name()='BusinessInfo']//*[local-name()='CustomerID']",
+						doc);
 				if (logMe)
 					System.out.println("CustomerID --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.BusinessInfo.CustomerID", tagValue);
 
-				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='BusinessInfo']//*[local-name()='BusinessProcessName']", doc);
+				tagValue = xpath.evaluate(
+						"//*[local-name()='ISPWebservicesHeader']//*[local-name()='BusinessInfo']//*[local-name()='BusinessProcessName']",
+						doc);
 				if (logMe)
 					System.out.println("BusinessProcessName --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.BusinessInfo.BusinessProcessName", tagValue);
 
-				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='BusinessInfo']//*[local-name()='BusinessProcessID']", doc);
+				tagValue = xpath.evaluate(
+						"//*[local-name()='ISPWebservicesHeader']//*[local-name()='BusinessInfo']//*[local-name()='BusinessProcessID']",
+						doc);
 				if (logMe)
 					System.out.println("BusinessProcessID --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.BusinessInfo.BusinessProcessID", tagValue);
 
-				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='BusinessInfo']//*[local-name()='BusinessOperation']", doc);
+				tagValue = xpath.evaluate(
+						"//*[local-name()='ISPWebservicesHeader']//*[local-name()='BusinessInfo']//*[local-name()='BusinessOperation']",
+						doc);
 				if (logMe)
 					System.out.println("BusinessOperation --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.BusinessInfo.BusinessOperation", tagValue);
 
-				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='BusinessInfo']//*[local-name()='BusinessFileID']", doc);
+				tagValue = xpath.evaluate(
+						"//*[local-name()='ISPWebservicesHeader']//*[local-name()='BusinessInfo']//*[local-name()='BusinessFileID']",
+						doc);
 				if (logMe)
 					System.out.println("BusinessFileID --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.BusinessInfo.BusinessFileID", tagValue);
 
-				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='TechnicalInfo']//*[local-name()='ChannelIDCode']", doc);
+				tagValue = xpath.evaluate(
+						"//*[local-name()='ISPWebservicesHeader']//*[local-name()='TechnicalInfo']//*[local-name()='ChannelIDCode']",
+						doc);
 				if (logMe)
 					System.out.println("ChannelIDCode --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.TechnicalInfo.ChannelIDCode", tagValue);
 
-				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='TechnicalInfo']//*[local-name()='ApplicationID']", doc);
+				tagValue = xpath.evaluate(
+						"//*[local-name()='ISPWebservicesHeader']//*[local-name()='TechnicalInfo']//*[local-name()='ApplicationID']",
+						doc);
 				if (logMe)
 					System.out.println("ApplicationID --> " + tagValue);
 				if (tagValue == null || tagValue.length() == 0) {
@@ -670,112 +717,47 @@ public class Rest {
 				}
 				tokenMap.put("ISPWebservicesHeader.TechnicalInfo.ApplicationID", tagValue);
 
-				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='TechnicalInfo']//*[local-name()='CallerServerName']", doc);
+				tagValue = xpath.evaluate(
+						"//*[local-name()='ISPWebservicesHeader']//*[local-name()='TechnicalInfo']//*[local-name()='CallerServerName']",
+						doc);
 				if (logMe)
 					System.out.println("CallerServerName --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.TechnicalInfo.CallerServerName", tagValue);
 
-				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='TechnicalInfo']//*[local-name()='CallerProgramName']", doc);
+				tagValue = xpath.evaluate(
+						"//*[local-name()='ISPWebservicesHeader']//*[local-name()='TechnicalInfo']//*[local-name()='CallerProgramName']",
+						doc);
 				if (logMe)
 					System.out.println("CallerProgramName --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.TechnicalInfo.CallerProgramName", tagValue);
 
-				int countag = Integer
-						.parseInt(xpath.evaluate("count(//*[local-name()='ISPWebservicesHeader']//*[local-name()='AdditionalBusinessInfo']//*[local-name()='Param'])", doc));
+				int countag = Integer.parseInt(xpath.evaluate(
+						"count(//*[local-name()='ISPWebservicesHeader']//*[local-name()='AdditionalBusinessInfo']//*[local-name()='Param'])",
+						doc));
 				String tagName = null;
-				
-				if (countag !=0) {
 
-				for (int ii = 1; ii <= countag; ii++) {
-
-					tagName = xpath.evaluate(
-							"//*[local-name()='ISPWebservicesHeader']//*[local-name()='AdditionalBusinessInfo']/Param[" + String.valueOf(ii) + "]//@*[local-name()='Name']",
-							doc);
-					
-					if (tagName != null && tagName.length() != 0) {
-						
-						tagValue = xpath.evaluate(
-								"//*[local-name()='ISPWebservicesHeader']//*[local-name()='AdditionalBusinessInfo']/Param[" + String.valueOf(ii) + "]//@*[local-name()='Value']",
-								doc);
-						tokenMap.put("ISPWebservicesHeader.AdditionalBusinessInfo." + tagName, tagValue);
-						if (logMe)
-							System.out.println(tagName + " --> " + tagValue);
-					}
-				}
-				
-				} else {
-					
-					// *deprecated*
-					
-					countag = Integer
-							.parseInt(xpath.evaluate("count(/ISPWebservicesHeader/AdditionalBusinessInfo)", doc));
-					
-					tagName = null;
-					
-					if (countag !=0) {
+				if (countag != 0) {
 
 					for (int ii = 1; ii <= countag; ii++) {
 
 						tagName = xpath.evaluate(
-								"/ISPWebservicesHeader/AdditionalBusinessInfo[" + String.valueOf(ii) + "]/@Name",
-								doc);
+								"//*[local-name()='ISPWebservicesHeader']//*[local-name()='AdditionalBusinessInfo']/Param["
+										+ String.valueOf(ii) + "]//@*[local-name()='Name']",
+										doc);
+
 						if (tagName != null && tagName.length() != 0) {
+
 							tagValue = xpath.evaluate(
-									"/ISPWebservicesHeader/AdditionalBusinessInfo[" + String.valueOf(ii) + "]/@Value",
-									doc);
+									"//*[local-name()='ISPWebservicesHeader']//*[local-name()='AdditionalBusinessInfo']/Param["
+											+ String.valueOf(ii) + "]//@*[local-name()='Value']",
+											doc);
 							tokenMap.put("ISPWebservicesHeader.AdditionalBusinessInfo." + tagName, tagValue);
 							if (logMe)
 								System.out.println(tagName + " --> " + tagValue);
 						}
 					}
-				  }
+
 				}
-				
-				/*
-				 * 
-				 * non serve + tagValue = xpath.evaluate(
-				 * "/ISPWebservicesHeader/AdditionalBusinessInfo/CodUnitaOperativa/text()",
-				 * doc); if (logMe) System.out.println("CodUnitaOperativa --> "
-				 * + tagValue); tokenMap.put(
-				 * "ISPWebservicesHeader.AdditionalBusinessInfo.CodUnitaOperativa",
-				 * tagValue);
-				 * 
-				 * tagValue = xpath.evaluate(
-				 * "/ISPWebservicesHeader/AdditionalBusinessInfo/DataContabile/text()",
-				 * doc); if (logMe) System.out.println("DataContabile --> " +
-				 * tagValue); tokenMap.put(
-				 * "ISPWebservicesHeader.AdditionalBusinessInfo.DataContabile",
-				 * tagValue);
-				 * 
-				 * tagValue = xpath.evaluate(
-				 * "/ISPWebservicesHeader/AdditionalBusinessInfo/FlagPaperless/text()",
-				 * doc); if (logMe) System.out.println("FlagPaperless --> " +
-				 * tagValue); tokenMap.put(
-				 * "ISPWebservicesHeader.AdditionalBusinessInfo.FlagPaperless",
-				 * tagValue);
-				 * 
-				 * tagValue = xpath.evaluate(
-				 * "/ISPWebservicesHeader/AdditionalBusinessInfo/CodABI/text()",
-				 * doc); if (logMe) System.out.println("CodABI --> " +
-				 * tagValue); tokenMap.put(
-				 * "ISPWebservicesHeader.AdditionalBusinessInfo.CodABI",
-				 * tagValue);
-				 * 
-				 * tagValue = xpath.evaluate(
-				 * "/ISPWebservicesHeader/AdditionalBusinessInfo/CodOperatività/text()",
-				 * doc); if (logMe) System.out.println("CodOperatività --> " +
-				 * tagValue); tokenMap.put(
-				 * "ISPWebservicesHeader.AdditionalBusinessInfo.CodOperatività",
-				 * tagValue);
-				 * 
-				 * tagValue = xpath.evaluate(
-				 * "/ISPWebservicesHeader/AdditionalBusinessInfo/CodTerminaleCics/text()",
-				 * doc); if (logMe) System.out.println("CodTerminaleCics --> " +
-				 * tagValue); tokenMap.put(
-				 * "ISPWebservicesHeader.AdditionalBusinessInfo.CodTerminaleCics",
-				 * tagValue);
-				 * 
-				 */
 
 			} catch (Exception e) {
 				tokenMap = null;
@@ -797,17 +779,17 @@ public class Rest {
 		String ts = null;
 
 		String other = null;
-		
+
 		if (input != null) {
-			
-			input=input.replace("-", "");
-			input=input.replace(":", "");
-			input=input.replace(".", "");
-			
+
+			input = input.replace("-", "");
+			input = input.replace(":", "");
+			input = input.replace(".", "");
+
 		}
-		
+
 		if (input != null && input.length() >= 17 & input.length() <= 20) {
-			
+
 			String zero = "00000000";
 
 			ts = input.substring(0, 14);
