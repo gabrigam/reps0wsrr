@@ -6,6 +6,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -27,6 +28,14 @@ public class ISPHeaderUtility {
 		String ts = null;
 
 		String other = null;
+
+		if (input != null) {
+
+			input = input.replace("-", "");
+			input = input.replace(":", "");
+			input = input.replace(".", "");
+
+		}
 
 		if (input != null && input.length() >= 17 & input.length() <= 20) {
 
@@ -69,7 +78,6 @@ public class ISPHeaderUtility {
 			return null;
 
 	}
-	
 
 	@SuppressWarnings("unchecked")
 	private static HashMap ISPHeaderScompositionLocal(String ispHeader) {
@@ -77,6 +85,7 @@ public class ISPHeaderUtility {
 		Document doc = null;
 		XPathFactory xpathFactory = XPathFactory.newInstance();
 		XPath xpath = xpathFactory.newXPath();
+		
 		InputSource source = new InputSource(new StringReader(ispHeader));
 		try {
 			doc = (Document) xpath.evaluate("/", source, XPathConstants.NODE);
@@ -139,6 +148,22 @@ public class ISPHeaderUtility {
 			tokenMap.put("CodTerminaleCics",
 					xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/CodTerminaleCics/text()", doc));
 
+			int countag = Integer
+					.parseInt(xpath.evaluate("count(/ISPWebservicesHeader/AdditionalBusinessInfo/Param)", doc));
+
+			String tagValue = null;
+			for (int ii = 1; ii <= countag; ii++) {
+
+				tagValue = xpath.evaluate(
+						"/ISPWebservicesHeader/AdditionalBusinessInfo/Param[" + String.valueOf(ii) + "]/@Name", doc);
+				// System.out.println(xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/Param["+String.valueOf(ii)+"]/@Name",
+				// doc));
+				if (tagValue != null && tagValue.length() != 0)
+					tokenMap.put(tagValue, xpath.evaluate(
+							"/ISPWebservicesHeader/AdditionalBusinessInfo/Param[" + String.valueOf(ii) + "]/@Value",
+							doc));
+			}
+
 		} catch (XPathExpressionException e) {
 			// TODO Auto-generated catch block
 			tokenMap.put("ISPHEADERMALFORMED", "TRUE");
@@ -148,7 +173,6 @@ public class ISPHeaderUtility {
 		return tokenMap;
 	}
 
-	
 	@SuppressWarnings("unchecked")
 
 	public static TWObject ISPHeaderTagValues(String ispHeader) {
@@ -227,6 +251,7 @@ public class ISPHeaderUtility {
 				ISPHeaderValues.setPropertyValue("CallerProgramName",
 						xpath.evaluate("/ISPWebservicesHeader/TechnicalInfo/CallerProgramName/text()", doc));
 
+				/**
 				ISPHeaderValues.setPropertyValue("CodUnitaOperativa",
 						xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/CodUnitaOperativa/text()", doc));
 				ISPHeaderValues.setPropertyValue("DataContabile",
@@ -239,6 +264,55 @@ public class ISPHeaderUtility {
 						xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/CodOperatività/text()", doc));
 				ISPHeaderValues.setPropertyValue("CodTerminaleCics",
 						xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/CodTerminaleCics/text()", doc));
+                **/
+				
+				String tagValue = null;
+
+				int countag = Integer
+						.parseInt(xpath.evaluate("count(/ISPWebservicesHeader/AdditionalBusinessInfo/Param)", doc));
+				String tagName = null;
+
+				if (countag != 0) {
+
+					for (int ii = 1; ii <= countag; ii++) {
+
+						tagName = xpath.evaluate(
+								"/ISPWebservicesHeader/AdditionalBusinessInfo/Param[" + String.valueOf(ii) + "]/@Name",
+								doc);
+						if (tagName != null && tagName.length() != 0) {
+							tagValue = xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo/Param["
+									+ String.valueOf(ii) + "]/@Value", doc);
+							ISPHeaderValues.setPropertyValue(tagName, tagValue);
+
+						}
+					}
+				}
+
+				else {
+					
+					// *deprecated*
+					
+					countag = Integer
+							.parseInt(xpath.evaluate("count(/ISPWebservicesHeader/AdditionalBusinessInfo)", doc));
+					tagName = null;
+
+					if (countag != 0) {
+
+						for (int ii = 1; ii <= countag; ii++) {
+
+							tagName = xpath.evaluate(
+									"/ISPWebservicesHeader/AdditionalBusinessInfo[" + String.valueOf(ii) + "]/@Name",
+									doc);
+							if (tagName != null && tagName.length() != 0) {
+								tagValue = xpath.evaluate("/ISPWebservicesHeader/AdditionalBusinessInfo["
+										+ String.valueOf(ii) + "]/@Value", doc);
+								ISPHeaderValues.setPropertyValue(tagName, tagValue);
+
+							}
+						}
+					}
+					
+				}
 
 			} catch (XPathExpressionException e) {
 				// TODO Auto-generated catch block
@@ -257,14 +331,10 @@ public class ISPHeaderUtility {
 		return ISPHeaderValues;
 
 	}
-	
-	
+
 	public static Object testByte(String data) throws Exception {
 		return data.getBytes();
 	}
-	
-	
-	/** main da attivare solo per test locale
 
 	public static void main(String[] args) {
 
@@ -273,8 +343,6 @@ public class ISPHeaderUtility {
 		String timeStamp = null;
 		String timeStamp_ = null;
 		boolean error = false;
-		
-		
 
 		HashMap ispHeaderMap = new HashMap();
 
@@ -297,27 +365,30 @@ public class ISPHeaderUtility {
 		// repetitions:-->
 		// <CodUnitaOperativa>[CodUnitaOperativa]</CodUnitaOperativa><DataContabile>[DataContabile]</DataContabile><FlagPaperless>[FlagPaperless>]</FlagPaperless>
 		// <CodABI>[CodABI]</CodABI><CodOperatività>[CodOperarività]</CodOperatività><CodTerminaleCics>[CodTerminaleCics]</CodTerminaleCics></AdditionalBusinessInfo></ISPWebservicesHeader>";
-		String ispHeader = "<ISPWebservicesHeader><!--You may enter the following 6 items in any order--> <RequestInfo><!--You may enter the following 5 items in any order--><TransactionId>TID</TransactionId><Timestamp>20170630125040000252</Timestamp><ServiceID_>SID</ServiceID_><ServiceVersion>SERVICEVERION</ServiceVersion><!--Optional:--><Language>IT</Language></RequestInfo><OperatorInfo UserID=\"U0H1963\" IsVirtualUser=\"VIUSER\" NotISPUserID=\"NOTVIU\"/><CompanyInfo><!--You may enter the following 4 items in any order--><ISPCallerCompanyIDCode>[ISPCallerCompanyIDCode]</ISPCallerCompanyIDCode><!--Optional:--><NotISPCompanyIDCode>[NotISPCompanyIDCode]</NotISPCompanyIDCode><!--Optional:--><ISPBranchCode>[ISPBranchCode]</ISPBranchCode><ISPServiceCompanyIDCode>[ISPServiceCompanyIDCode]</ISPServiceCompanyIDCode></CompanyInfo><BusinessInfo><!--You may enter the following 5 items in any order--><CustomerID>[CustomerID]</CustomerID><!--Optional:--><BusinessProcessName>[BusinessProcessName]</BusinessProcessName><!--Optional:--><BusinessProcessID>[BusinessProcessID]</BusinessProcessID><!--Optional:--><BusinessOperation>[BusinessOperation]</BusinessOperation><!--Optional:--><BusinessFileID>[BusinessFileID]</BusinessFileID></BusinessInfo>         <TechnicalInfo>            <!--You may enter the following 4 items in any order-->            <ChannelIDCode>[ChannelIDCode]</ChannelIDCode>            <ApplicationID>[ApplicationID]</ApplicationID>            <CallerServerName>[CallerServerName]</CallerServerName>            <CallerProgramName>[CallerProgramName]</CallerProgramName>         </TechnicalInfo>         <AdditionalBusinessInfo>            <!--1 or more repetitions:-->            <CodUnitaOperativa>[CodUnitaOperativa]</CodUnitaOperativa><DataContabile>[DataContabile]</DataContabile><FlagPaperless>[FlagPaperless>]</FlagPaperless>	<CodABI>[CodABI]</CodABI><CodOperatività>[CodOperarività]</CodOperatività><CodTerminaleCics>[CodTerminaleCics]</CodTerminaleCics></AdditionalBusinessInfo></ISPWebservicesHeader>";
+		// String ispHeader = "<ISPWebservicesHeader><!--You may enter the
+		// following 6 items in any order--> <RequestInfo><!--You may enter the
+		// following 5 items in any
+		// order--><TransactionId>TID</TransactionId><Timestamp>20170630125040000252</Timestamp><ServiceID_>SID</ServiceID_><ServiceVersion>SERVICEVERION</ServiceVersion><!--Optional:--><Language>IT</Language></RequestInfo><OperatorInfo
+		// UserID=\"U0H1963\" IsVirtualUser=\"VIUSER\"
+		// NotISPUserID=\"NOTVIU\"/><CompanyInfo><!--You may enter the following
+		// 4 items in any
+		// order--><ISPCallerCompanyIDCode>[ISPCallerCompanyIDCode]</ISPCallerCompanyIDCode><!--Optional:--><NotISPCompanyIDCode>[NotISPCompanyIDCode]</NotISPCompanyIDCode><!--Optional:--><ISPBranchCode>[ISPBranchCode]</ISPBranchCode><ISPServiceCompanyIDCode>[ISPServiceCompanyIDCode]</ISPServiceCompanyIDCode></CompanyInfo><BusinessInfo><!--You
+		// may enter the following 5 items in any
+		// order--><CustomerID>[CustomerID]</CustomerID><!--Optional:--><BusinessProcessName>[BusinessProcessName]</BusinessProcessName><!--Optional:--><BusinessProcessID>[BusinessProcessID]</BusinessProcessID><!--Optional:--><BusinessOperation>[BusinessOperation]</BusinessOperation><!--Optional:--><BusinessFileID>[BusinessFileID]</BusinessFileID></BusinessInfo>
+		// <TechnicalInfo> <!--You may enter the following 4 items in any
+		// order--> <ChannelIDCode>[ChannelIDCode]</ChannelIDCode>
+		// <ApplicationID>[ApplicationID]</ApplicationID>
+		// <CallerServerName>[CallerServerName]</CallerServerName>
+		// <CallerProgramName>[CallerProgramName]</CallerProgramName>
+		// </TechnicalInfo> <AdditionalBusinessInfo> <!--1 or more
+		// repetitions:-->
+		// <CodUnitaOperativa>[CodUnitaOperativa]</CodUnitaOperativa><DataContabile>[DataContabile]</DataContabile><FlagPaperless>[FlagPaperless>]</FlagPaperless>
+		// <CodABI>[CodABI]</CodABI><CodOperatività>[CodOperarività]</CodOperatività><CodTerminaleCics>[CodTerminaleCics]</CodTerminaleCics></AdditionalBusinessInfo></ISPWebservicesHeader>";
+		String ispHeader = "<ISPWebservicesHeader><!--You may enter the following 6 items in any order--> <RequestInfo><!--You may enter the following 5 items in any order--><TransactionId>TID</TransactionId><Timestamp>20170630125040000252</Timestamp><ServiceVersion>SERVICEVERION</ServiceVersion><!--Optional:--><Language>IT</Language></RequestInfo><OperatorInfo UserID=\"U0H1963\" IsVirtualUser=\"VIUSER\" NotISPUserID=\"NOTVIU\"/><CompanyInfo><!--You may enter the following 4 items in any order--><!--Optional:--><!--Optional:--><ISPBranchCode>[ISPBranchCode]</ISPBranchCode><ISPServiceCompanyIDCode>[ISPServiceCompanyIDCode]</ISPServiceCompanyIDCode></CompanyInfo><BusinessInfo><!--You may enter the following 5 items in any order--><CustomerID>[CustomerID]</CustomerID><!--Optional:--><BusinessProcessName>[BusinessProcessName]</BusinessProcessName><!--Optional:--><BusinessProcessID>[BusinessProcessID]</BusinessProcessID><!--Optional:--><BusinessOperation>[BusinessOperation]</BusinessOperation><!--Optional:--><BusinessFileID>[BusinessFileID]</BusinessFileID></BusinessInfo>         <TechnicalInfo>            <!--You may enter the following 4 items in any order-->            <ChannelIDCode>[ChannelIDCode]</ChannelIDCode>            <ApplicationID>[ApplicationID]</ApplicationID>            <CallerServerName>[CallerServerName]</CallerServerName>            <CallerProgramName>[CallerProgramName]</CallerProgramName>         </TechnicalInfo>         <AdditionalBusinessInfo>            <!--1 or more repetitions:-->            <CodUnitaOperativa>[CodUnitaOperativa]</CodUnitaOperativa><DataContabile>[DataContabile]</DataContabile><FlagPaperless>[FlagPaperless>]</FlagPaperless>	<CodABI>[CodABI]</CodABI><CodOperatività>[CodOperarività]</CodOperatività><CodTerminaleCics>[CodTerminaleCics]</CodTerminaleCics></AdditionalBusinessInfo></ISPWebservicesHeader>";
 
-		String K="20170630125040000252";
-		
-		String y=K.substring(0,4)+"-"+K.substring(4,6)+"-"+K.substring(6,8)+"-"+K.substring(8,10)+"."+K.substring(10,12)+"."+K.substring(12,14)+"."+K.substring(14,K.length());
-		String M=K.substring(4,6);
-		String d=K.substring(6,8);
-		String H=K.substring(8,10);
-		String m=K.substring(10,12);
-		String s=K.substring(12,14);
-		String ss=K.substring(14,K.length());
-		int h=0;
-		
-		try {
-			System.out.println(new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss.SSSSSS").parse(K).toString());
-			int f=0;
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		// ispHeader=null;
+		ispHeader = "<ISPWebservicesHeader><RequestInfo><TransactionId>BPMTKMQ2017-07</TransactionId><Timestamp>20170703180828371</Timestamp><ServiceID>XINBPTE1</ServiceID><ServiceVersion>01</ServiceVersion><Language>E</Language></RequestInfo><OperatorInfo UserID=\"U0H2438\" IsVirtualUser=\"false\" NotISPUserID=\"U900389\"/><CompanyInfo><ISPCallerCompanyIDCode>01</ISPCallerCompanyIDCode><NotISPCompanyIDCode>99</NotISPCompanyIDCode><ISPBranchCode>02841</ISPBranchCode><ISPServiceCompanyIDCode>02</ISPServiceCompanyIDCode></CompanyInfo><BusinessInfo><CustomerID>ABCDEF80L09B248Z</CustomerID><BusinessProcessName>BusinessProcessName</BusinessProcessName><BusinessProcessID>123</BusinessProcessID><BusinessOperation>BusinessOperation</BusinessOperation><BusinessFileID>BusinessFileID</BusinessFileID></BusinessInfo><TechnicalInfo><ChannelIDCode>99</ChannelIDCode><ApplicationID>IXPG0</ApplicationID><CallerServerName>CallerServerName</CallerServerName><CallerProgramName>BPMPA</CallerProgramName></TechnicalInfo><AdditionalBusinessInfo><Param Name=\"CodUnitaOperativa\" Value=\"14493\"/><Param Name=\"DataContabile\" Value=\"03072017\"/><Param Name=\"FlagPaperless\" Value=\"S\"/><Param Name=\"CodABI\" Value=\"03069\"/><Param Name=\"CodOperatività\" Value=\"N\"/><Param Name_=\"CodTerminaleCics\" Value=\"9999\"/></AdditionalBusinessInfo></ISPWebservicesHeader>";
+		ispHeader="<int:ISPWebservicesHeader xmlns:int=\"http://eric.van-der-vlist.com/ns/person\">         <RequestInfo>            <TransactionId>GKBG0_20170913113655000769</TransactionId>            <Timestamp>20170913113655000769</Timestamp>            <ServiceID>GKMGDECPLF</ServiceID>            <ServiceVersion>00</ServiceVersion>              <Language>it</Language>         </RequestInfo>         <OperatorInfo UserID=\"U0G4356\" IsVirtualUser=\"false\"     NotISPUserID=\"\"   />         <CompanyInfo>            <ISPCallerCompanyIDCode>01</ISPCallerCompanyIDCode>            <ISPServiceCompanyIDCode>01</ISPServiceCompanyIDCode>            <ISPBranchCode>00700</ISPBranchCode>            <NotISPCompanyIDCode></NotISPCompanyIDCode>         </CompanyInfo>         <BusinessInfo>            <CustomerID>U0G4356</CustomerID>            <BusinessProcessName>Richiesta Pratica Mogeni</BusinessProcessName>            <BusinessProcessID>76828</BusinessProcessID>            <BusinessOperation></BusinessOperation>            <BusinessFileID></BusinessFileID>         </BusinessInfo>         <TechnicalInfo>            <ChannelIDCode>01</ChannelIDCode>            <ApplicationID>GKBG0</ApplicationID>            <CallerServerName>localhost</CallerServerName>            <CallerProgramName>GKBG0-BPM</CallerProgramName>         </TechnicalInfo>         <AdditionalBusinessInfo>    <Param Name=\"CodABI\" Value=\"01025\"/>  </AdditionalBusinessInfo></int:ISPWebservicesHeader>";
+	
 		ispHeaderMap = ISPHeaderUtility.ISPHeaderScompositionLocal(ispHeader);
 
 		if (ispHeaderMap != null) {
@@ -352,6 +423,5 @@ public class ISPHeaderUtility {
 		}
 
 	}
-	
-  */
+
 }
