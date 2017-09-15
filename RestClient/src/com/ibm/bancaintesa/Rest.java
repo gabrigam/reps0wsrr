@@ -70,7 +70,7 @@ public class Rest {
 
 		try {
 
-			System.out.println(doRest(command, url, content, headerMap, userid, password, false, 100));
+			System.out.println(doRest(command, url, content, headerMap, userid, password, false, 100,"",false));
 		} catch (Exception e) {
 			e.printStackTrace(System.out);
 		}
@@ -117,10 +117,12 @@ public class Rest {
 	 * @throws Exception
 	 */
 	public static HashMap<String, String> doRest(String command, String urlString, String content,
-			HashMap<String, String> headerMap, String userid, String password, boolean debug, int timeout)
+			HashMap<String, String> headerMap, String userid, String password, boolean debug, int timeout,String interfaccia,boolean servizioIIB)
 			throws Exception {
 
 		HashMap<String, String> returnVal = new HashMap<String, String>();
+		
+		System.out.println("Parametri passati :  Interfaccia="+interfaccia+" ServizioIIB="+servizioIIB );
 
 		// Check that the command type is known
 		if (!command.equals("GET") && !command.equals("POST") && !command.equals("PUT") && !command.equals("DELETE")) {
@@ -137,8 +139,7 @@ public class Rest {
 				if (timeout > 0) {
 
 					httpUrlConnection.setReadTimeout(timeout * 1000); // timeout
-																		// is in
-																		// milliseconds
+																		// is in																	// milliseconds
 				}
 
 				String ispHeader = headerMap.get("X-ISPWebServicesHeader");
@@ -153,11 +154,11 @@ public class Rest {
 						System.out.println(
 								"###################################################################################################");
 						System.out.println("Error ISPHeader : " + ispHeader
-								+ " is Malformed or mandatory fields are missing or invalid (enable debug on caller for more information");
+								+ " is Malformed or Mandatory fields ( </Timestamp>,<ServiceID > or </ApplicationID>) are void or </Timestamp> contains invalid data");
 						System.out.println(
 								"###################################################################################################");
 						throw new RestException("Error ISPHeader : " + ispHeader
-								+ " is Malformed or mandatory fields are missing or invalid");
+								+ " is Malformed or Mandatory fields ( </Timestamp>,<ServiceID > or </ApplicationID>) are void or </Timestamp> contains invalid data");
 					}
 
 					// If a header map was supplied, add the map name=value
@@ -166,7 +167,7 @@ public class Rest {
 					if (debug) {
 						System.out.println(
 								"###################################################################################################");
-						System.out.println(">> doRest MAP  key -value http-header-request-property list ; ");
+						System.out.println(">> doRest MAP  key -value http-header-request-property alpahbetical list order; ");
 						System.out.println(
 								"###################################################################################################");
 					}
@@ -179,14 +180,14 @@ public class Rest {
 								"###################################################################################################");
 						System.out.println(">> doRest: command=" + command + ", urlString=" + urlString + ", content="
 								+ content + ", userid=" + userid + ", +, X-ISPWebServicesHeader=" + ispHeader
-								+ " , timeout=" + timeout);
+								+ " , timeout=" + timeout + " , isIIBService="+servizioIIB+" , ServiceInterface="+interfaccia);
 						System.out.println(
 								"###################################################################################################");
 					} else {
 						System.out.println(
 								"###################################################################################################");
 						System.out.println(">> doRest: command=" + command + ", urlString=" + urlString + ", content="
-								+ content + ", userid=" + userid + ", , X-ISPWebServicesHeader=" + ispHeader);
+								+ content + ", userid=" + userid + ", , X-ISPWebServicesHeader=" + ispHeader+ " , isIIBService="+servizioIIB+" , ServiceInterface="+interfaccia);
 						System.out.println(
 								"###################################################################################################");
 					}
@@ -204,7 +205,7 @@ public class Rest {
 						if (debug)
 							System.out.println(">> doRest requestProperty : " + key + " = " + headerMap.get(key));
 					}
-					// add single ISPHeader field as single requestProperty
+					//add single ISPHeader field as single requestProperty
 					if (debug) {
 						System.out.println(
 								"###################################################################################################");
@@ -223,7 +224,6 @@ public class Rest {
 							String value = ispHeaderMap.get(key);
 							if (value == null)
 								value = "";
-							      //if (key !=null && key.contains("CodOperativit")) key="ISPWebservicesHeader.AdditionalBusinessInfo.CodOperativit%E0";
 							      encodedValue=URLEncoder.encode(value, "UTF-8");
 							      encodedKey=URLEncoder.encode(key, "UTF-8");
 								httpUrlConnection.addRequestProperty(encodedKey, encodedValue);
@@ -253,25 +253,41 @@ public class Rest {
 
 				} else {
 
+					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+					//   IIB         Interface       Clear Token b64            Raw token             EnvelopSoap
+					//                             Header X-ISP-Security     Header Authorization        
+					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
+					//   yes           REST              yes			            yes                    NA
+					//    no           REST               no                        yes                    NA
+					//   yes           SOAP               no                        yes              ISPHeader + WsseSecurity
+					//    no           SOAP               no                         no              ISPHeader + WsseSecurity
+					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+					
 					String clearToken = headerMap.get("X-ISP-Security");
 					String clearTokenb64 = null;
 
+					//if present clear Token execute b64 trasformation and pass it in header only if is IIB service of type REST
 					if (clearToken != null) {
 						clearTokenb64 = new String(
 								org.apache.commons.codec.binary.Base64.encodeBase64(clearToken.getBytes()));
-
+						
+						if (servizioIIB & interfaccia.equalsIgnoreCase("REST"))
+							
 						httpUrlConnection.setRequestProperty("X-ISP-Security", clearTokenb64);
 
 						if (debug) {
 							System.out.println(
 									"###################################################################################################");
 							System.out.println(">> doRest FOUND - Security Clear Token \n" + clearToken);
-							System.out.println(">> doRest FOUND - Security Clear Token \n" + clearToken);
 							System.out.println(
 									"###################################################################################################");
 							System.out.println(">> doRest B64   - Security ClearToken \n" + clearTokenb64);
 							System.out.println(
 									"###################################################################################################");
+							
+						if (servizioIIB & interfaccia.equalsIgnoreCase("REST"))
+							
+							System.out.println("created http header: X-ISP-Security with Clear Token b64");
 						}
 
 					} else {
@@ -287,10 +303,13 @@ public class Rest {
 					}
 
 					String rawToken = headerMap.get("Authorization");
-
+					
+					//If present raw Token then creation of http header only if is a IIB Service or interface is of type Rest
+					
 					if (rawToken != null) {
 
-						httpUrlConnection.setRequestProperty("Authorization", rawToken);
+						if (servizioIIB | interfaccia.equalsIgnoreCase("REST")) httpUrlConnection.setRequestProperty("Authorization", rawToken);
+						
 
 						if (debug) {
 							System.out.println(
@@ -298,6 +317,11 @@ public class Rest {
 							System.out.println(">> doRest FOUND - Security Raw Token \n" + rawToken);
 							System.out.println(
 									"###################################################################################################");
+							
+						if (servizioIIB | interfaccia.equalsIgnoreCase("REST"))
+							
+							System.out.println("Aggiunto header Authorization con Raw Token");
+							
 						}
 
 					} else
@@ -386,7 +410,7 @@ public class Rest {
 	} // End of doRest
 
 	public static HashMap<String, String> doRest(String command, String urlString, String content,
-			HashMap<String, String> headerMap, String aliasAuthName, boolean debug, int timeout) throws Exception {
+			HashMap<String, String> headerMap, String aliasAuthName, boolean debug, int timeout,String interfaccia,boolean servizioIIB) throws Exception {
 
 		HashMap<String, String> returnVal = new HashMap<String, String>();
 		String userid = "";
@@ -405,7 +429,7 @@ public class Rest {
 			return returnVal;
 		}
 
-		return doRest(command, urlString, content, headerMap, userid, password, debug, timeout);
+		return doRest(command, urlString, content, headerMap, userid, password, debug, timeout,interfaccia,servizioIIB);
 
 		// Never reached. We should never reach this line.
 	} // End of doRest
@@ -651,6 +675,8 @@ public class Rest {
 				int countag = Integer
 						.parseInt(xpath.evaluate("count(/ISPWebservicesHeader/AdditionalBusinessInfo/Param)", doc));
 				String tagName = null;
+				
+				if (countag !=0) {
 
 				for (int ii = 1; ii <= countag; ii++) {
 
@@ -666,7 +692,35 @@ public class Rest {
 							System.out.println(tagName + " --> " + tagValue);
 					}
 				}
+				
+				} else {
+					
+					// *deprecated*
+					
+					countag = Integer
+							.parseInt(xpath.evaluate("count(/ISPWebservicesHeader/AdditionalBusinessInfo)", doc));
+					
+					tagName = null;
+					
+					if (countag !=0) {
 
+					for (int ii = 1; ii <= countag; ii++) {
+
+						tagName = xpath.evaluate(
+								"/ISPWebservicesHeader/AdditionalBusinessInfo[" + String.valueOf(ii) + "]/@Name",
+								doc);
+						if (tagName != null && tagName.length() != 0) {
+							tagValue = xpath.evaluate(
+									"/ISPWebservicesHeader/AdditionalBusinessInfo[" + String.valueOf(ii) + "]/@Value",
+									doc);
+							tokenMap.put("ISPWebservicesHeader.AdditionalBusinessInfo." + tagName, tagValue);
+							if (logMe)
+								System.out.println(tagName + " --> " + tagValue);
+						}
+					}
+				  }
+				}
+				
 				/*
 				 * 
 				 * non serve + tagValue = xpath.evaluate(
@@ -733,9 +787,17 @@ public class Rest {
 		String ts = null;
 
 		String other = null;
-
+		
+		if (input != null) {
+			
+			input=input.replace("-", "");
+			input=input.replace(":", "");
+			input=input.replace(".", "");
+			
+		}
+		
 		if (input != null && input.length() >= 17 & input.length() <= 20) {
-
+			
 			String zero = "00000000";
 
 			ts = input.substring(0, 14);
