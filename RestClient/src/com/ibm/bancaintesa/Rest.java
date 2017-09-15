@@ -67,6 +67,11 @@ public class Rest {
 		String password = "Password01";
 		HashMap<String, String> headerMap = new HashMap<String, String>();
 		Options options = null;
+		
+		
+		String ISPHeader="<int:ISPWebservicesHeader xmlns:int=\"http://eric.van-der-vlist.com/ns/person\">         <RequestInfo>            <TransactionId>GKBG0_20170913113655000769</TransactionId>            <Timestamp>20170913113655000769</Timestamp>            <ServiceID>GKMGDECPLF</ServiceID>            <ServiceVersion>00</ServiceVersion>              <Language>it</Language>         </RequestInfo>         <OperatorInfo UserID=\"U0G4356\" IsVirtualUser=\"false\"     NotISPUserID=\"\"   />         <CompanyInfo>            <ISPCallerCompanyIDCode>01</ISPCallerCompanyIDCode>            <ISPServiceCompanyIDCode>01</ISPServiceCompanyIDCode>            <ISPBranchCode>00700</ISPBranchCode>            <NotISPCompanyIDCode></NotISPCompanyIDCode>         </CompanyInfo>         <BusinessInfo>            <CustomerID>U0G4356</CustomerID>            <BusinessProcessName>Richiesta Pratica Mogeni</BusinessProcessName>            <BusinessProcessID>76828</BusinessProcessID>            <BusinessOperation></BusinessOperation>            <BusinessFileID></BusinessFileID>         </BusinessInfo>         <TechnicalInfo>            <ChannelIDCode>01</ChannelIDCode>            <ApplicationID>GKBG0</ApplicationID>            <CallerServerName>localhost</CallerServerName>            <CallerProgramName>GKBG0-BPM</CallerProgramName>         </TechnicalInfo>         <AdditionalBusinessInfo>    <Param Name=\"CodABI\" Value=\"01025\"/>  </AdditionalBusinessInfo></int:ISPWebservicesHeader>";
+		
+		Rest.ISPHeaderScomposition(ISPHeader, true);
 
 		try {
 
@@ -122,7 +127,7 @@ public class Rest {
 
 		HashMap<String, String> returnVal = new HashMap<String, String>();
 		
-		System.out.println("Parametri passati :  Interfaccia="+interfaccia+" ServizioIIB="+servizioIIB );
+		System.out.println("fxVer 01 Parametri passati :  Interfaccia="+interfaccia+" ServizioIIB="+servizioIIB );
 
 		// Check that the command type is known
 		if (!command.equals("GET") && !command.equals("POST") && !command.equals("PUT") && !command.equals("DELETE")) {
@@ -531,12 +536,14 @@ public class Rest {
 
 			try {
 
-				tagValue = xpath.evaluate("/ISPWebservicesHeader/RequestInfo/TransactionId/text()", doc);
+				//tokenMap.put("TransactionId",xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='RequestInfo']//*[local-name()='TransactionId']", doc));
+				
+				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='RequestInfo']//*[local-name()='TransactionId']", doc);
 				tokenMap.put("ISPWebservicesHeader.RequestInfo.TransactionId", tagValue);
 				if (logMe)
 					System.out.println("TransactionId --> " + tagValue);
 
-				tagValue = xpath.evaluate("/ISPWebservicesHeader/RequestInfo/Timestamp/text()", doc);
+				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='RequestInfo']//*[local-name()='Timestamp']", doc);
 				if (logMe)
 					System.out.println("Timestamp --> " + tagValue);
 				if (tagValue == null || tagValue.length() == 0) {
@@ -559,7 +566,7 @@ public class Rest {
 				}
 				tokenMap.put("ISPWebservicesHeader.RequestInfo.Timestamp", tagValue);
 
-				tagValue = xpath.evaluate("/ISPWebservicesHeader/RequestInfo/ServiceID/text()", doc);
+				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='RequestInfo']//*[local-name()='ServiceID']", doc);
 				if (logMe)
 					System.out.println("ServiceID --> " + tagValue);
 				if (tagValue == null || tagValue.length() == 0) {
@@ -573,82 +580,83 @@ public class Rest {
 				}
 				tokenMap.put("ISPWebservicesHeader.RequestInfo.ServiceID", tagValue);
 
-				tagValue = xpath.evaluate("/ISPWebservicesHeader/RequestInfo/ServiceVersion/text()", doc);
+				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='RequestInfo']//*[local-name()='ServiceVersion']", doc);
 				if (logMe)
 					System.out.println("ServiceVersion --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.RequestInfo.ServiceVersion", tagValue);
 
-				tagValue = xpath.evaluate("/ISPWebservicesHeader/RequestInfo/Language/text()", doc);
+				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='RequestInfo']//*[local-name()='Language']", doc);
 				if (logMe)
 					System.out.println("Language --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.RequestInfo.Language", tagValue);
 
-				tagValue = xpath.evaluate("/ISPWebservicesHeader/OperatorInfo/@UserID", doc);
+				///@*[local-name()='UserID']
+				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='OperatorInfo']/@*[local-name()='UserID']", doc);
 				if (logMe)
 					System.out.println("UserID --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.OperatorInfo.UserID", tagValue);
 
-				tagValue = xpath.evaluate("/ISPWebservicesHeader/OperatorInfo/@IsVirtualUser", doc);
+				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='OperatorInfo']/@*[local-name()='IsVirtualUser']", doc);
 				if (logMe)
 					System.out.println("IsVirtualUser --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.OperatorInfo.ISVirtualUser", tagValue);
 
-				tagValue = xpath.evaluate("/ISPWebservicesHeader/OperatorInfo/@NotISPUserID", doc);
+				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='OperatorInfo']/@*[local-name()='NotISPUserID']", doc);
 				if (logMe)
 					System.out.println("NotISPUserID --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.OperatorInfo.NotISPUserID", tagValue);
 
-				tagValue = xpath.evaluate("/ISPWebservicesHeader/CompanyInfo/ISPCallerCompanyIDCode/text()", doc);
+				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='CompanyInfo']//*[local-name()='ISPCallerCompanyIDCode']", doc);
 				if (logMe)
 					System.out.println("ISPCallerCompanyIDCode --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.CompanyInfo.ISPCallerCompanyIDCode", tagValue);
 
-				tagValue = xpath.evaluate("/ISPWebservicesHeader/CompanyInfo/NotISPCompanyIDCode/text()", doc);
+				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='CompanyInfo']//*[local-name()='NotISPCompanyIDCode']", doc);
 				if (logMe)
 					System.out.println("NotISPCompanyIDCode --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.CompanyInfo.NotISPCompanyIDCode", tagValue);
 
-				tagValue = xpath.evaluate("/ISPWebservicesHeader/CompanyInfo/ISPBranchCode/text()", doc);
+				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='CompanyInfo']//*[local-name()='ISPBranchCode']", doc);
 				if (logMe)
 					System.out.println("ISPBranchCode --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.CompanyInfo.ISPBranchCode", tagValue);
 
-				tagValue = xpath.evaluate("/ISPWebservicesHeader/CompanyInfo/ISPServiceCompanyIDCode/text()", doc);
+				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='CompanyInfo']//*[local-name()='ISPServiceCompanyIDCode']", doc);
 				if (logMe)
 					System.out.println("ISPServiceCompanyIDCode --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.CompanyInfo.ISPServiceCompanyIDCode", tagValue);
 
-				tagValue = xpath.evaluate("/ISPWebservicesHeader/BusinessInfo/CustomerID/text()", doc);
+				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='BusinessInfo']//*[local-name()='CustomerID']", doc);
 				if (logMe)
 					System.out.println("CustomerID --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.BusinessInfo.CustomerID", tagValue);
 
-				tagValue = xpath.evaluate("/ISPWebservicesHeader/BusinessInfo/BusinessProcessName/text()", doc);
+				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='BusinessInfo']//*[local-name()='BusinessProcessName']", doc);
 				if (logMe)
 					System.out.println("BusinessProcessName --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.BusinessInfo.BusinessProcessName", tagValue);
 
-				tagValue = xpath.evaluate("/ISPWebservicesHeader/BusinessInfo/BusinessProcessID/text()", doc);
+				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='BusinessInfo']//*[local-name()='BusinessProcessID']", doc);
 				if (logMe)
 					System.out.println("BusinessProcessID --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.BusinessInfo.BusinessProcessID", tagValue);
 
-				tagValue = xpath.evaluate("/ISPWebservicesHeader/BusinessInfo/BusinessOperation/text()", doc);
+				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='BusinessInfo']//*[local-name()='BusinessOperation']", doc);
 				if (logMe)
 					System.out.println("BusinessOperation --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.BusinessInfo.BusinessOperation", tagValue);
 
-				tagValue = xpath.evaluate("/ISPWebservicesHeader/BusinessInfo/BusinessFileID/text()", doc);
+				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='BusinessInfo']//*[local-name()='BusinessFileID']", doc);
 				if (logMe)
 					System.out.println("BusinessFileID --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.BusinessInfo.BusinessFileID", tagValue);
 
-				tagValue = xpath.evaluate("/ISPWebservicesHeader/TechnicalInfo/ChannelIDCode/text()", doc);
+				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='TechnicalInfo']//*[local-name()='ChannelIDCode']", doc);
 				if (logMe)
 					System.out.println("ChannelIDCode --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.TechnicalInfo.ChannelIDCode", tagValue);
 
-				tagValue = xpath.evaluate("/ISPWebservicesHeader/TechnicalInfo/ApplicationID/text()", doc);
+				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='TechnicalInfo']//*[local-name()='ApplicationID']", doc);
 				if (logMe)
 					System.out.println("ApplicationID --> " + tagValue);
 				if (tagValue == null || tagValue.length() == 0) {
@@ -662,18 +670,18 @@ public class Rest {
 				}
 				tokenMap.put("ISPWebservicesHeader.TechnicalInfo.ApplicationID", tagValue);
 
-				tagValue = xpath.evaluate("/ISPWebservicesHeader/TechnicalInfo/CallerServerName/text()", doc);
+				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='TechnicalInfo']//*[local-name()='CallerServerName']", doc);
 				if (logMe)
 					System.out.println("CallerServerName --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.TechnicalInfo.CallerServerName", tagValue);
 
-				tagValue = xpath.evaluate("/ISPWebservicesHeader/TechnicalInfo/CallerProgramName/text()", doc);
+				tagValue = xpath.evaluate("//*[local-name()='ISPWebservicesHeader']//*[local-name()='TechnicalInfo']//*[local-name()='CallerProgramName']", doc);
 				if (logMe)
 					System.out.println("CallerProgramName --> " + tagValue);
 				tokenMap.put("ISPWebservicesHeader.TechnicalInfo.CallerProgramName", tagValue);
 
 				int countag = Integer
-						.parseInt(xpath.evaluate("count(/ISPWebservicesHeader/AdditionalBusinessInfo/Param)", doc));
+						.parseInt(xpath.evaluate("count(//*[local-name()='ISPWebservicesHeader']//*[local-name()='AdditionalBusinessInfo']//*[local-name()='Param'])", doc));
 				String tagName = null;
 				
 				if (countag !=0) {
@@ -681,11 +689,13 @@ public class Rest {
 				for (int ii = 1; ii <= countag; ii++) {
 
 					tagName = xpath.evaluate(
-							"/ISPWebservicesHeader/AdditionalBusinessInfo/Param[" + String.valueOf(ii) + "]/@Name",
+							"//*[local-name()='ISPWebservicesHeader']//*[local-name()='AdditionalBusinessInfo']/Param[" + String.valueOf(ii) + "]//@*[local-name()='Name']",
 							doc);
+					
 					if (tagName != null && tagName.length() != 0) {
+						
 						tagValue = xpath.evaluate(
-								"/ISPWebservicesHeader/AdditionalBusinessInfo/Param[" + String.valueOf(ii) + "]/@Value",
+								"//*[local-name()='ISPWebservicesHeader']//*[local-name()='AdditionalBusinessInfo']/Param[" + String.valueOf(ii) + "]//@*[local-name()='Value']",
 								doc);
 						tokenMap.put("ISPWebservicesHeader.AdditionalBusinessInfo." + tagName, tagValue);
 						if (logMe)
