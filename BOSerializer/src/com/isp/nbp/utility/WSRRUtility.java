@@ -3780,7 +3780,7 @@ public class WSRRUtility {
 	
 	// 29052017
 	
-	public String generalWSRRQuery(String userquery, String baseURL,String user, String password) {
+	public String generalWSRRQuery(String userquery, String baseURL,String user, String password,boolean debug) {
 
 		String graph = null;
 
@@ -3806,7 +3806,11 @@ public class WSRRUtility {
 				urlConnection.setRequestProperty("Authorization", "Basic " + encoding);
 			}
 
-			System.out.println(url);
+			if (debug) {
+				System.out.println("Eseguita Query >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+				System.out.println(url);
+				System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+			}
 			
 			int responsecode = urlConnection.getResponseCode();
 			if (responsecode == 200 || (responsecode == 201)) {

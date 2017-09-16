@@ -28,7 +28,7 @@ public class WSRRToBusinessObjectEPMQ {
 
 	}
 
-	public String createNBPBOCompact(boolean usoSpecializzazione, String specializzazione, String data, String url,
+	public String WSRRBOSerializer(boolean usoSpecializzazione, String specializzazione, String data, String url,
 			String user, String password) throws XPathExpressionException {
 
 		TWObject NBP_BO = null;
@@ -141,7 +141,7 @@ public class WSRRToBusinessObjectEPMQ {
 									query6 = query5;
 									query6 = query6.replaceAll("%BSRURI%", proxybsrURI);
 
-									result = wsrrutility.generalWSRRQuery(query6, url, user, password);
+									result = wsrrutility.generalWSRRQuery(query6, url, user, password,true);
 									PROXY_BO = WSRRToBusinessObjectEPMQ.makeBO(result, proxy, null, url, user,
 											password);
 
