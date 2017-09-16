@@ -43,11 +43,11 @@ public class WSRRToBusinessObjectCompactEPMQ {
 
 		final String MQ_EP = "[bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, sm63_PGM_DEST, sm63_serviceVersion, sm63_EXPIRY, sm63_serviceName, sm63_DATA_PRIMO_UTILIZZO, sm63_LUNGH_OUT, sm63_endpointType, sm63_PGM_DEST_RISP,sm63_FLAG_3LINK, sm63_STATO_OPER, sm63_serviceNamespace, sm63_PGM_QUADRATURA, sm63_USO_SICUREZZA, sm63_ID_APPL, sm63_TIPO_OPER, sm63_LUNGH_IN, sm63_TRACCIATURA, sm63_ALTER_COLL, sm63_TGT_SERVER, sm63_PRIORITY, sm63_PGM_FORM, sm63_DATA_ULTIMO_UTILIZZO, sm63_CALL_HEADER, sm63_MOD_COLLOQUIO, sm63_Timeout, sm63_ID_TGT_DES, sm63_SPECIALIZZAZIONE, sm63_BACKOUT_COUNT]";
 
-		System.out.println("#########################################################################################################################################");
+		System.out.println("########################################################################################################################################");
 		System.out.println("WSRRToBusinessObjectCompactEPMQ V1.0 Sept 2017");
-		System.out.println("#########################################################################################################################################");
+		System.out.println("########################################################################################################################################");
 		System.out.println("Parametri - Censimento : "+name+" versione : "+version+ " wsrr : "+url +" considero specializzazione? : "+usoSpecializzazione +" specializzazione : "+specializzazione);
-		System.out.println("#########################################################################################################################################");
+		System.out.println("########################################################################################################################################");
 		query1 = query1.replaceAll("%CATALOGNAME%", name).replaceAll("%VERSION%", version);
 		String result;
 
