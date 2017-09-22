@@ -103,7 +103,7 @@ public class WSRRToBusinessObject {
 
 		System.out.println(
 				"########################################################################################################################################");
-		System.out.println("WSRRToBusinessObject V1.0 Sept 2017jj");
+		System.out.println("WSRRToBusinessObject V1.0 Sept 2017");
 		System.out.println(
 				"########################################################################################################################################");
 		System.out.println("Parametri - Censimento : " + name + " versione : " + version + " wsrr : " + url);
@@ -114,7 +114,7 @@ public class WSRRToBusinessObject {
 		String result;
 		String resultINT;
 		String resultSLD;
-		WSRRToBusinessObject.log("Punto4", debug);
+		
 		WSRRUtility wsrrutility = new WSRRUtility();
 
 		result = wsrrutility.generalWSRRQuery(query1, url, user, password, debug);
@@ -135,6 +135,7 @@ public class WSRRToBusinessObject {
 		String relation = null;
 		String type = null;
 		String subType = null;
+		String governanceState=null;
 		String environment = null;
 		String proxy = null;
 		String proxybsrURI = null;
@@ -207,12 +208,20 @@ public class WSRRToBusinessObject {
 				if (classification != null && classification.indexOf("http://isp/#") != -1) {
 					subType = classification.substring(classification.indexOf("#") + 1, classification.length());
 				}
+				
+				//governance object state				
+				if (classification != null && classification.indexOf("http://www.ibm.com/xmlns/prod/serviceregistry/lifecycle/v6r3/LifecycleDefinition#") != -1) {
+					governanceState = classification.substring(classification.indexOf("#") + 1, classification.length());
+				}
+				
 				current = null;
 			}
 
 			WSRRToBusinessObject.log("Censimento di tipo : " + type + " sottotipo : " + subType, debug);
 
 			NBP_BO.setPropertyValue("SERVICE_INDEX", type + "#" + subType);
+			
+			NBP_BO.setPropertyValue("GOVERNANCE_STATE",governanceState);
 
 			SV_BO = WSRRToBusinessObject.makeBO(result, -1, type, subType, url, user, password, debug);
 
@@ -236,7 +245,7 @@ public class WSRRToBusinessObject {
 
 			query2 = query2.replaceAll("%CATALOGNAME%", name).replaceAll("%TYPE%",
 					type.substring(0, type.length() - 7));
-			WSRRToBusinessObject.log("Punto5", debug);
+
 			result = wsrrutility.generalWSRRQuery(query2, url, user, password, debug);
 
 			BS_BO = WSRRToBusinessObject.makeBO(result, -1, type.substring(0, type.length() - 7), subType, url, user,
@@ -250,35 +259,13 @@ public class WSRRToBusinessObject {
 				NBP_BO.setPropertyValue("ACRO", BS_BO);
 			} else {
 				query3 = query3.replaceAll("%BSRURI%", (String) BS_BO.getPropertyValue("bsrURI"));
-				WSRRToBusinessObject.log("Punto6", debug);
+
 				result = wsrrutility.generalWSRRQuery(query3, url, user, password, debug);
 
 				ACR_BO = WSRRToBusinessObject.makeBO(result, -1, "Organization", null, url, user, password, debug);
 				NBP_BO.setPropertyValue("ACRO", ACR_BO);
 				WSRRToBusinessObject.log("Creato oggetto ACR_BO", debug);
 			}
-
-			/**
-			 * // Ricavo Interfaccia
-			 * 
-			 * if (BS_BO == null) {
-			 * 
-			 * NBP_BO.setPropertyValue("INTERF", BS_BO);
-			 * 
-			 * } else {
-			 * 
-			 * query7 = query7.replaceAll("%BSRURI%", (String)
-			 * SV_BO.getPropertyValue("bsrURI"));
-			 * WSRRToBusinessObject.log("Punto7", debug); result =
-			 * wsrrutility.generalWSRRQuery(query7, url, user, password, debug);
-			 * WSRRToBusinessObject.log("micra " + result, debug); INTERF_BO =
-			 * WSRRToBusinessObject.makeBO(result, -1, "Interface", null, url,
-			 * user, password, debug); WSRRToBusinessObject.log("contiene " +
-			 * INTERF_BO.toXMLString(), debug);
-			 * NBP_BO.setPropertyValue("INTERF", INTERF_BO);
-			 * WSRRToBusinessObject.log("Creato oggetto INTERF_BO", debug); }
-			 * 
-			 **/
 
 			// Ricavo SLD
 
@@ -289,11 +276,9 @@ public class WSRRToBusinessObject {
 			} else {
 
 				query8 = query8.replaceAll("%BSRURI%", (String) SV_BO.getPropertyValue("bsrURI"));
-				WSRRToBusinessObject.log("Punto8", debug);
+
 				resultSLD = wsrrutility.generalWSRRQuery(query8, url, user, password, debug);
 				
-				WSRRToBusinessObject.log("Punto8 dati "+resultSLD, debug);
-
 				xpathFactory = XPathFactory.newInstance();
 				xpath = xpathFactory.newXPath();
 				// result=result.replaceAll("(\\r|\\n)", "");
@@ -304,9 +289,7 @@ public class WSRRToBusinessObject {
 				int countag = 0;
 				current = null;
 				String bsrURISLD = null;
-				String interfaceType=null;
 				String interfaceTypes=null;
-				int position=0;
 
 				doc = (Document) xpath.evaluate("/", source, XPathConstants.NODE);
 
@@ -314,58 +297,28 @@ public class WSRRToBusinessObject {
 				SLD_BO = null;
 
 				if (countagSLD != 0) {
+					
+					WSRRToBusinessObject.log("Trovati - " + countagSLD+" oggetti di tipo SLD ", debug);
 
 					for (int iii = 1; iii <= countagSLD; iii++) {
-
-						WSRRToBusinessObject.log("Sandro1 " + countagSLD+" / "+iii, debug);
 
 						SLD_BO = null;
 						SLD_BO = WSRRToBusinessObject.makeBO(resultSLD, iii, "SLD", null, url, user, password, debug);
 						bsrURISLD = (String) SLD_BO.getPropertyValue("bsrURI");
-						
-						WSRRToBusinessObject.log("nome SLD" + SLD_BO.getPropertyValue("name"),true);
-						
-						
-						interfaceType=new StringBuilder(((String)  SLD_BO.getPropertyValue("name"))).reverse().toString();
-						position=interfaceType.indexOf("_", 0);
-						if (position==-1) interfaceType=(String)  SLD_BO.getPropertyValue("name");
-						else 
-							interfaceType=interfaceType.substring(0,position);
 												
 						interfaceTypes=(String)NBP_BO.getPropertyValue("INTERFACE_INDEX");
 						
 						if (interfaceTypes==null)
-							NBP_BO.setPropertyValue("INTERFACE_INDEX", interfaceType);
+							NBP_BO.setPropertyValue("INTERFACE_INDEX", ((String)  SLD_BO.getPropertyValue("description")));
 						else
-							NBP_BO.setPropertyValue("INTERFACE_INDEX", interfaceTypes+"_"+interfaceType);
+							NBP_BO.setPropertyValue("INTERFACE_INDEX", interfaceTypes+"_"+(String)  SLD_BO.getPropertyValue("description"));
 						
-						
-						WSRRToBusinessObject.log("$$$$$$$$$$$$$$$$$$$$$ " + "(" + iii + ") " + SLD_BO.toXMLString(),
-								debug);
-						WSRRToBusinessObject.log("DURRRRRRRRRRRRRRRRR " + "(" + iii + ") " + bsrURISLD, debug);
-
 						query7bis = query7bis.replaceAll("%BSRURI%", (String) bsrURISLD);
 						resultINT = wsrrutility.generalWSRRQuery(query7bis, url, user, password, debug);
 						INTERF_BO = WSRRToBusinessObject.makeBO(resultINT, -1, "Interface", null, url, user, password,
 								debug);
 						SLD_BO.setPropertyValue("INTERF", INTERF_BO);
-						WSRRToBusinessObject.log("Creato oggetto INTERF_BO", debug);
-						WSRRToBusinessObject.log(SLD_BO.toXMLString(), debug);
-
-						////////////////////////////////////////////////////////////////////////////////////////////
-
-						////////////////////////////////////////////////////////////////////////////////////////////
-
-						// }
-						// }
-
-						// SLD_BO = WSRRToBusinessObject.makeBO(result, "SLD",
-						// null,
-						// url, user, password,debug);
-						
-						
-						//SLD_BO.setPropertyValue("SLD", SLD_BO);???
-						
+						WSRRToBusinessObject.log("Creato oggetto INTERF_BO", debug);						
 						
 						WSRRToBusinessObject.log("Creato oggetto SLD_BO", debug);
 
@@ -417,12 +370,8 @@ public class WSRRToBusinessObject {
 
 						query6 = query4bis;
 						query6 = query6.replaceAll("%BSRURI%", bsrURISLD);
-						WSRRToBusinessObject.log("brigatda", debug);
 						result = wsrrutility.generalWSRRQuery(query6, url, user, password, debug);
 
-						// WSRRToBusinessObject.log("Risultato query ricavo
-						// endpoint :
-						// "+result, debug);
 
 						// navigo gli endpoints
 
@@ -438,7 +387,6 @@ public class WSRRToBusinessObject {
 						String current_ = null;
 						String value_ = null;
 
-						WSRRToBusinessObject.log("ciaoooo" + result, debug);
 
 						try {
 
@@ -549,7 +497,7 @@ public class WSRRToBusinessObject {
 												proxy = "CALLABLE";
 												query6 = query5;
 												query6 = query6.replaceAll("%BSRURI%", proxybsrURI);
-												WSRRToBusinessObject.log("Punto10", debug);
+										
 												result = wsrrutility.generalWSRRQuery(query6, url, user, password,
 														debug);
 												PROXY_BO = WSRRToBusinessObject.makeBO(result, -1, proxy, null, url,
@@ -574,7 +522,7 @@ public class WSRRToBusinessObject {
 												query6 = query6.replaceAll("%BSRURI%", proxybsrURI);
 												result = wsrrutility.generalWSRRQuery(query6, url, user, password,
 														debug);
-												WSRRToBusinessObject.log("Punto1 : " + result, debug);
+										
 												PROXY_BO = WSRRToBusinessObject.makeBO(result, -1, proxy, null, url,
 														user, password, debug);
 												WSRRToBusinessObject
@@ -593,7 +541,7 @@ public class WSRRToBusinessObject {
 												proxy = "REST";
 												query6 = query5;
 												query6 = query6.replaceAll("%BSRURI%", proxybsrURI);
-												WSRRToBusinessObject.log("Punto2", debug);
+											
 												result = wsrrutility.generalWSRRQuery(query6, url, user, password,
 														debug);
 												PROXY_BO = WSRRToBusinessObject.makeBO(result, -1, proxy, null, url,
@@ -614,7 +562,7 @@ public class WSRRToBusinessObject {
 												proxy = "MQMANUAL";
 												query6 = query5;
 												query6 = query6.replaceAll("%BSRURI%", proxybsrURI);
-												WSRRToBusinessObject.log("Punto3", debug);
+											
 												result = wsrrutility.generalWSRRQuery(query6, url, user, password,
 														debug);
 												PROXY_BO = WSRRToBusinessObject.makeBO(result, -1, proxy, null, url,
@@ -675,7 +623,7 @@ public class WSRRToBusinessObject {
 									}
 
 									// Setto Ambiente dell'endpoint
-									WSRRToBusinessObject.log("SETTOSETTO", debug);
+
 
 									EP_BO.setPropertyValue("environment", environment);
 
@@ -910,7 +858,6 @@ public class WSRRToBusinessObject {
 									}
 
 									SLD_BO.setPropertyValue("ENDPOINT_INDEX",type);
-									WSRRToBusinessObject.log("SETTOSETTO111111", debug);
 
 								}
 
@@ -957,7 +904,6 @@ public class WSRRToBusinessObject {
 								SLD_BO.setPropertyValue("ENDPOINT_MQ_UAT", EP_BO_MQ_UAT);
 								SLD_BO.setPropertyValue("ENDPOINT_MQ_INDEP", EP_BO_MQ_INDEP);
 
-								WSRRToBusinessObject.log("SETTOSETTOFINE**** "+countagSLD +" - "+iii, debug);
 
 							} // endpoint
 
@@ -971,20 +917,11 @@ public class WSRRToBusinessObject {
 							e.printStackTrace();
 							NBP_BO = null;
 						}
-
 						
-						WSRRToBusinessObject.log("<INDICE> "+iii,debug);
-						
-						// 331
-						// compongo SLD_BO
-						//WSRRToBusinessObject.log("vipera" +SLD_BO.toXMLString(), debug);
 					    SLD_BO_LIST.addArrayData(SLD_BO_LIST.getArraySize(), SLD_BO);
 						
-						
-						//quiiiiiiii
 					}//for
 
-					WSRRToBusinessObject.log("viperasize " +SLD_BO_LIST.getArraySize(), debug);
 				}//count tag SLF
 			} //base
 		} catch (Exception e) {
@@ -997,20 +934,16 @@ public class WSRRToBusinessObject {
 		}
 
 		//reverse INTERFACE_INDEX
-		String interfaceTypes=(String)NBP_BO.getPropertyValue("INTERFACE_INDEX");
-		interfaceTypes=new StringBuilder(interfaceTypes).reverse().toString();
-		NBP_BO.setPropertyValue("INTERFACE_INDEX", interfaceTypes);
+		//String interfaceTypes=(String)NBP_BO.getPropertyValue("INTERFACE_INDEX");
+		//interfaceTypes=new StringBuilder(interfaceTypes).reverse().toString();
+		//NBP_BO.setPropertyValue("INTERFACE_INDEX", interfaceTypes);
 		
-		WSRRToBusinessObject.log("SETTOSETTOFINETOTALE****", debug);
-		WSRRToBusinessObject.log(NBP_BO.toString(), debug);
-		WSRRToBusinessObject.log(NBP_BO.toXMLString(), debug);
 		// attacco SLD a NBP_BO
-
 		NBP_BO.setPropertyValue("SLD", SLD_BO_LIST);
-		//WSRRToBusinessObject.log(SLD_BO.toXMLString(), debug);
-		//WSRRToBusinessObject.log("DIMITRIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII!!!!", debug);
-		WSRRToBusinessObject.log(NBP_BO.toString(), debug);
-		WSRRToBusinessObject.log(NBP_BO.toXMLString(), debug);
+		
+		WSRRToBusinessObject.log("Risultato NBP_BO",debug);
+		WSRRToBusinessObject.log(NBP_BO.toXMLString(),debug);
+		WSRRToBusinessObject.log("Fine Estrattore",true);
 		return NBP_BO;
 	}
 
@@ -1034,13 +967,12 @@ public class WSRRToBusinessObject {
 
 		TWObject CURRENT_BO = null;
 
-		boolean isInterf = false;
-
 		if (data == null)
 			return null;
 
-		WSRRToBusinessObject.log("Chiamata a makeBO....!!! per tipo : " + type, debug);
-		WSRRToBusinessObject.log("target : " + target, debug);
+		WSRRToBusinessObject.log("Chiamata a makeBO per tipo : " + type, debug);
+		
+		//WSRRToBusinessObject.log("target : " + target, debug);
 
 		XPathFactory xpathFactory = XPathFactory.newInstance();
 		XPath xpath = xpathFactory.newXPath();
@@ -1068,7 +1000,7 @@ public class WSRRToBusinessObject {
 			countString = "count(" + path + "/property)";
 			count = Integer.parseInt(xpath.evaluate(countString, doc));
 
-			WSRRToBusinessObject.log("Contati : " + count, debug);
+			//WSRRToBusinessObject.log("Contati : " + count, debug);
 
 			if (count == 0)
 				return null;
@@ -1096,8 +1028,7 @@ public class WSRRToBusinessObject {
 
 			if (type != null && type.indexOf("Interface") != -1 && target.equals("UNDEF")) {
 				target = INTERF;
-				isInterf = true;
-				WSRRToBusinessObject.log("***Sono in Interace***", debug);
+				//WSRRToBusinessObject.log("***Sono in Interace***", debug);
 			}
 			if (type != null && type.indexOf("SLD") != -1 && target.equals("UNDEF"))
 				target = SLD;
@@ -1155,7 +1086,7 @@ public class WSRRToBusinessObject {
 				}
 			}
 			WSRRToBusinessObject.log("makeBO eseguito per tipo : " + type, debug);
-			WSRRToBusinessObject.log("target : " + target, debug);
+			//WSRRToBusinessObject.log("target : " + target, debug);
 
 		} catch (Exception e) {
 
@@ -1166,9 +1097,6 @@ public class WSRRToBusinessObject {
 			CURRENT_BO = null;
 		}
 
-		if (isInterf) {
-			WSRRToBusinessObject.log("Immagine BO interfaccia : " + CURRENT_BO.toString(), debug);
-		}
 		return CURRENT_BO;
 	}
 
