@@ -1,6 +1,9 @@
 package com.isp.nbp.utility;
 
 import java.io.StringReader;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -36,6 +39,7 @@ public class WSRRToBusinessObject {
 		TWObject SV_BO = null;
 		TWObject BS_BO = null;
 		TWObject ACR_BO = null;
+		TWObject SSA_BO = null;
 		TWObject INTERF_BO = null;
 		TWObject SLD_BO = null;
 
@@ -103,7 +107,7 @@ public class WSRRToBusinessObject {
 
 		System.out.println(
 				"########################################################################################################################################");
-		System.out.println("WSRRToBusinessObject V1.0 Sept 2017");
+		System.out.println("WSRRToBusinessObject V1.0 Sept 2017 ssa");
 		System.out.println(
 				"########################################################################################################################################");
 		System.out.println("Parametri - Censimento : " + name + " versione : " + version + " wsrr : " + url);
@@ -146,6 +150,7 @@ public class WSRRToBusinessObject {
 			BS_BO = (TWObject) TWObjectFactory.createObject();
 			SV_BO = (TWObject) TWObjectFactory.createObject();
 			ACR_BO = (TWObject) TWObjectFactory.createObject();
+			SSA_BO = (TWObject) TWObjectFactory.createObject();
 			INTERF_BO = (TWObject) TWObjectFactory.createObject();
 			SLD_BO = (TWObject) TWObjectFactory.createObject();
 
@@ -223,6 +228,8 @@ public class WSRRToBusinessObject {
 			
 			NBP_BO.setPropertyValue("GOVERNANCE_STATE",governanceState);
 
+			WSRRToBusinessObject.log("result ********** "+result+" - "+type +" - "+subType, debug);	
+			
 			SV_BO = WSRRToBusinessObject.makeBO(result, -1, type, subType, url, user, password, debug);
 
 			WSRRToBusinessObject.log("Creato oggetto SV_BO", debug);
@@ -265,8 +272,18 @@ public class WSRRToBusinessObject {
 				ACR_BO = WSRRToBusinessObject.makeBO(result, -1, "Organization", null, url, user, password, debug);
 				NBP_BO.setPropertyValue("ACRO", ACR_BO);
 				WSRRToBusinessObject.log("Creato oggetto ACR_BO", debug);
+				
+				
+				//Ricavo SSA
+				
+				result= wsrrutility.getSSAFromAcronimo((String) ACR_BO.getPropertyValue("name"), url, user, password);
+				WSRRToBusinessObject.log("bsrURI acronimo "+(String) ACR_BO.getPropertyValue("bsrURI"), debug);
+				WSRRToBusinessObject.log("bsrURI result "+result, debug);
+				SSA_BO = WSRRToBusinessObject.makeBO(result, -1, "Organization", null, url, user, password, debug);
+				NBP_BO.setPropertyValue("SSA", SSA_BO);
+				WSRRToBusinessObject.log("Creato oggetto BO_SSA", debug);				
 			}
-
+	
 			// Ricavo SLD
 
 			if (BS_BO == null) {
@@ -312,6 +329,8 @@ public class WSRRToBusinessObject {
 							NBP_BO.setPropertyValue("INTERFACE_INDEX", ((String)  SLD_BO.getPropertyValue("description")));
 						else
 							NBP_BO.setPropertyValue("INTERFACE_INDEX", interfaceTypes+"_"+(String)  SLD_BO.getPropertyValue("description"));
+						
+						SLD_BO.setPropertyValue("EXTENDED_INTERFACE_DESCR","INTERFACCIA : "+(String)  SLD_BO.getPropertyValue("description"));
 						
 						query7bis = query7bis.replaceAll("%BSRURI%", (String) bsrURISLD);
 						resultINT = wsrrutility.generalWSRRQuery(query7bis, url, user, password, debug);
@@ -861,7 +880,6 @@ public class WSRRToBusinessObject {
 
 								}
 
-
 								SLD_BO.setPropertyValue("ENDPOINT_SOAP_APPL", EP_BO_SOAP_APPL);
 								SLD_BO.setPropertyValue("ENDPOINT_SOAP_SYST", EP_BO_SOAP_SYST);
 								SLD_BO.setPropertyValue("ENDPOINT_SOAP_PROD", EP_BO_SOAP_PROD);
@@ -956,7 +974,8 @@ public class WSRRToBusinessObject {
 		final String SOPEN = " [type, subType, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, gep63_ABILITAZ_INFRASTR, gep63_DESC_ESTESA, gep63_SOPEN_LINK_SIN_APPS_EST, gep63_SOPEN_ATTACHMENT_TYPE, gep63_SOPEN_DOWNTIME_PIANIFICATO, gep63_SOPEN_REPS0, ale63_assetType, gep63_SOPEN_NUM_CHIAMATE_PICCO, ale63_guid, gep63_SOPEN_RIF_CHIAMANTI_EST, gep63_SOPEN_STATO_ATTUALE_FUNZ, ale63_remoteState, gep63_DATA_RITIRO_SERV, gep63_MATR_RICH_CREAZIONE, ale63_assetOwners, gep63_FLG_CTRL_TIPOLOGIA, gep63_PIATT_EROG, gep63_MATR_RICH_MODIFICA, gep63_DISP_SERV, gep63_PID_PROCESSO_GOV, gep63_SOPEN_RIF_CHIAMANTI_INT, gep63_TIPOLOGIA, gep63_MATR_PUBBLICATORE_CREAZ_SERV, gep63_SOPEN_EAR_SERVIZIO, gep63_SOPEN_AMBIENTE_FISICO, gep63_DERIVANTE_DA_ALTRI_SERV, gep63_VINCOLI_RIUSO, gep63_ATTIVATO_IN_PROD, gep63_INFO_COSTO, gep63_consumerIdentifier, gep63_SOPEN_VOLUME_GIORN, gep63_SOPEN_AMBITO_IMPLEMENTAZIONE, gep63_UTILIZ_PIU_BAN_CLONI, ale63_ownerEmail, gep63_ATTIVATO_IN_SYST, gep63_SOPEN_DIM_MAX_MSG, ale63_communityName, gep63_DATA_PUBBL_CREAZ_SERV, gep63_SECURITY_ROLE, gep63_NOME_SERVIZIO_PRECEDENTE, gep63_SOPEN_DIM_MIN_MSG, gep63_SOPEN_FLG_CONTIENE_ATTACHMENT, ale63_fullDescription, gep63_ATTIVATO_IN_APPL, gep63_TIPOLOGIA_OGGETTO_ESISTENTE, gep63_versionTerminationDate, gep63_DOC_ANALISI_FUNZIONALE, gep63_versionAvailabilityDate, gep63_DOC_ANALISI_DETTAGLIO, gep63_DOC_ANALISI_TECNICA, ale63_requirementsLink, ale63_assetWebLink]";
 		final String SERVICEVERSION = "[type, subType, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, ale63_remoteState, ale63_communityName, ale63_assetOwners, ale63_assetType, ale63_guid, ale63_fullDescription, ale63_ownerEmail, ale63_requirementsLink, ale63_assetWebLink]";
 		final String ACRONIMO = "[bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, ale63_RESP_FUNZIONALE_MATRICOLA, ale63_RESP_ATTIVITA_NOMINATIVO, ale63_RESP_FUNZIONALE_NOMINATIVO, ale63_DESC_AMBITO, ale63_RESP_SERVIZIO_NOMINATIVO, ale63_contact, ale63_contactEmail, ale63_CODICE_SISTEMA_APPLICATIVO, ale63_RESP_ATTIVITA_MATRICOLA, ale63_RESP_SERVIZIO_MATRICOLA, ale63_RESP_UFFICIO_MATRICOLA, ale63_RESP_TECNICO_MATRICOLA, ale63_RESP_UFFICIO_NOMINATIVO, ale63_RESP_TECNICO_NOMINATIVO, ale63_AMBITO]";
-
+		//final String SSA = "[bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, ale63_RESP_FUNZIONALE_MATRICOLA, ale63_RESP_ATTIVITA_NOMINATIVO, ale63_RESP_FUNZIONALE_NOMINATIVO, ale63_DESC_AMBITO, ale63_RESP_SERVIZIO_NOMINATIVO, ale63_contact, ale63_contactEmail, ale63_CODICE_SISTEMA_APPLICATIVO, ale63_RESP_ATTIVITA_MATRICOLA, ale63_RESP_SERVIZIO_MATRICOLA, ale63_RESP_UFFICIO_MATRICOLA, ale63_RESP_TECNICO_MATRICOLA, ale63_RESP_UFFICIO_NOMINATIVO, ale63_RESP_TECNICO_NOMINATIVO, ale63_AMBITO]";
+		
 		final String INTERF = "[type, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, sm63_interfaceVersion,sm63_interfaceNamespace, sm63_interfaceName, rest80_webLink]";
 		final String SLD = "[type, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, gep63_consumerIdentifierLocationInfo, gep63_contextIdentifierLocationInfo]";
 		final String SOAP_PROXY = "[type, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, sm63_DATAPOWER_DEDICATO, sm63_FLG_USO_DATAPOWER_DEDICATO, sm63_ESPOSIZIONE, sm63_ESPOSTO_INTRANET, sm63_ERRORE_GENERAZIONE_WSPROXY, sm63_NOTE, sm63_FLG_ESP_CONTROPARTE_ESTERNA, sm63_FLG_ESPOSTO_SOCIETA_GRUPPO, sm63_NOTE_GEN_WSPROXY, sm63_SOCIETA_CHE_ESPONE_SERVIZIO, sm63_FLG_RICHIAMABILE_DA_CICS, sm63_FLG_CONTROPARTE_DSI, sm63_FLG_CONTROPARTE_INTERNET, sm63_Timeout]";
@@ -1028,7 +1047,6 @@ public class WSRRToBusinessObject {
 
 			if (type != null && type.indexOf("Interface") != -1 && target.equals("UNDEF")) {
 				target = INTERF;
-				//WSRRToBusinessObject.log("***Sono in Interace***", debug);
 			}
 			if (type != null && type.indexOf("SLD") != -1 && target.equals("UNDEF"))
 				target = SLD;
@@ -1109,5 +1127,11 @@ public class WSRRToBusinessObject {
 			System.out.println(
 					"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 		}
+	}
+	
+	public String convertFromSeconds(String seconds) {
+		Date date = new Date(Long.parseLong(seconds));
+		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+		return sdf.format(date);
 	}
 }
