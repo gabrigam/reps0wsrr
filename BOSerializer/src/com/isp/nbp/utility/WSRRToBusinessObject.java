@@ -107,7 +107,7 @@ public class WSRRToBusinessObject {
 
 		System.out.println(
 				"########################################################################################################################################");
-		System.out.println("WSRRToBusinessObject V1.0 Sept 2017 ssa");
+		System.out.println("WSRRToBusinessObject V1.0 Sept 2017  ssa");
 		System.out.println(
 				"########################################################################################################################################");
 		System.out.println("Parametri - Censimento : " + name + " versione : " + version + " wsrr : " + url);
