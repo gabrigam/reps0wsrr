@@ -27,6 +27,7 @@ public class WSRRToBusinessObject {
 	String query7 = "/Metadata/XML/GraphQuery?query=/WSRR/GenericObject[@bsrURI='%BSRURI%']/gep63_provides(.)/gep63_serviceInterface(.)"; // interfaccia
 	String query7bis = "/Metadata/XML/GraphQuery?query=/WSRR/GenericObject[@bsrURI='%BSRURI%']/gep63_serviceInterface(.)"; // interfaccia
 	String query8 = "/Metadata/XML/GraphQuery?query=/WSRR/GenericObject[@bsrURI='%BSRURI%']/gep63_provides(.)";
+	String query9 = "/Metadata/XML/";//documenti
 
 	public WSRRToBusinessObject() {
 
@@ -45,8 +46,10 @@ public class WSRRToBusinessObject {
 
 		TWObject EP_BO = null;
 		TWObject PROXY_BO = null;
-
-		TWList SLD_BO_LIST = null;
+		TWObject DOC_BO=null;
+ 
+		TWList SLD_BO_LIST= null;
+		TWList INTERF_BO_LIST = null;
 		TWList EP_BO_REST_APPL = null;
 		TWList EP_BO_REST_SYST = null;
 		TWList EP_BO_REST_PROD = null;
@@ -107,7 +110,7 @@ public class WSRRToBusinessObject {
 
 		System.out.println(
 				"########################################################################################################################################");
-		System.out.println("WSRRToBusinessObject V1.0 Sept 2017  ssa");
+		System.out.println("WSRRToBusinessObject V1.1 October 2017  ssa+docs..");
 		System.out.println(
 				"########################################################################################################################################");
 		System.out.println("Parametri - Censimento : " + name + " versione : " + version + " wsrr : " + url);
@@ -143,6 +146,7 @@ public class WSRRToBusinessObject {
 		String environment = null;
 		String proxy = null;
 		String proxybsrURI = null;
+		String documentURI = null;
 		String target = "UNDEF";
 
 		try {
@@ -196,6 +200,7 @@ public class WSRRToBusinessObject {
 			EP_BO_MQ_UAT = TWObjectFactory.createList();
 			EP_BO_MQ_INDEP = TWObjectFactory.createList();
 			SLD_BO_LIST = TWObjectFactory.createList();
+			INTERF_BO_LIST = TWObjectFactory.createList();
 
 			doc = (Document) xpath.evaluate("/", source, XPathConstants.NODE);
 			count = Integer.parseInt(xpath.evaluate("count(/resources/resource/classifications/classification)", doc));
@@ -227,8 +232,6 @@ public class WSRRToBusinessObject {
 			NBP_BO.setPropertyValue("SERVICE_INDEX", type + "#" + subType);
 			
 			NBP_BO.setPropertyValue("GOVERNANCE_STATE",governanceState);
-
-			WSRRToBusinessObject.log("result ********** "+result+" - "+type +" - "+subType, debug);	
 			
 			SV_BO = WSRRToBusinessObject.makeBO(result, -1, type, subType, url, user, password, debug);
 
@@ -336,9 +339,68 @@ public class WSRRToBusinessObject {
 						resultINT = wsrrutility.generalWSRRQuery(query7bis, url, user, password, debug);
 						INTERF_BO = WSRRToBusinessObject.makeBO(resultINT, -1, "Interface", null, url, user, password,
 								debug);
-						SLD_BO.setPropertyValue("INTERF", INTERF_BO);
-						WSRRToBusinessObject.log("Creato oggetto INTERF_BO", debug);						
+
+						WSRRToBusinessObject.log("INTERF_QUERY "+resultINT,debug);
 						
+						xpathFactory = XPathFactory.newInstance();
+						xpath = xpathFactory.newXPath();
+						// result=result.replaceAll("(\\r|\\n)", "");
+						source = new InputSource(new StringReader(resultINT));
+						doc = null;
+						count = 0;
+						countag = 0;
+						current = null;
+						String value = null;
+						String current_ = null;
+						String value_ = null;
+
+							doc = (Document) xpath.evaluate("/", source, XPathConstants.NODE);
+							
+							count = Integer.parseInt(xpath.evaluate("count(/resources/resource/relationships/relationship)", doc));
+							
+							WSRRToBusinessObject.log("INTERF_COUNT "+count,debug);
+							
+							for (int i = 1; i <= count; i++) {
+														
+								current = "/resources/resource/relationships/relationship[" + String.valueOf(i) + "]/@name";
+								
+								relation = xpath.evaluate(current, doc);
+
+								if (relation.indexOf("rest80_definitionDocument") != -1) {
+
+									current = "/resources/resource/relationships/relationship[" + String.valueOf(i)
+									+ "]/@targetBsrURI";
+									
+									WSRRToBusinessObject.log("INTERF_NAME "+current,debug);
+									
+									if (xpath.evaluate(current, doc) != null) {
+																		
+										documentURI = xpath.evaluate(current, doc);
+										
+										WSRRToBusinessObject.log("INTERF_URI_DOC "+current,debug);
+										query6 = query9;
+										query6 = query6+documentURI;										
+										result = wsrrutility.generalWSRRQuery(query6, url, user, password,
+												debug);
+										WSRRToBusinessObject.log("INTERF_QUERY_Result "+result,debug);
+										DOC_BO = WSRRToBusinessObject.makeBO(result, -1, "Document", null, url,
+												user, password, debug);
+										WSRRToBusinessObject.log(
+												"Creato DOCUMENTO",
+												debug);
+										INTERF_BO_LIST.addArrayData(INTERF_BO_LIST.getArraySize(), DOC_BO);
+									}
+
+								}
+								
+							}
+							
+					    INTERF_BO.setPropertyValue("DOCUMENTS", INTERF_BO_LIST);
+					    
+						WSRRToBusinessObject.log("Creato oggetto INTERF_BO", debug);
+						
+						SLD_BO.setPropertyValue("INTERF", INTERF_BO);
+											
 						WSRRToBusinessObject.log("Creato oggetto SLD_BO", debug);
 
 						// }
@@ -402,10 +464,9 @@ public class WSRRToBusinessObject {
 						count = 0;
 						countag = 0;
 						current = null;
-						String value = null;
-						String current_ = null;
-						String value_ = null;
-
+						value = null;
+						current_ = null;
+						value_ = null;
 
 						try {
 
@@ -974,6 +1035,7 @@ public class WSRRToBusinessObject {
 		final String SOPEN = " [type, subType, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, gep63_ABILITAZ_INFRASTR, gep63_DESC_ESTESA, gep63_SOPEN_LINK_SIN_APPS_EST, gep63_SOPEN_ATTACHMENT_TYPE, gep63_SOPEN_DOWNTIME_PIANIFICATO, gep63_SOPEN_REPS0, ale63_assetType, gep63_SOPEN_NUM_CHIAMATE_PICCO, ale63_guid, gep63_SOPEN_RIF_CHIAMANTI_EST, gep63_SOPEN_STATO_ATTUALE_FUNZ, ale63_remoteState, gep63_DATA_RITIRO_SERV, gep63_MATR_RICH_CREAZIONE, ale63_assetOwners, gep63_FLG_CTRL_TIPOLOGIA, gep63_PIATT_EROG, gep63_MATR_RICH_MODIFICA, gep63_DISP_SERV, gep63_PID_PROCESSO_GOV, gep63_SOPEN_RIF_CHIAMANTI_INT, gep63_TIPOLOGIA, gep63_MATR_PUBBLICATORE_CREAZ_SERV, gep63_SOPEN_EAR_SERVIZIO, gep63_SOPEN_AMBIENTE_FISICO, gep63_DERIVANTE_DA_ALTRI_SERV, gep63_VINCOLI_RIUSO, gep63_ATTIVATO_IN_PROD, gep63_INFO_COSTO, gep63_consumerIdentifier, gep63_SOPEN_VOLUME_GIORN, gep63_SOPEN_AMBITO_IMPLEMENTAZIONE, gep63_UTILIZ_PIU_BAN_CLONI, ale63_ownerEmail, gep63_ATTIVATO_IN_SYST, gep63_SOPEN_DIM_MAX_MSG, ale63_communityName, gep63_DATA_PUBBL_CREAZ_SERV, gep63_SECURITY_ROLE, gep63_NOME_SERVIZIO_PRECEDENTE, gep63_SOPEN_DIM_MIN_MSG, gep63_SOPEN_FLG_CONTIENE_ATTACHMENT, ale63_fullDescription, gep63_ATTIVATO_IN_APPL, gep63_TIPOLOGIA_OGGETTO_ESISTENTE, gep63_versionTerminationDate, gep63_DOC_ANALISI_FUNZIONALE, gep63_versionAvailabilityDate, gep63_DOC_ANALISI_DETTAGLIO, gep63_DOC_ANALISI_TECNICA, ale63_requirementsLink, ale63_assetWebLink]";
 		final String SERVICEVERSION = "[type, subType, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, ale63_remoteState, ale63_communityName, ale63_assetOwners, ale63_assetType, ale63_guid, ale63_fullDescription, ale63_ownerEmail, ale63_requirementsLink, ale63_assetWebLink]";
 		final String ACRONIMO = "[bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, ale63_RESP_FUNZIONALE_MATRICOLA, ale63_RESP_ATTIVITA_NOMINATIVO, ale63_RESP_FUNZIONALE_NOMINATIVO, ale63_DESC_AMBITO, ale63_RESP_SERVIZIO_NOMINATIVO, ale63_contact, ale63_contactEmail, ale63_CODICE_SISTEMA_APPLICATIVO, ale63_RESP_ATTIVITA_MATRICOLA, ale63_RESP_SERVIZIO_MATRICOLA, ale63_RESP_UFFICIO_MATRICOLA, ale63_RESP_TECNICO_MATRICOLA, ale63_RESP_UFFICIO_NOMINATIVO, ale63_RESP_TECNICO_NOMINATIVO, ale63_AMBITO]";
+		final String DOCUMENT = "[bsrURI, name, nspace, description, owner, lastModified, creationTimestamp, lastModifiedBy, encoding, location, contentSize]";
 		//final String SSA = "[bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, ale63_RESP_FUNZIONALE_MATRICOLA, ale63_RESP_ATTIVITA_NOMINATIVO, ale63_RESP_FUNZIONALE_NOMINATIVO, ale63_DESC_AMBITO, ale63_RESP_SERVIZIO_NOMINATIVO, ale63_contact, ale63_contactEmail, ale63_CODICE_SISTEMA_APPLICATIVO, ale63_RESP_ATTIVITA_MATRICOLA, ale63_RESP_SERVIZIO_MATRICOLA, ale63_RESP_UFFICIO_MATRICOLA, ale63_RESP_TECNICO_MATRICOLA, ale63_RESP_UFFICIO_NOMINATIVO, ale63_RESP_TECNICO_NOMINATIVO, ale63_AMBITO]";
 		
 		final String INTERF = "[type, bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, sm63_interfaceVersion,sm63_interfaceNamespace, sm63_interfaceName, rest80_webLink]";
@@ -1044,6 +1106,9 @@ public class WSRRToBusinessObject {
 
 			if (type != null && type.indexOf("Organization") != -1 && target.equals("UNDEF"))
 				target = ACRONIMO;
+			
+			if (type != null && type.indexOf("Document") != -1 && target.equals("UNDEF"))
+				target = DOCUMENT;
 
 			if (type != null && type.indexOf("Interface") != -1 && target.equals("UNDEF")) {
 				target = INTERF;
