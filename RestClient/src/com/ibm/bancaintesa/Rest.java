@@ -788,7 +788,8 @@ public class Rest {
 
 		}
 
-		if (input != null && input.length() >= 17 & input.length() <= 20) {
+		//modifico massima lunghezza = 19 a 20 spacca DP
+		if (input != null && input.length() >= 17 & input.length() <= 19) {
 
 			String zero = "00000000";
 
@@ -808,7 +809,7 @@ public class Rest {
 
 				ts = ts + other;
 
-				int difflen = 20 - ts.length();
+				int difflen = 19 - ts.length();
 
 				ts = ts.concat(zero.substring(0, difflen));
 
