@@ -70,6 +70,8 @@ public class Rest {
 
 		String ISPHeader = "<int:ISPWebservicesHeader xmlns:int=\"http://eric.van-der-vlist.com/ns/person\">         <RequestInfo>            <TransactionId>GKBG0_20170913113655000769</TransactionId>            <Timestamp>20170913113655000769</Timestamp>            <ServiceID>GKMGDECPLF</ServiceID>            <ServiceVersion>00</ServiceVersion>              <Language>it</Language>         </RequestInfo>         <OperatorInfo UserID=\"U0G4356\" IsVirtualUser=\"false\"     NotISPUserID=\"\"   />         <CompanyInfo>            <ISPCallerCompanyIDCode>01</ISPCallerCompanyIDCode>            <ISPServiceCompanyIDCode>01</ISPServiceCompanyIDCode>            <ISPBranchCode>00700</ISPBranchCode>            <NotISPCompanyIDCode></NotISPCompanyIDCode>         </CompanyInfo>         <BusinessInfo>            <CustomerID>U0G4356</CustomerID>            <BusinessProcessName>Richiesta Pratica Mogeni</BusinessProcessName>            <BusinessProcessID>76828</BusinessProcessID>            <BusinessOperation></BusinessOperation>            <BusinessFileID></BusinessFileID>         </BusinessInfo>         <TechnicalInfo>            <ChannelIDCode>01</ChannelIDCode>            <ApplicationID>GKBG0</ApplicationID>            <CallerServerName>localhost</CallerServerName>            <CallerProgramName>GKBG0-BPM</CallerProgramName>         </TechnicalInfo>         <AdditionalBusinessInfo>    <Param Name=\"CodABI\" Value=\"01025\"/>  </AdditionalBusinessInfo></int:ISPWebservicesHeader>";
 
+		ISPHeader="<int:ISPWebservicesHeader xmlns:int=\"aaa\"><RequestInfo><TransactionId>PADEMOSOAPDIRECT</TransactionId><Timestamp>2017100511273500087</Timestamp><ServiceID>LKPWSRSOAP</ServiceID><ServiceVersion>01</ServiceVersion><Language>E</Language></RequestInfo><OperatorInfo UserID=\"U0H2438\" IsVirtualUser=\"false\" NotISPUserID=\"U900389\"/><CompanyInfo><ISPCallerCompanyIDCode>01</ISPCallerCompanyIDCode><NotISPCompanyIDCode>99</NotISPCompanyIDCode><ISPBranchCode>02841</ISPBranchCode><ISPServiceCompanyIDCode>02</ISPServiceCompanyIDCode></CompanyInfo><BusinessInfo><CustomerID>ABCDEF80L09B248Z</CustomerID><BusinessProcessName>BusinessProcessName</BusinessProcessName><BusinessProcessID>123</BusinessProcessID><BusinessOperation>BusinessOperation</BusinessOperation><BusinessFileID>BusinessFileID</BusinessFileID></BusinessInfo><TechnicalInfo><ChannelIDCode>99</ChannelIDCode><ApplicationID>IXPG0</ApplicationID><CallerServerName>CallerServerName</CallerServerName><CallerProgramName>PADEMO</CallerProgramName></TechnicalInfo><AdditionalBusinessInfo><Param Name=\"CodUnitaOperativa\" Value=\"14493\"/><Param Name=\"DataContabile\" Value=\"03072017\"/><Param Name=\"FlagPaperless\" Value=\"S\"/><Param Name=\"CodABI\" Value=\"03069\"/><Param Name=\"CodOperativita\" Value=\"N\"/><Param Name=\"CodTerminaleCics\" Value=\"9999\"/></AdditionalBusinessInfo></int:ISPWebservicesHeader>";
+		ISPHeader="<ISPWebservicesHeader><RequestInfo><TransactionId>PADEMOSOAPDIRECT</TransactionId><Timestamp>20171005123740000790</Timestamp><ServiceID>LKPWSRSOAP</ServiceID><ServiceVersion>01</ServiceVersion><Language>E</Language></RequestInfo><OperatorInfo UserID=\"U0H2438\" IsVirtualUser=\"false\" NotISPUserID=\"U900389\"/><CompanyInfo><ISPCallerCompanyIDCode>01</ISPCallerCompanyIDCode><NotISPCompanyIDCode>99</NotISPCompanyIDCode><ISPBranchCode>02841</ISPBranchCode><ISPServiceCompanyIDCode>02</ISPServiceCompanyIDCode></CompanyInfo><BusinessInfo><CustomerID>ABCDEF80L09B248Z</CustomerID><BusinessProcessName>BusinessProcessName</BusinessProcessName><BusinessProcessID>123</BusinessProcessID><BusinessOperation>BusinessOperation</BusinessOperation><BusinessFileID>BusinessFileID</BusinessFileID></BusinessInfo><TechnicalInfo><ChannelIDCode>99</ChannelIDCode><ApplicationID>IXPG0</ApplicationID><CallerServerName>CallerServerName</CallerServerName><CallerProgramName>PADEMO</CallerProgramName></TechnicalInfo><AdditionalBusinessInfo><Param Name=\"CodUnitaOperativa\" Value=\"14493\"/><Param Name=\"DataContabile\" Value=\"03072017\"/><Param Name=\"FlagPaperless\" Value=\"S\"/><Param Name=\"CodABI\" Value=\"03069\"/><Param Name=\"CodOperativita\" Value=\"N\"/><Param Name=\"CodTerminaleCics\" Value=\"9999\"/></AdditionalBusinessInfo></ISPWebservicesHeader>";
 		Rest.ISPHeaderScomposition(ISPHeader, true);
 
 		try {
@@ -126,8 +128,8 @@ public class Rest {
 
 		HashMap<String, String> returnVal = new HashMap<String, String>();
 
-		System.out.println("fxVer 01 Parametri passati :  Interfaccia=" + interfaccia + " ServizioIIB=" + servizioIIB);
-
+		//System.out.println("fxVer 01 Parametri passati :  Interfaccia=" + interfaccia + " ServizioIIB=" + servizioIIB);
+		System.out.println("Ver03 Parametri passati :  Interfaccia=" + interfaccia + " ServizioIIB=" + servizioIIB);
 		// Check that the command type is known
 		if (!command.equals("GET") && !command.equals("POST") && !command.equals("PUT") && !command.equals("DELETE")) {
 			throw new RestException("Unsupported command: " + command + ".  Supported commands are GET, POST, PUT");
@@ -149,7 +151,7 @@ public class Rest {
 				}
 
 				String ispHeader = headerMap.get("X-ISPWebServicesHeader");
-
+				
 				HashMap<String, String> ispHeaderMap = null;
 
 				if (ispHeader != null && !ispHeader.equals("#NOTREQUIRED#")) {
@@ -249,6 +251,7 @@ public class Rest {
 				// Auth
 				// info
 				if (userid != null && !userid.isEmpty()) {
+					
 					String authorization = "Basic " + new String(org.apache.commons.codec.binary.Base64
 							.encodeBase64(new String(userid + ":" + password).getBytes()));
 					httpUrlConnection.setRequestProperty("Authorization", authorization);
@@ -788,8 +791,8 @@ public class Rest {
 
 		}
 
-		//modifico massima lunghezza = 19 a 20 spacca DP
-		if (input != null && input.length() >= 17 & input.length() <= 19) {
+		
+		if (input != null && input.length() >= 17 & input.length() <= 20) {
 
 			String zero = "00000000";
 
@@ -809,7 +812,9 @@ public class Rest {
 
 				ts = ts + other;
 
-				int difflen = 19 - ts.length();
+				int len=ts.length();
+				if (len==20) len=19;
+				int difflen = 19 - len;
 
 				ts = ts.concat(zero.substring(0, difflen));
 
