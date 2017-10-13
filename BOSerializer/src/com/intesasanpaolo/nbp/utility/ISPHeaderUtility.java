@@ -57,7 +57,9 @@ public class ISPHeaderUtility {
 
 				ts = ts + other;
 
-				int difflen = 20 - ts.length();
+				int len=ts.length();
+				if (len==20) len=19;
+				int difflen = 19 - len;
 
 				ts = ts.concat(zero.substring(0, difflen));
 
@@ -307,6 +309,8 @@ public class ISPHeaderUtility {
 		HashMap ispHeaderMap = new HashMap();
 
 
+		ISPHeaderUtility.checkTimestamp("20171006134855000818");
+		
 		String ispHeader = "<ISPWebservicesHeader><!--You may enter the following 6 items in any order--> <RequestInfo><!--You may enter the following 5 items in any order--><TransactionId>TID</TransactionId><Timestamp>20170630125040000252</Timestamp><ServiceVersion>SERVICEVERION</ServiceVersion><!--Optional:--><Language>IT</Language></RequestInfo><OperatorInfo UserID=\"U0H1963\" IsVirtualUser=\"VIUSER\" NotISPUserID=\"NOTVIU\"/><CompanyInfo><!--You may enter the following 4 items in any order--><!--Optional:--><!--Optional:--><ISPBranchCode>[ISPBranchCode]</ISPBranchCode><ISPServiceCompanyIDCode>[ISPServiceCompanyIDCode]</ISPServiceCompanyIDCode></CompanyInfo><BusinessInfo><!--You may enter the following 5 items in any order--><CustomerID>[CustomerID]</CustomerID><!--Optional:--><BusinessProcessName>[BusinessProcessName]</BusinessProcessName><!--Optional:--><BusinessProcessID>[BusinessProcessID]</BusinessProcessID><!--Optional:--><BusinessOperation>[BusinessOperation]</BusinessOperation><!--Optional:--><BusinessFileID>[BusinessFileID]</BusinessFileID></BusinessInfo>         <TechnicalInfo>            <!--You may enter the following 4 items in any order-->            <ChannelIDCode>[ChannelIDCode]</ChannelIDCode>            <ApplicationID>[ApplicationID]</ApplicationID>            <CallerServerName>[CallerServerName]</CallerServerName>            <CallerProgramName>[CallerProgramName]</CallerProgramName>         </TechnicalInfo>         <AdditionalBusinessInfo>            <!--1 or more repetitions:-->            <CodUnitaOperativa>[CodUnitaOperativa]</CodUnitaOperativa><DataContabile>[DataContabile]</DataContabile><FlagPaperless>[FlagPaperless>]</FlagPaperless>	<CodABI>[CodABI]</CodABI><CodOperatività>[CodOperarività]</CodOperatività><CodTerminaleCics>[CodTerminaleCics]</CodTerminaleCics></AdditionalBusinessInfo></ISPWebservicesHeader>";
 
 		ispHeader = "<ISPWebservicesHeader><RequestInfo><TransactionId>BPMTKMQ2017-07</TransactionId><Timestamp>20170703180828371</Timestamp><ServiceID>XINBPTE1</ServiceID><ServiceVersion>01</ServiceVersion><Language>E</Language></RequestInfo><OperatorInfo UserID=\"U0H2438\" IsVirtualUser=\"false\" NotISPUserID=\"U900389\"/><CompanyInfo><ISPCallerCompanyIDCode>01</ISPCallerCompanyIDCode><NotISPCompanyIDCode>99</NotISPCompanyIDCode><ISPBranchCode>02841</ISPBranchCode><ISPServiceCompanyIDCode>02</ISPServiceCompanyIDCode></CompanyInfo><BusinessInfo><CustomerID>ABCDEF80L09B248Z</CustomerID><BusinessProcessName>BusinessProcessName</BusinessProcessName><BusinessProcessID>123</BusinessProcessID><BusinessOperation>BusinessOperation</BusinessOperation><BusinessFileID>BusinessFileID</BusinessFileID></BusinessInfo><TechnicalInfo><ChannelIDCode>99</ChannelIDCode><ApplicationID>IXPG0</ApplicationID><CallerServerName>CallerServerName</CallerServerName><CallerProgramName>BPMPA</CallerProgramName></TechnicalInfo><AdditionalBusinessInfo><Param Name=\"CodUnitaOperativa\" Value=\"14493\"/><Param Name=\"DataContabile\" Value=\"03072017\"/><Param Name=\"FlagPaperless\" Value=\"S\"/><Param Name=\"CodABI\" Value=\"03069\"/><Param Name=\"CodOperatività\" Value=\"N\"/><Param Name_=\"CodTerminaleCics\" Value=\"9999\"/></AdditionalBusinessInfo></ISPWebservicesHeader>";
