@@ -110,7 +110,7 @@ public class WSRRToBusinessObject {
 
 		System.out.println(
 				"########################################################################################################################################");
-		System.out.println("WSRRToBusinessObject V1.1 October 2017  ssa+docs..");
+		System.out.println("WSRRToBusinessObject V1.2 October 2017  ssa+docs+fix documenti");
 		System.out.println(
 				"########################################################################################################################################");
 		System.out.println("Parametri - Censimento : " + name + " versione : " + version + " wsrr : " + url);
@@ -360,6 +360,8 @@ public class WSRRToBusinessObject {
 							
 							WSRRToBusinessObject.log("INTERF_COUNT "+count,debug);
 							
+							int documentiAllegati=0;;
+							
 							for (int i = 1; i <= count; i++) {
 														
 								current = "/resources/resource/relationships/relationship[" + String.valueOf(i) + "]/@name";
@@ -374,7 +376,7 @@ public class WSRRToBusinessObject {
 									WSRRToBusinessObject.log("INTERF_NAME "+current,debug);
 									
 									if (xpath.evaluate(current, doc) != null) {
-																		
+																				
 										documentURI = xpath.evaluate(current, doc);
 										
 										WSRRToBusinessObject.log("INTERF_URI_DOC "+current,debug);
@@ -382,24 +384,33 @@ public class WSRRToBusinessObject {
 										query6 = query6+documentURI;										
 										result = wsrrutility.generalWSRRQuery(query6, url, user, password,
 												debug);
-										WSRRToBusinessObject.log("INTERF_QUERY_Result "+result,debug);
-										DOC_BO = WSRRToBusinessObject.makeBO(result, -1, "Document", null, url,
+										
+										//workaround 11/10/2017 controllo se la relazione non ha documenti
+										if (result!=null && result.length()!=0) {
+											documentiAllegati++;
+											WSRRToBusinessObject.log("INTERF_QUERY_Result "+result,debug);
+										  DOC_BO = WSRRToBusinessObject.makeBO(result, -1, "Document", null, url,
 												user, password, debug);
-										WSRRToBusinessObject.log(
+										  WSRRToBusinessObject.log(
 												"Creato DOCUMENTO",
 												debug);
-										INTERF_BO_LIST.addArrayData(INTERF_BO_LIST.getArraySize(), DOC_BO);
+										 INTERF_BO_LIST.addArrayData(INTERF_BO_LIST.getArraySize(), DOC_BO);
+										}
 									}
 
 								}
 								
 							}
-							
+					
 					    INTERF_BO.setPropertyValue("DOCUMENTS", INTERF_BO_LIST);
 					    
+						INTERF_BO.setPropertyValue("DOCUMENTS_COUNT",documentiAllegati+"" ); 
+	                    	
 						WSRRToBusinessObject.log("Creato oggetto INTERF_BO", debug);
 						
 						SLD_BO.setPropertyValue("INTERF", INTERF_BO);
+						
+					
 											
 						WSRRToBusinessObject.log("Creato oggetto SLD_BO", debug);
 
