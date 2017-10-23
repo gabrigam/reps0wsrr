@@ -2980,9 +2980,11 @@ public class WSRRUtility {
 
 		String resultdata = null;
 
-		String query = "/Metadata/JSON/PropertyQuery?query=/WSRR/GenericObject[classifiedByAnyOf(.,'http://www.ibm.com/xmlns/prod/serviceregistry/v6r3/ALEModel%23Organization')/ale63_childOrganizations(.)[@name='%BSRURIACRONIMO%']]&p1=name";
+		String query = "/Metadata/XML/GraphQuery?query=/WSRR/GenericObject[classifiedByAnyOf(.,'http://www.ibm.com/xmlns/prod/serviceregistry/v6r3/ALEModel%23Organization')/ale63_childOrganizations(.)[@name='%BSRURIACRONIMO%']]";
 		query = query.replaceAll("%BSRURIACRONIMO%", bsrURIAcronimo);
 
+		System.out.println("ssaquery "+query);
+		
 		HttpURLConnection urlConnection = null;
 
 		try {
@@ -3033,16 +3035,6 @@ public class WSRRUtility {
 				urlConnection.disconnect();
 		}
 
-		if (resultdata != null && resultdata.equals("[]"))
-			resultdata = null;
-
-		if (resultdata != null) {
-			JSONArray jsa = new JSONArray(resultdata);
-			resultdata = ((JSONObject) ((JSONArray) jsa.get(0)).get(0)).getString("name");
-			if (resultdata != null) {
-				resultdata = ((JSONObject) ((JSONArray) jsa.get(0)).get(0)).getString("value");
-			}
-		}
 		return resultdata;
 	}
 
