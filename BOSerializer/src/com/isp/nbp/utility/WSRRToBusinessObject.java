@@ -110,7 +110,7 @@ public class WSRRToBusinessObject {
 
 		System.out.println(
 				"########################################################################################################################################");
-		System.out.println("WSRRToBusinessObject V1.2 October 2017  ssa+docs+fix documenti");
+		System.out.println("WSRRToBusinessObject V1.4 October 2017  ssa+docs+fix documenti+sm63_SOAPProxy");
 		System.out.println(
 				"########################################################################################################################################");
 		System.out.println("Parametri - Censimento : " + name + " versione : " + version + " wsrr : " + url);
@@ -617,7 +617,7 @@ public class WSRRToBusinessObject {
 												PROXY_BO = WSRRToBusinessObject.makeBO(result, -1, proxy, null, url,
 														user, password, debug);
 												WSRRToBusinessObject
-												.log("Creato PROXY_BO per tipo SOAP (sm63_SOAPProxy)", debug);
+												.log("Creato PROXY_BO per tipo SOAP (sm63_SOAPProxy) bsrURI "+proxybsrURI, debug);
 											}
 										}
 
