@@ -78,7 +78,7 @@ public class Reps0WSRR {
 		Boolean result = false;
 		String bsrURI = null;
 		
-		boolean log=false;
+		boolean log=true;
 		
 		Reps0WSRR.logMe(">>>>>>WSRRoutine parametri", log);
 		Reps0WSRR.logMe(">>>>>>WSRRoutine "+bsrURISLD, log);
@@ -217,7 +217,7 @@ public class Reps0WSRR {
 						if (interfaceType.equalsIgnoreCase("REST")) {
 							Reps0WSRR.logMe(">>>>>>WSRRoutine P26", log);
 							envelope = envelopes.createRestEndpointXMLDAta(systemTestUrlSecurized,systemTestTimeout, "SystemTest",
-									"", null, "SI-Datapower");
+									"", null, sicurezza);
 							Reps0WSRR.logMe(">>>>>>WSRRoutine P27", log);
 						}
 
@@ -225,7 +225,7 @@ public class Reps0WSRR {
 							Reps0WSRR.logMe(">>>>>>WSRRoutine P28", log);
 
 							envelope = envelopes.createCallableEndpointXMLDAta(systemTestUrlSecurized, systemTestTimeout,
-									"SystemTest", "", null, "SI-Datapower");
+									"SystemTest", "", null, "sicurezza");
 							Reps0WSRR.logMe(">>>>>>WSRRoutine P29", log);
 						}
 						Reps0WSRR.logMe(">>>>>>WSRRoutine P30", log);
@@ -308,14 +308,14 @@ public class Reps0WSRR {
 							if (interfaceType.equalsIgnoreCase("REST")) {
 								Reps0WSRR.logMe(">>>>>>WSRRoutine P51", log);
 								envelope = envelopes.createRestEndpointXMLDAta(productionUrlSecurized, productionTimeout,
-										"Produzione", "", null, "SI-Datapower");
+										"Produzione", "", null, sicurezza);
 								Reps0WSRR.logMe(">>>>>>WSRRoutine P52", log);
 							}
 
 							if (interfaceType.equalsIgnoreCase("CALLABLE")) {
 								Reps0WSRR.logMe(">>>>>>WSRRoutine P53", log);
 								envelope = envelopes.createCallableEndpointXMLDAta(productionUrlSecurized, productionTimeout,
-										"Produzione", "", null, "SI-Datapower");
+										"Produzione", "", null, sicurezza);
 								Reps0WSRR.logMe(">>>>>>WSRRoutine P54", log);
 							}
 							Reps0WSRR.logMe(">>>>>>WSRRoutine P55", log);
@@ -401,14 +401,14 @@ public class Reps0WSRR {
 								Reps0WSRR.logMe(">>>>>>WSRRoutine P75", log);
 
 								envelope = envelopes.createRestEndpointXMLDAta(independentSecurized, independentTimeout,
-										"IndipendentTest", "", null, "SI-Datapower");
+										"IndipendentTest", "", null, sicurezza);
 								Reps0WSRR.logMe(">>>>>>WSRRoutine P76", log);
 							}
 
 							if (interfaceType.equalsIgnoreCase("CALLABLE")) {
 								Reps0WSRR.logMe(">>>>>>WSRRoutine P77", log);
 								envelope = envelopes.createCallableEndpointXMLDAta(independentSecurized, independentTimeout,
-										"IndipendentTest", "", null, "SI-Datapower");
+										"IndipendentTest", "", null, sicurezza);
 								Reps0WSRR.logMe(">>>>>>WSRRoutine P78", log);
 							}
 							Reps0WSRR.logMe(">>>>>>WSRRoutine P79", log);
@@ -497,14 +497,14 @@ public class Reps0WSRR {
 							if (interfaceType.equalsIgnoreCase("REST")) {
 								Reps0WSRR.logMe(">>>>>>WSRRoutine P102", log);
 								envelope = envelopes.createRestEndpointXMLDAta(userAcceptanceUrlSecurized, userAcceptanceTimeout,
-										"UserAcceptanceTest", "", null, "SI-Datapower");
+										"UserAcceptanceTest", "", null, sicurezza);
 								Reps0WSRR.logMe(">>>>>>WSRRoutine P103", log);
 							}
 
 							if (interfaceType.equalsIgnoreCase("CALLABLE")) {
 								Reps0WSRR.logMe(">>>>>>WSRRoutine P104", log);
 								envelope = envelopes.createCallableEndpointXMLDAta(userAcceptanceUrlSecurized, userAcceptanceTimeout,
-										"UserAcceptanceTest", "", null, "SI-Datapower");
+										"UserAcceptanceTest", "", null, "sicurezza");
 								Reps0WSRR.logMe(">>>>>>WSRRoutine P105", log);
 							}
 							Reps0WSRR.logMe(">>>>>>WSRRoutine P106", log);
