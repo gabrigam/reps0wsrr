@@ -17,21 +17,22 @@ public class WSRRUtility {
 
 	public static void main(String[] args) throws Exception {
 		
-		long start_time = System.nanoTime();
-		//Thread.sleep(1345);
-		long end_time = System.nanoTime();
-		double difference = (end_time - start_time)/1e6;
-		// void insert test here!!!!
-		String wsrr = "https://WIN-MT67KKLQ7LO:9443/WSRR/8.5";
+	long start_time = System.nanoTime();
+	//Thread.sleep(1345);
+	long end_time = System.nanoTime();
+	double difference = (end_time - start_time)/1e6;
+	// void insert test here!!!!
+	String wsrr = "https://gabrieleWSRR:9443/WSRR/8.5";
 
-		WSRRUtility wut = new WSRRUtility();
-		//wut.getEndpointNameFromBsrUriSLDEnvironmentCheckSecurity("98d59998-78a1-4167.a4d1.8e1ab88ed132", "Application",
-		//		"REST", false, "KLL", wsrr, "gabriele", "viviana");
-		
+	WSRRUtility wut = new WSRRUtility();
+	System.out.println(wut.getLastUsableServiceVersion("TESTINA400", wsrr, "gabriele", "viviana"));
+	//wut.getEndpointNameFromBsrUriSLDEnvironmentCheckSecurity("98d59998-78a1-4167.a4d1.8e1ab88ed132", "Application",
+	//		"REST", false, "KLL", wsrr, "gabriele", "viviana");
 	
-		
-		
-	}
+
+	
+	
+}
 
 	public static String aboutLib() {
 
@@ -4613,6 +4614,105 @@ public class WSRRUtility {
 		return data;
 
 	}
+	
+	////////////////////////////////////////////////////
+	//27112017
+		public String getLastUsableServiceVersion(String name, String baseURL, String user, String password) {
+
+			// Create the variable to return
+			String lastUsableSV = null;
+
+			String query = "/Metadata/JSON/PropertyQuery?query=/WSRR/GenericObject[@name='%CATALOGNAME%']&p1=version";
+
+			query = query.replaceAll("%CATALOGNAME%", name);
+
+			HttpURLConnection urlConnection = null;
+
+			try {
+				StringBuffer sb = new StringBuffer();
+				sb.append(baseURL).append(query);
+				URL url = new URL(sb.toString());
+				urlConnection = (HttpURLConnection) url.openConnection();
+				urlConnection.setRequestMethod("GET");
+				urlConnection.setRequestProperty("Content-Type", "text/xml; charset=UTF-8");
+				urlConnection.setUseCaches(false);
+
+				if (user != null && password != null) {
+
+					String userPassword = user + ":" + password;
+
+					String encoding = new String(Base64.encodeBase64(userPassword.getBytes()));
+
+					urlConnection.setRequestProperty("Authorization", "Basic " + encoding);
+				}
+
+				int responsecode = urlConnection.getResponseCode();
+				if (responsecode == 200 || (responsecode == 201)) {
+					InputStream is = null;
+					is = urlConnection.getInputStream();
+					int ch;
+					sb.delete(0, sb.length());
+					while ((ch = is.read()) != -1) {
+						sb.append((char) ch);
+					}
+					lastUsableSV = sb.toString();
+					is.close();
+				} else {
+					BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+					StringBuffer stringBuffer = new StringBuffer();
+					String line = null;
+					while (null != (line = reader.readLine())) {
+						stringBuffer.append(line);
+					}
+					reader.close();
+				}
+				urlConnection.disconnect();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			finally {
+				if (urlConnection != null)
+					urlConnection.disconnect();
+			}
+
+			if (lastUsableSV != null && lastUsableSV.equals("[]"))
+				lastUsableSV = null;
+
+																	if (lastUsableSV ==null) return lastUsableSV;
+			
+			JSONArray jsa = new JSONArray(lastUsableSV);
+			JSONArray jsae = null;
+			JSONObject jso = null;
+			int currentVersion = 0;
+			int lastVersion=0;
+			int i = jsa.length();
+			int j = 0;
+			String current="";
+			while (i > j) {
+				jsae = (JSONArray) jsa.getJSONArray(j);
+				try {
+					jso = (JSONObject) jsae.getJSONObject(0);
+                     current=(String) jso.get("value");
+					if (current !=null && current.length() !=0) {
+					currentVersion=Integer.parseInt((String) jso.get("value"));
+					if (currentVersion>=lastVersion) lastVersion=currentVersion;
+					}
+				} catch (Exception ex) {
+					return null;
+				}
+
+				j++;
+			}
+			currentVersion++;		
+			if (currentVersion >=10) lastUsableSV=currentVersion+"";
+			else lastUsableSV="0"+currentVersion;
+			if (currentVersion==100) return null;
+			return lastUsableSV;
+		}
+	
+	
+	/////////////////////////////////////////////////////
 
 	public String getGenericObjectByName(String name, String baseURL, String user, String password) {
 
