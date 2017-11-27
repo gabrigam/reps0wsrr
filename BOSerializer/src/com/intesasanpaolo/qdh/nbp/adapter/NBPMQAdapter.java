@@ -279,7 +279,7 @@ public class NBPMQAdapter {
 	 * @throws EncodingException 
 	 * @throws UnsupportedEncodingException 
 	 */
-	public int writeString(String newMessage)  {
+	public int writeString(String newMessage,boolean zerobinary)  {
 
 		this.twsAdapterCompletionCode = MQException.MQCC_OK;
 		this.twsAdapterReasonCode = MQException.MQRC_NONE;
@@ -289,16 +289,19 @@ public class NBPMQAdapter {
 		if (newMessage != null) {
 			
 			System.out.println("message encoded " + newMessage);
+			System.out.println("set [90-100] with zero binary " + zerobinary);
 
 			try {
 
 				byte [] bytesEBCDIC = NBPMQAdapter.creatByteArrayFromTokenizer(newMessage);
-
+				
+				byte [] bytesEBCDICNormalized =NBPMQAdapter.setzerobinary(bytesEBCDIC, zerobinary);
+				
 				MQMessage twsMsg = new MQMessage();
 
 				//twsMsg.writeString(new String(bytesEBCDIC));
 				
-				twsMsg.write(bytesEBCDIC, 0, bytesEBCDIC.length);
+				twsMsg.write(bytesEBCDICNormalized, 0, bytesEBCDICNormalized.length);
 				
 				//twsMsg.writeString(NBPMQAdapter.toHex(bytesEBCDIC));
 
@@ -366,7 +369,7 @@ public class NBPMQAdapter {
 							System.out.println("writeString() end");
 							return TWS_ADAPTER_WRITE_KO;
 						}
-						writeString(newMessage); // send again
+						writeString(newMessage,zerobinary); // send again
 
 						System.out.println("writeString() end");
 						return TWS_ADAPTER_WRITE_OK;
@@ -655,7 +658,7 @@ public class NBPMQAdapter {
 
 				if (rc == 0) {
 
-					rc = adapter_Appl_Instance.writeString((String) NBPApplData.getPropertyValue("DATA"));
+					rc = adapter_Appl_Instance.writeString((String) NBPApplData.getPropertyValue("DATA"),true);
 
 					if (rc == 0) {
 
@@ -668,7 +671,7 @@ public class NBPMQAdapter {
 							if (rc == 0) {
 								
 
-								rc = adapter_QDH_Instance.writeString((String) NBPQDHData.getPropertyValue("DATA"));
+								rc = adapter_QDH_Instance.writeString((String) NBPQDHData.getPropertyValue("DATA"),false);
 
 
 								if (rc == 0) {
@@ -755,57 +758,29 @@ public class NBPMQAdapter {
 		
 		return byteData;
 	}
-	/**
-	public static void main(String [] args) throws EncodingException, UnsupportedEncodingException {
-
-		byte ffff=0;
-		
 	
-		byte a[]="A0".getBytes("Cp500");
-		byte[] qq=NBPMQAdapter.intToBytes(48);
-		//Byte.decode("223");
-		
-		
-		byte[] AA = "ciao".getBytes();
-		byte[] data=NBPMQAdapter.creatByteArrayFromTokenizer("1_2_3_4_0_0_0_0_0_0_0_0_100_101");
-		System.out.println(new String(data));
-		
-		String newMessage= "T:";
-		byte[] bytesEBCDIC = newMessage.getBytes("Cp500");
-		String  base = NBPMQAdapter.toHex(bytesEBCDIC);
-		byte[] bytesEBCDIC__ = newMessage.getBytes("UTF-8"); 
-		byte[] bytesEBCDIC___ = newMessage.getBytes("UTF-16"); 
-		int[] intEBCDIC= new int[bytesEBCDIC.length];
-		byte[] bytesEBCDIC____ =new String(bytesEBCDIC__).getBytes("Cp500"); 
-		
-	       for(int i=0; i<newMessage.length(); i++){
-	    	    byte b=bytesEBCDIC[i];
-	    	    if (b<0) intEBCDIC[i]=(bytesEBCDIC[i]+256);
-	    	    else intEBCDIC[i]=bytesEBCDIC[i];
-	            System.out.println("ASCII "+newMessage.charAt(i)+"  <-->  "+b +"  <-->  "+intEBCDIC[i]);
-	       }
-	       
-	    
-	       
-	       String KK=Arrays.toString(intEBCDIC).toString();
-	       String KK1=new String(bytesEBCDIC,"Cp500");
-	       //String KK1g=new String()
-	       
-	       int j=0;
+/**
+	public static void main(String [] args)  {
 
-
-
-		//byte[] bytes=Encoder.stringToBytes("ciao", "Cp500");
-
-
-
-		//System.out.println(new String(data, "Cp1047")); // convert into readable string       
-
-		//String data_coverted=Encoder.bytesToString(data, "Cp500");
-		//System.out.println("DOPO C "+data.toString());
-		
+     String pippo="abcdefghilmjkiiuoijjiojojjiouiiijijijru940284389uirirjjekrwjruiewruurjrjewkrrweuuiir3jrjjewrjeewhjrwjhuir3rhwejrwrrnrewjrjhrherhehrwjrjewjkrjkewkrjkwerwrwkrui23u442423rwerewrwerrr3r23344242344rrew";
+	 byte data[]=pippo.getBytes();
+	 byte aaa[]=NBPMQAdapter.setzerobinary(data,true);
+	 System.out.println(aaa);
+	 int q=0;
 	}
 	
-	**/
-
+**/	
+    private static byte[] setzerobinary(byte[] stream,boolean zerobinary) {    
+        int idx = 0;
+        byte b = 0x00;
+       //
+        if(zerobinary){
+        
+         for (idx = 10; idx < 100; idx++) {
+              stream[idx] = b;
+         }
+        }       
+        return stream;
+    }
+    
 }
