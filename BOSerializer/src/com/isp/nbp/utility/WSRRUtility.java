@@ -4622,8 +4622,9 @@ public class WSRRUtility {
 			// Create the variable to return
 			String lastUsableSV = null;
 
-			String query = "/Metadata/JSON/PropertyQuery?query=/WSRR/GenericObject[@name='%CATALOGNAME%']&p1=version";
+			//String query = "/Metadata/JSON/PropertyQuery?query=/WSRR/GenericObject[@name='%CATALOGNAME%']&p1=version";
 
+			String query ="/Metadata/JSON/PropertyQuery?query=/WSRR/GenericObject[classifiedByAnyOf(.,'http://www.ibm.com/xmlns/prod/serviceregistry/profile/v6r3/GovernanceEnablementModel%23SOPENServiceVersion','http://www.ibm.com/xmlns/prod/serviceregistry/profile/v6r3/GovernanceEnablementModel%23SCOPENServiceVersion','http://www.ibm.com/xmlns/prod/serviceregistry/profile/v6r3/GovernanceEnablementModel%23SHOSTServiceVersion','http://www.ibm.com/xmlns/prod/serviceregistry/profile/v6r3/GovernanceEnablementModel%23SCHOSTServiceVersion')%20and%20@name='%CATALOGNAME%']&p1=version";
 			query = query.replaceAll("%CATALOGNAME%", name);
 
 			HttpURLConnection urlConnection = null;
@@ -4631,6 +4632,7 @@ public class WSRRUtility {
 			try {
 				StringBuffer sb = new StringBuffer();
 				sb.append(baseURL).append(query);
+				//System.out.println("RIS1 "+sb.toString());
 				URL url = new URL(sb.toString());
 				urlConnection = (HttpURLConnection) url.openConnection();
 				urlConnection.setRequestMethod("GET");
@@ -4679,7 +4681,7 @@ public class WSRRUtility {
 			if (lastUsableSV != null && lastUsableSV.equals("[]"))
 				lastUsableSV = null;
 
-																	if (lastUsableSV ==null) return lastUsableSV;
+			if (lastUsableSV ==null) return lastUsableSV;
 			
 			JSONArray jsa = new JSONArray(lastUsableSV);
 			JSONArray jsae = null;
@@ -4704,10 +4706,11 @@ public class WSRRUtility {
 
 				j++;
 			}
-			currentVersion++;		
-			if (currentVersion >=10) lastUsableSV=currentVersion+"";
-			else lastUsableSV="0"+currentVersion;
-			if (currentVersion==100) return null;
+			lastVersion++;		
+			if (lastVersion >=10) lastUsableSV=lastVersion+"";
+			else lastUsableSV="0"+lastVersion;
+			if (lastVersion==100) return null;
+			//System.out.println("RIS "+currentVersion);
 			return lastUsableSV;
 		}
 	
