@@ -110,7 +110,7 @@ public class WSRRToBusinessObject {
 
 		System.out.println(
 				"########################################################################################################################################");
-		System.out.println("WSRRToBusinessObject V1.4 October 2017  ssa+docs+fix documenti+sm63_SOAPProxy");
+		System.out.println("WSRRToBusinessObject V1.5 October 2017  ssa+docs+fix documenti+sm63_SOAPProxy");
 		System.out.println(
 				"########################################################################################################################################");
 		System.out.println("Parametri - Censimento : " + name + " versione : " + version + " wsrr : " + url);
@@ -132,6 +132,8 @@ public class WSRRToBusinessObject {
 
 		WSRRToBusinessObject
 		.log("Censimento : " + name + " versione : " + version + " Trovato procedo con l'analisi...", debug);
+		WSRRToBusinessObject
+		.log("RIS"+result,true);
 		XPathFactory xpathFactory = XPathFactory.newInstance();
 		XPath xpath = xpathFactory.newXPath();
 		InputSource source = new InputSource(new StringReader(result));
