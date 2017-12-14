@@ -16,6 +16,51 @@ import org.xml.sax.InputSource;
 public class MatchServiceVersionVsISPHeader {
 //14122017.
 	
+	
+	public boolean matchServiceNameAndVersionVSServiceIDAndServiceVersionISPHeader(String serviceName,String serviceVersion,String ispHeader,boolean logme) {
+	
+		boolean result=false;
+		String serviceID_ISPHeader=null;
+		String serviceVersion_ISPHeader=null;
+		
+		HashMap headerFileds=MatchServiceVersionVsISPHeader.ISPHeaderScomposition(ispHeader,logme);	
+		
+		try {
+		if (headerFileds!=null && headerFileds.size()!=0) {			
+			serviceID_ISPHeader=(String)headerFileds.get("ISPWebservicesHeader.RequestInfo.ServiceID");
+			serviceVersion_ISPHeader=(String)headerFileds.get("ISPWebservicesHeader.RequestInfo.ServiceVersion");
+			
+			if (!(serviceName==null || serviceVersion==null || serviceID_ISPHeader==null || serviceVersion_ISPHeader==null )){				
+			 if (serviceName.equals(serviceID_ISPHeader) && serviceVersion.equals(serviceVersion_ISPHeader) ) {				
+				 result=true;
+			 }				
+			}
+		}		
+		if (logme) {
+			System.out.println("######################################  matchServiceNameAndVersionVSServiceIDAndServiceVersionISPHeader ###################################");
+			System.out.println("ServiceName = "+serviceName);
+			System.out.println("ServiceVersion = "+serviceVersion);
+			System.out.println("ServiceID (ISPHEADER) = "+serviceID_ISPHeader);
+			System.out.println("ServiceVersion (ISPHEADER) = "+serviceVersion_ISPHeader);
+			System.out.println("Match Result = "+result);
+			System.out.println("######################################  matchServiceNameAndVersionVSServiceIDAndServiceVersionISPHeader ###################################");
+		}		
+		}
+		catch(Exception ex ) {			
+			if (logme) {
+				System.out.println("######################################  matchServiceNameAndVersionVSServiceIDAndServiceVersionISPHeader ###################################");
+				System.out.println("ServiceName = "+serviceName);
+				System.out.println("ServiceVersion = "+serviceVersion);
+				System.out.println("ServiceID (ISPHEADER) = "+serviceID_ISPHeader);
+				System.out.println("ServiceVersion (ISPHEADER) = "+serviceVersion_ISPHeader);
+				System.out.println("Match Result = ERROR "+ex.getMessage());
+				System.out.println("######################################  matchServiceNameAndVersionVSServiceIDAndServiceVersionISPHeader ###################################");
+			}			
+		result=false;				
+		}
+		return result;
+	}
+	
 
 	private static HashMap<String, String> ISPHeaderScomposition(String ispHeader, boolean logMe) {
 
