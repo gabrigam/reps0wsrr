@@ -108,9 +108,12 @@ public class WSRRToBusinessObject {
 		final String MQ_EP = "[bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, sm63_PGM_DEST, sm63_serviceVersion, sm63_EXPIRY, sm63_serviceName, sm63_DATA_PRIMO_UTILIZZO, sm63_LUNGH_OUT, sm63_endpointType, sm63_PGM_DEST_RISP,sm63_FLAG_3LINK, sm63_STATO_OPER, sm63_serviceNamespace, sm63_PGM_QUADRATURA, sm63_USO_SICUREZZA, sm63_ID_APPL, sm63_TIPO_OPER, sm63_LUNGH_IN, sm63_TRACCIATURA, sm63_ALTER_COLL, sm63_TGT_SERVER, sm63_PRIORITY, sm63_PGM_FORM, sm63_DATA_ULTIMO_UTILIZZO, sm63_CALL_HEADER, sm63_MOD_COLLOQUIO, sm63_Timeout, sm63_ID_TGT_DES, sm63_SPECIALIZZAZIONE, sm63_BACKOUT_COUNT]";
 		final String CICS_EP = "[bsrURI, name, nspace, version, description, owner, lastModified, creationTimestamp, lastModifiedBy, primaryType, sm63_serviceVersion, sm63_serviceName, sm63_DATA_PRIMO_UTILIZZO, sm63_endpointType, sm63_Stage, sm63_DATA_ULTIMO_UTILIZZO, sm63_Timeout, sm63_serviceNamespace, sm63_USO_SICUREZZA, sm63_SPECIALIZZAZIONE]";
 
+		long start_=System.currentTimeMillis();
+		long end_=0l;
+		
 		System.out.println(
 				"########################################################################################################################################");
-		System.out.println("WSRRToBusinessObject V1.5 October 2017  ssa+docs+fix documenti+sm63_SOAPProxy");
+		System.out.println("WSRRToBusinessObject V1.6 December 2017  ssa+docs+fix documenti+sm63_SOAPProxy+ (1.6) fixed reset values+query replace value");
 		System.out.println(
 				"########################################################################################################################################");
 		System.out.println("Parametri - Censimento : " + name + " versione : " + version + " wsrr : " + url);
@@ -132,8 +135,7 @@ public class WSRRToBusinessObject {
 
 		WSRRToBusinessObject
 		.log("Censimento : " + name + " versione : " + version + " Trovato procedo con l'analisi...", debug);
-		WSRRToBusinessObject
-		.log("RIS"+result,true);
+		//WSRRToBusinessObject.log("RIS"+result,true);
 		XPathFactory xpathFactory = XPathFactory.newInstance();
 		XPath xpath = xpathFactory.newXPath();
 		InputSource source = new InputSource(new StringReader(result));
@@ -277,13 +279,12 @@ public class WSRRToBusinessObject {
 				ACR_BO = WSRRToBusinessObject.makeBO(result, -1, "Organization", null, url, user, password, debug);
 				NBP_BO.setPropertyValue("ACRO", ACR_BO);
 				WSRRToBusinessObject.log("Creato oggetto ACR_BO", debug);
-				
-				
+								
 				//Ricavo SSA
 				
 				result= wsrrutility.getSSAFromAcronimo((String) ACR_BO.getPropertyValue("name"), url, user, password);
 				WSRRToBusinessObject.log("bsrURI acronimo "+(String) ACR_BO.getPropertyValue("bsrURI"), debug);
-				WSRRToBusinessObject.log("bsrURI result "+result, debug);
+				//WSRRToBusinessObject.log("bsrURI result "+result, debug);
 				SSA_BO = WSRRToBusinessObject.makeBO(result, -1, "Organization", null, url, user, password, debug);
 				NBP_BO.setPropertyValue("SSA", SSA_BO);
 				WSRRToBusinessObject.log("Creato oggetto BO_SSA", debug);				
@@ -337,12 +338,14 @@ public class WSRRToBusinessObject {
 						
 						SLD_BO.setPropertyValue("EXTENDED_INTERFACE_DESCR","INTERFACCIA : "+(String)  SLD_BO.getPropertyValue("description"));
 						
-						query7bis = query7bis.replaceAll("%BSRURI%", (String) bsrURISLD);
-						resultINT = wsrrutility.generalWSRRQuery(query7bis, url, user, password, debug);
+						String query_=query7bis;
+						query_ = query_.replaceAll("%BSRURI%", (String) bsrURISLD);
+						
+						resultINT = wsrrutility.generalWSRRQuery(query_, url, user, password, debug);
 						INTERF_BO = WSRRToBusinessObject.makeBO(resultINT, -1, "Interface", null, url, user, password,
 								debug);
 
-						WSRRToBusinessObject.log("INTERF_QUERY "+resultINT,debug);
+						//WSRRToBusinessObject.log("INTERF_QUERY "+resultINT,debug);
 						
 						xpathFactory = XPathFactory.newInstance();
 						xpath = xpathFactory.newXPath();
@@ -360,7 +363,7 @@ public class WSRRToBusinessObject {
 							
 							count = Integer.parseInt(xpath.evaluate("count(/resources/resource/relationships/relationship)", doc));
 							
-							WSRRToBusinessObject.log("INTERF_COUNT "+count,debug);
+							//WSRRToBusinessObject.log("INTERF_COUNT "+count,debug);
 							
 							int documentiAllegati=0;;
 							
@@ -375,13 +378,13 @@ public class WSRRToBusinessObject {
 									current = "/resources/resource/relationships/relationship[" + String.valueOf(i)
 									+ "]/@targetBsrURI";
 									
-									WSRRToBusinessObject.log("INTERF_NAME "+current,debug);
+									//WSRRToBusinessObject.log("INTERF_NAME "+current,debug);
 									
 									if (xpath.evaluate(current, doc) != null) {
 																				
 										documentURI = xpath.evaluate(current, doc);
 										
-										WSRRToBusinessObject.log("INTERF_URI_DOC "+current,debug);
+										//WSRRToBusinessObject.log("INTERF_URI_DOC "+current,debug);
 										query6 = query9;
 										query6 = query6+documentURI;										
 										result = wsrrutility.generalWSRRQuery(query6, url, user, password,
@@ -390,7 +393,7 @@ public class WSRRToBusinessObject {
 										//workaround 11/10/2017 controllo se la relazione non ha documenti
 										if (result!=null && result.length()!=0) {
 											documentiAllegati++;
-											WSRRToBusinessObject.log("INTERF_QUERY_Result "+result,debug);
+											//WSRRToBusinessObject.log("INTERF_QUERY_Result "+result,debug);
 										  DOC_BO = WSRRToBusinessObject.makeBO(result, -1, "Document", null, url,
 												user, password, debug);
 										  WSRRToBusinessObject.log(
@@ -411,12 +414,8 @@ public class WSRRToBusinessObject {
 						WSRRToBusinessObject.log("Creato oggetto INTERF_BO", debug);
 						
 						SLD_BO.setPropertyValue("INTERF", INTERF_BO);
-						
-					
-											
+																	
 						WSRRToBusinessObject.log("Creato oggetto SLD_BO", debug);
-
-						// }
 
 						SLD_BO.setPropertyValue("ENDPOINT_SOAP_APPL", null);
 						SLD_BO.setPropertyValue("ENDPOINT_SOAP_SYST", null);
@@ -1010,7 +1009,57 @@ public class WSRRToBusinessObject {
 							NBP_BO = null;
 						}
 						
-					    SLD_BO_LIST.addArrayData(SLD_BO_LIST.getArraySize(), SLD_BO);
+
+						SLD_BO_LIST.addArrayData(SLD_BO_LIST.getArraySize(), SLD_BO);
+						
+						SLD_BO=null;
+						
+						/////////////////////////////////////////////////////////////////////////////////////////////////////////
+						//1.6 fix
+						EP_BO_REST_APPL = TWObjectFactory.createList();
+						EP_BO_REST_SYST = TWObjectFactory.createList();
+						EP_BO_REST_PROD = TWObjectFactory.createList();
+						EP_BO_REST_UAT = TWObjectFactory.createList();
+						EP_BO_REST_INDEP = TWObjectFactory.createList();
+
+						EP_BO_SOAP_APPL = TWObjectFactory.createList();
+						EP_BO_SOAP_SYST = TWObjectFactory.createList();
+						EP_BO_SOAP_PROD = TWObjectFactory.createList();
+						EP_BO_SOAP_UAT = TWObjectFactory.createList();
+						EP_BO_SOAP_INDEP = TWObjectFactory.createList();
+
+						EP_BO_CALLABLE_APPL = TWObjectFactory.createList();
+						EP_BO_CALLABLE_SYST = TWObjectFactory.createList();
+						EP_BO_CALLABLE_PROD = TWObjectFactory.createList();
+						EP_BO_CALLABLE_UAT = TWObjectFactory.createList();
+						EP_BO_CALLABLE_INDEP = TWObjectFactory.createList();
+
+						EP_BO_ZRES_APPL = TWObjectFactory.createList();
+						EP_BO_ZRES_SYST = TWObjectFactory.createList();
+						EP_BO_ZRES_PROD = TWObjectFactory.createList();
+						EP_BO_ZRES_UAT = TWObjectFactory.createList();
+						EP_BO_ZRES_INDEP = TWObjectFactory.createList();
+
+						EP_BO_WOLA_APPL = TWObjectFactory.createList();
+						EP_BO_WOLA_SYST = TWObjectFactory.createList();
+						EP_BO_WOLA_PROD = TWObjectFactory.createList();
+						EP_BO_WOLA_UAT = TWObjectFactory.createList();
+						EP_BO_WOLA_INDEP = TWObjectFactory.createList();
+
+						EP_BO_CICS_APPL = TWObjectFactory.createList();
+						EP_BO_CICS_SYST = TWObjectFactory.createList();
+						EP_BO_CICS_PROD = TWObjectFactory.createList();
+						EP_BO_CICS_UAT = TWObjectFactory.createList();
+						EP_BO_CICS_INDEP = TWObjectFactory.createList();
+
+						EP_BO_MQ_APPL = TWObjectFactory.createList();
+						EP_BO_MQ_SYST = TWObjectFactory.createList();
+						EP_BO_MQ_PROD = TWObjectFactory.createList();
+						EP_BO_MQ_UAT = TWObjectFactory.createList();
+						EP_BO_MQ_INDEP = TWObjectFactory.createList();						
+						
+						INTERF_BO_LIST = TWObjectFactory.createList();
+					   //////////////////////////////////////////////////////////////////////////////////////////////////////////
 						
 					}//for
 
@@ -1032,8 +1081,16 @@ public class WSRRToBusinessObject {
 		
 		// attacco SLD a NBP_BO
 		NBP_BO.setPropertyValue("SLD", SLD_BO_LIST);
-		
-		WSRRToBusinessObject.log("Risultato NBP_BO",debug);
+		//fix 121217
+		try {
+			SLD_BO_LIST = TWObjectFactory.createList();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		end_=System.currentTimeMillis();
+		long diffSeconds = (end_-start_) / 1000 % 60;
+		WSRRToBusinessObject.log("Risultato NBP_BO in circa : "+diffSeconds+" s",debug);
 		WSRRToBusinessObject.log(NBP_BO.toXMLString(),debug);
 		WSRRToBusinessObject.log("Fine Estrattore",true);
 		return NBP_BO;
