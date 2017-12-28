@@ -115,7 +115,7 @@ public class Reps0WSRR {
 		String bsrURI = null;
 
 		boolean log = true;
-		Reps0WSRR.logMe(">RepsoWSRR mapper V20.2 November 2017", true);
+		Reps0WSRR.logMe(">RepsoWSRR mapper V20.3 December 2017", true);
 
 		Reps0WSRR.logMe(">>>>>>WSRRoutine parametri::", log);
 		Reps0WSRR.logMe(">>>>>>WSRRoutine " + bsrURISLD, log);
@@ -264,7 +264,7 @@ public class Reps0WSRR {
 							Reps0WSRR.logMe(">>>>>>WSRRoutine P28", log);
 
 							envelope = envelopes.createCallableEndpointXMLDAta(systemTestUrlSecurized,
-									systemTestTimeout, "SystemTest", "", null, "sicurezza");
+									systemTestTimeout, "SystemTest", "", null, sicurezza);//2812 sostituito "sicurezza" con sicurezza
 							Reps0WSRR.logMe(">>>>>>WSRRoutine P29", log);
 						}
 						Reps0WSRR.logMe(">>>>>>WSRRoutine P30", log);
@@ -562,7 +562,7 @@ public class Reps0WSRR {
 								if (interfaceType.equalsIgnoreCase("CALLABLE")) {
 									Reps0WSRR.logMe(">>>>>>WSRRoutine P104", log);
 									envelope = envelopes.createCallableEndpointXMLDAta(userAcceptanceUrlSecurized,
-											userAcceptanceTimeout, "UserAcceptanceTest", "", null, "sicurezza");
+											userAcceptanceTimeout, "UserAcceptanceTest", "", null, sicurezza);//2812 sostituito "sicurezza" con sicurezza
 									Reps0WSRR.logMe(">>>>>>WSRRoutine P105", log);
 								}
 								Reps0WSRR.logMe(">>>>>>WSRRoutine P106", log);
