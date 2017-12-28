@@ -113,7 +113,7 @@ public class WSRRToBusinessObject {
 		
 		System.out.println(
 				"########################################################################################################################################");
-		System.out.println("WSRRToBusinessObject V1.6 December 2017  ssa+docs+fix documenti+sm63_SOAPProxy+ (1.6) fixed reset values+query replace value");
+		System.out.println("WSRRToBusinessObject V1.7 December 2017  ssa+docs+fix documenti+sm63_SOAPProxy+ (1.6) fixed reset values+query replace value");
 		System.out.println(
 				"########################################################################################################################################");
 		System.out.println("Parametri - Censimento : " + name + " versione : " + version + " wsrr : " + url);
@@ -1006,7 +1006,7 @@ public class WSRRToBusinessObject {
 							System.out.println(
 									"*********************************************KO************************************+");
 							e.printStackTrace();
-							NBP_BO = null;
+							//NBP_BO = null; 2412
 						}
 						
 
@@ -1071,7 +1071,7 @@ public class WSRRToBusinessObject {
 			System.out.println(e.getMessage());
 			System.out.println("*********************************************KO************************************+");
 			e.printStackTrace();
-			NBP_BO = null;
+			//NBP_BO = null; 2412
 		}
 
 		//reverse INTERFACE_INDEX
