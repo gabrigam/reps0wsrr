@@ -62,21 +62,27 @@ public class Rest {
 		 * "http://linuxbpm85:9080/rest/bpm/wle/v1/process/1?action=delete&parts=all";
 		 */
 		String contentFile = null;
-		String content = null;
-		String userid = "bpmadmin";
-		String password = "Password01";
+		String content = "busta";
+		String userid = null;
+		String password = null;
 		HashMap<String, String> headerMap = new HashMap<String, String>();
 		Options options = null;
 
+		HashMap myHeader= new HashMap();
+		myHeader.put("X-ISP-Security","ew08ew809wuikjekjwejkjejwejwejkhwq"); //clear
+		myHeader.put("Authorization","glfklgprpepeprppofpodppfppfdpfdp"); //raw
+		
 		String ISPHeader = "<int:ISPWebservicesHeader xmlns:int=\"http://eric.van-der-vlist.com/ns/person\">         <RequestInfo>            <TransactionId>GKBG0_20170913113655000769</TransactionId>            <Timestamp>20170913113655000769</Timestamp>            <ServiceID>GKMGDECPLF</ServiceID>            <ServiceVersion>00</ServiceVersion>              <Language>it</Language>         </RequestInfo>         <OperatorInfo UserID=\"U0G4356\" IsVirtualUser=\"false\"     NotISPUserID=\"\"   />         <CompanyInfo>            <ISPCallerCompanyIDCode>01</ISPCallerCompanyIDCode>            <ISPServiceCompanyIDCode>01</ISPServiceCompanyIDCode>            <ISPBranchCode>00700</ISPBranchCode>            <NotISPCompanyIDCode></NotISPCompanyIDCode>         </CompanyInfo>         <BusinessInfo>            <CustomerID>U0G4356</CustomerID>            <BusinessProcessName>Richiesta Pratica Mogeni</BusinessProcessName>            <BusinessProcessID>76828</BusinessProcessID>            <BusinessOperation></BusinessOperation>            <BusinessFileID></BusinessFileID>         </BusinessInfo>         <TechnicalInfo>            <ChannelIDCode>01</ChannelIDCode>            <ApplicationID>GKBG0</ApplicationID>            <CallerServerName>localhost</CallerServerName>            <CallerProgramName>GKBG0-BPM</CallerProgramName>         </TechnicalInfo>         <AdditionalBusinessInfo>    <Param Name=\"CodABI\" Value=\"01025\"/>  </AdditionalBusinessInfo></int:ISPWebservicesHeader>";
 
 		ISPHeader="<int:ISPWebservicesHeader xmlns:int=\"aaa\"><RequestInfo><TransactionId>PADEMOSOAPDIRECT</TransactionId><Timestamp>2017100511273500087</Timestamp><ServiceID>LKPWSRSOAP</ServiceID><ServiceVersion>01</ServiceVersion><Language>E</Language></RequestInfo><OperatorInfo UserID=\"U0H2438\" IsVirtualUser=\"false\" NotISPUserID=\"U900389\"/><CompanyInfo><ISPCallerCompanyIDCode>01</ISPCallerCompanyIDCode><NotISPCompanyIDCode>99</NotISPCompanyIDCode><ISPBranchCode>02841</ISPBranchCode><ISPServiceCompanyIDCode>02</ISPServiceCompanyIDCode></CompanyInfo><BusinessInfo><CustomerID>ABCDEF80L09B248Z</CustomerID><BusinessProcessName>BusinessProcessName</BusinessProcessName><BusinessProcessID>123</BusinessProcessID><BusinessOperation>BusinessOperation</BusinessOperation><BusinessFileID>BusinessFileID</BusinessFileID></BusinessInfo><TechnicalInfo><ChannelIDCode>99</ChannelIDCode><ApplicationID>IXPG0</ApplicationID><CallerServerName>CallerServerName</CallerServerName><CallerProgramName>PADEMO</CallerProgramName></TechnicalInfo><AdditionalBusinessInfo><Param Name=\"CodUnitaOperativa\" Value=\"14493\"/><Param Name=\"DataContabile\" Value=\"03072017\"/><Param Name=\"FlagPaperless\" Value=\"S\"/><Param Name=\"CodABI\" Value=\"03069\"/><Param Name=\"CodOperativita\" Value=\"N\"/><Param Name=\"CodTerminaleCics\" Value=\"9999\"/></AdditionalBusinessInfo></int:ISPWebservicesHeader>";
 		ISPHeader="<ISPWebservicesHeader><RequestInfo><TransactionId>PADEMOSOAPDIRECT</TransactionId><Timestamp>20171005123740000790</Timestamp><ServiceID>LKPWSRSOAP</ServiceID><ServiceVersion>01</ServiceVersion><Language>E</Language></RequestInfo><OperatorInfo UserID=\"U0H2438\" IsVirtualUser=\"false\" NotISPUserID=\"U900389\"/><CompanyInfo><ISPCallerCompanyIDCode>01</ISPCallerCompanyIDCode><NotISPCompanyIDCode>99</NotISPCompanyIDCode><ISPBranchCode>02841</ISPBranchCode><ISPServiceCompanyIDCode>02</ISPServiceCompanyIDCode></CompanyInfo><BusinessInfo><CustomerID>ABCDEF80L09B248Z</CustomerID><BusinessProcessName>BusinessProcessName</BusinessProcessName><BusinessProcessID>123</BusinessProcessID><BusinessOperation>BusinessOperation</BusinessOperation><BusinessFileID>BusinessFileID</BusinessFileID></BusinessInfo><TechnicalInfo><ChannelIDCode>99</ChannelIDCode><ApplicationID>IXPG0</ApplicationID><CallerServerName>CallerServerName</CallerServerName><CallerProgramName>PADEMO</CallerProgramName></TechnicalInfo><AdditionalBusinessInfo><Param Name=\"CodUnitaOperativa\" Value=\"14493\"/><Param Name=\"DataContabile\" Value=\"03072017\"/><Param Name=\"FlagPaperless\" Value=\"S\"/><Param Name=\"CodABI\" Value=\"03069\"/><Param Name=\"CodOperativita\" Value=\"N\"/><Param Name=\"CodTerminaleCics\" Value=\"9999\"/></AdditionalBusinessInfo></ISPWebservicesHeader>";
-		Rest.ISPHeaderScomposition(ISPHeader, true);
+		myHeader.put("X-ISPWebServicesHeader", ISPHeader);
+		
+		//Rest.ISPHeaderScomposition(ISPHeader, true);
 
 		try {
 
-			System.out.println(doRest(command, url, content, headerMap, userid, password, false, 100, "", false));
+			System.out.println(doRest(command, url, content, myHeader, userid, password, true, 100, "REST", true));
 		} catch (Exception e) {
 			e.printStackTrace(System.out);
 		}
@@ -129,7 +135,7 @@ public class Rest {
 		HashMap<String, String> returnVal = new HashMap<String, String>();
 
 		//System.out.println("fxVer 01 Parametri passati :  Interfaccia=" + interfaccia + " ServizioIIB=" + servizioIIB);
-		System.out.println("Ver03 Parametri passati :  Interfaccia=" + interfaccia + " ServizioIIB=" + servizioIIB);
+		System.out.println("RestClient Ver06 Gennaio 2018");
 		// Check that the command type is known
 		if (!command.equals("GET") && !command.equals("POST") && !command.equals("PUT") && !command.equals("DELETE")) {
 			throw new RestException("Unsupported command: " + command + ".  Supported commands are GET, POST, PUT");
@@ -156,7 +162,7 @@ public class Rest {
 
 				if (ispHeader != null && !ispHeader.equals("#NOTREQUIRED#")) {
 
-					ispHeaderMap = Rest.ISPHeaderScomposition(ispHeader, debug);
+					ispHeaderMap = Rest.ISPHeaderScomposition(ispHeader, false);
 
 					if (ispHeaderMap == null) {
 						System.out.println(
@@ -169,25 +175,13 @@ public class Rest {
 								+ " is Malformed or Mandatory fields ( </Timestamp>,<ServiceID > or </ApplicationID>) are void or </Timestamp> contains invalid data");
 					}
 
-					// If a header map was supplied, add the map name=value
-					// pairs as
-					// HTTP header values
-					if (debug) {
-						System.out.println(
-								"###################################################################################################");
-						System.out.println(
-								">> doRest MAP  key -value http-header-request-property alpahbetical list order; ");
-						System.out.println(
-								"###################################################################################################");
-					}
-
 				}
 
 				if (debug) {
 					if (timeout != -1) {
 						System.out.println(
 								"###################################################################################################");
-						System.out.println(">> doRest: command=" + command + ", urlString=" + urlString + ", content="
+						System.out.println(">> doRest: Input Parameters  ->> command=" + command + ", urlString=" + urlString + ", content="
 								+ content + ", userid=" + userid + ", +, X-ISPWebServicesHeader=" + ispHeader
 								+ " , timeout=" + timeout + " , isIIBService=" + servizioIIB + " , ServiceInterface="
 								+ interfaccia);
@@ -196,7 +190,7 @@ public class Rest {
 					} else {
 						System.out.println(
 								"###################################################################################################");
-						System.out.println(">> doRest: command=" + command + ", urlString=" + urlString + ", content="
+						System.out.println(">> doRest: Input Parameters  ->>  command=" + command + ", urlString=" + urlString + ", content="
 								+ content + ", userid=" + userid + ", , X-ISPWebServicesHeader=" + ispHeader
 								+ " , isIIBService=" + servizioIIB + " , ServiceInterface=" + interfaccia);
 						System.out.println(
@@ -209,21 +203,16 @@ public class Rest {
 					Iterator<String> it = keySet.iterator();
 					while (it.hasNext()) {
 						String key = it.next();
-						if (!key.equals("X-ISPWebServicesHeader") && !key.equals("X-ISP-Security")
-								&& !key.equals("Authorization"))
+						if ((!key.equals("X-ISPWebServicesHeader") && !key.equals("X-ISP-Security")
+								&& !key.equals("Authorization"))) {
 							// skip X-ISPWebServicesHeader
 							httpUrlConnection.addRequestProperty(key, headerMap.get(key));
-						if (debug)
-							System.out.println(">> doRest requestProperty : " + key + " = " + headerMap.get(key));
+							if (debug)
+								System.out.println(">> doRest requestProperty : " + key + " = " + headerMap.get(key));
+						}
+
 					}
 					// add single ISPHeader field as single requestProperty
-					if (debug) {
-						System.out.println(
-								"###################################################################################################");
-						System.out.println(">> doRest ISPHEADER key -value http-header-request-property list ; ");
-						System.out.println(
-								"###################################################################################################");
-					}
 
 					if (ispHeaderMap != null) {
 						String encodedValue = null;
@@ -271,7 +260,7 @@ public class Rest {
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					// yes REST yes yes NA
 					// no REST no yes NA
-					// yes SOAP no yes ISPHeader + WsseSecurity
+					// yes SOAP no no ISPHeader + WsseSecurity
 					// no SOAP no no ISPHeader + WsseSecurity
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -291,16 +280,16 @@ public class Rest {
 						if (debug) {
 							System.out.println(
 									"###################################################################################################");
-							System.out.println(">> doRest FOUND - Security Clear Token \n" + clearToken);
+							System.out.println(">> doRest FOUND - Security Clear Token  \n" + clearToken);
 							System.out.println(
 									"###################################################################################################");
-							System.out.println(">> doRest B64   - Security ClearToken \n" + clearTokenb64);
+							System.out.println(">> doRest CALCULATED b64 - Security ClearToken \n" + clearTokenb64);
 							System.out.println(
 									"###################################################################################################");
 
 							if (servizioIIB & interfaccia.equalsIgnoreCase("REST"))
 
-								System.out.println("created http header: X-ISP-Security with Clear Token b64");
+								System.out.println("http header: X-ISP-Security with Clear Token b64 was created");
 						}
 
 					} else {
@@ -321,8 +310,9 @@ public class Rest {
 					// is a IIB Service or interface is of type Rest
 
 					if (rawToken != null) {
-
-						if (servizioIIB | interfaccia.equalsIgnoreCase("REST"))
+						
+						//if (servizioIIB | interfaccia.equalsIgnoreCase("REST")) modificato 160118 Authorization solo x REST non considero servizioIIB
+						if (interfaccia.equalsIgnoreCase("REST"))
 							httpUrlConnection.setRequestProperty("Authorization", rawToken);
 
 						if (debug) {
@@ -332,9 +322,9 @@ public class Rest {
 							System.out.println(
 									"###################################################################################################");
 
-							if (servizioIIB | interfaccia.equalsIgnoreCase("REST"))
+							if (interfaccia.equalsIgnoreCase("REST")) //modificato 160118 Authorization solo x REST non considero servizioIIB
 
-								System.out.println("Aggiunto header Authorization con Raw Token");
+								System.out.println("http header: Authorization with Raw Token was created");
 
 						}
 
@@ -349,6 +339,11 @@ public class Rest {
 						}
 				}
 
+				System.out.println(
+						"###################################################################################################");
+				System.out.println("Start executing call to link to URL : "+url +" command : "+command);				
+				System.out.println(
+						"###################################################################################################");
 				// If there is content AND the command is either POST or PUT,
 				// then
 				// send the request content
@@ -407,7 +402,12 @@ public class Rest {
 				httpUrlConnection.disconnect();
 
 				if (debug) {
-					System.out.println("doRest: result is " + sb.toString());
+					System.out.println(
+							"###################################################################################################");
+					System.out.println("doRest: response code is " + responseCode);
+					//System.out.println("doRest: result is " + sb.toString());
+					System.out.println(
+							"###################################################################################################");
 				}
 
 				returnVal.put(keyResponseMessage, "" + sb.toString());
