@@ -115,7 +115,7 @@ public class Reps0WSRR {
 		String bsrURI = null;
 
 		boolean log = true;
-		Reps0WSRR.logMe(">RepsoWSRR mapper V20.3 December 2017", true);
+		Reps0WSRR.logMe(">RepsoWSRR mapper V20.4 January 2018", true);
 
 		Reps0WSRR.logMe(">>>>>>WSRRoutine parametri::", log);
 		Reps0WSRR.logMe(">>>>>>WSRRoutine " + bsrURISLD, log);
@@ -210,8 +210,11 @@ public class Reps0WSRR {
 							// 29052017
 							if (result) {
 								Reps0WSRR.logMe(">>>>>>WSRRoutine P15", log);
+								//170118 sm63_Timeout NON va aggiornato x uriproxy
+								/**
 								result = Reps0WSRR.updateSinglePropertyJSONFormat(uriproxySystemTest, "sm63_Timeout",
 										systemTestTimeout, registry, user, password);
+								**/
 								Reps0WSRR.logMe(">>>>>>WSRRoutine P16", log);
 							}
 
@@ -301,10 +304,13 @@ public class Reps0WSRR {
 								}
 
 								// 29052017
+								//170118 vedi systemTest
 								if (result) {
 									Reps0WSRR.logMe(">>>>>>WSRRoutine P40", log);
+									/**
 									result = Reps0WSRR.updateSinglePropertyJSONFormat(uriproxyProduction,
 											"sm63_Timeout", productionTimeout, registry, user, password);
+									**/
 									Reps0WSRR.logMe(">>>>>>WSRRoutine P41", log);
 								}
 
@@ -394,8 +400,11 @@ public class Reps0WSRR {
 								// 29052017
 								if (result) {
 									Reps0WSRR.logMe(">>>>>>WSRRoutine P64", log);
+									//170118 vedi systemTest
+									/**
 									result = Reps0WSRR.updateSinglePropertyJSONFormat(uriproxyIndependent,
 											"sm63_Timeout", independentTimeout, registry, user, password);
+									**/
 									Reps0WSRR.logMe(">>>>>>WSRRoutine P65", log);
 								}
 
@@ -503,8 +512,11 @@ public class Reps0WSRR {
 								// 29052017
 								if (result) {
 									Reps0WSRR.logMe(">>>>>>WSRRoutine P90", log);
+									//170118 vedi systemTest
+									/*
 									result = Reps0WSRR.updateSinglePropertyJSONFormat(uriproxyUserAcceptance,
 											"sm63_Timeout", userAcceptanceTimeout, registry, user, password);
+									*/
 									Reps0WSRR.logMe(">>>>>>WSRRoutine P91", log);
 								}
 
