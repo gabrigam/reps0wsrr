@@ -28,6 +28,11 @@ public class Reps0WSRR {
 	// 30052017 modifica settaggio timeout
 
 	// 09112017 adattamento anche per la modifica
+	
+	// attenzione tra queste due date sono state eseguite modifiche non inserite in testata (vedere nel codice)
+	
+	// 12032018 filtraggio campi note
+	
 	public Reps0WSRR() {
 
 		// notes
@@ -115,7 +120,7 @@ public class Reps0WSRR {
 		String bsrURI = null;
 
 		boolean log = true;
-		Reps0WSRR.logMe(">RepsoWSRR mapper V20.4 January 2018", true);
+		Reps0WSRR.logMe(">RepsoWSRR mapper V20.5 March 2018", true);
 
 		Reps0WSRR.logMe(">>>>>>WSRRoutine parametri::", log);
 		Reps0WSRR.logMe(">>>>>>WSRRoutine " + bsrURISLD, log);
@@ -152,8 +157,28 @@ public class Reps0WSRR {
 		Reps0WSRR.logMe(">>>>>>WSRRoutine " + noteUser, log);
 		Reps0WSRR.logMe(">>>>>>WSRRoutine " + noteDP, log);
 		Reps0WSRR.logMe(">>>>>>WSRRoutine " + noteError, log);
+		
+		//12032018 filtro le note codificando " < >
+		
+	    if (noteUser!=null) {
+	    	noteUser = noteUser.replaceAll("\"","&quote;");
+	    	noteUser = noteUser.replaceAll("<","&lt;");
+	    	noteUser = noteUser.replaceAll(">","&gt;");	    	
+	    }
+	    
+	    if (noteDP!=null) {
+	    	noteDP = noteDP.replaceAll("\"","&quote;");
+	    	noteDP = noteDP.replaceAll("<","&lt;");
+	    	noteDP = noteDP.replaceAll(">","&gt;");	    	
+	    }
+	    
+	    if (noteError!=null) {
+	    	noteError = noteError.replaceAll("\"","&quote;");
+	    	noteError = noteError.replaceAll("<","&lt;");
+	    	noteError = noteError.replaceAll(">","&gt;");	    	
+	    }
+		
 	    if (userAcceptanceUrlSecurized !=null )Reps0WSRR.logMe(">>>>>>WSRRoutine " + userAcceptanceUrlSecurized.length(), log);
-
 
 		try {
 			Reps0WSRR.logMe(">>>>>>WSRRoutine P1", log);
