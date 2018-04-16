@@ -33,6 +33,9 @@ public class Reps0WSRR {
 	
 	// 12032018 filtraggio campi note
 	
+	// 14042018 aggiunta modifica per poter gestire il codice anche quando sono in UPD (aggiunta modifica nuovo EP) inserito test su presenza proxy
+	//          esempio noteUser != null && noteUser.length() != 0 && uriproxySystemTest !=null
+	
 	public Reps0WSRR() {
 
 		// notes
@@ -120,7 +123,7 @@ public class Reps0WSRR {
 		String bsrURI = null;
 
 		boolean log = true;
-		Reps0WSRR.logMe(">RepsoWSRR mapper V20.5 March 2018", true);
+		Reps0WSRR.logMe(">RepsoWSRR mapper V20.6 April 2018", true);
 
 		Reps0WSRR.logMe(">>>>>>WSRRoutine parametri::", log);
 		Reps0WSRR.logMe(">>>>>>WSRRoutine " + bsrURISLD, log);
@@ -225,7 +228,7 @@ public class Reps0WSRR {
 
 						if (result) {
 							Reps0WSRR.logMe(">>>>>>WSRRoutine P12", log);
-							if (noteUser != null && noteUser.length() != 0) {
+							if (noteUser != null && noteUser.length() != 0 && uriproxySystemTest !=null) {
 								Reps0WSRR.logMe(">>>>>>WSRRoutine P13", log);
 								result = Reps0WSRR.updateSinglePropertyJSONFormat(uriproxySystemTest,
 										"sm63_NOTE_GEN_WSPROXY", noteUser, registry, user, password);
@@ -246,7 +249,7 @@ public class Reps0WSRR {
 							if (result) {
 								Reps0WSRR.logMe(">>>>>>WSRRoutine P17", log);
 
-								if (noteDP != null && noteDP.length() != 0) {
+								if (noteDP != null && noteDP.length() != 0 && uriproxySystemTest !=null) {
 									Reps0WSRR.logMe(">>>>>>WSRRoutine P18", log);
 									result = Reps0WSRR.updateSinglePropertyJSONFormat(uriproxySystemTest, "sm63_NOTE",
 											noteDP, registry, user, password);
@@ -257,7 +260,7 @@ public class Reps0WSRR {
 
 							if (result) {
 								Reps0WSRR.logMe(">>>>>>WSRRoutine P20", log);
-								if (noteError != null && noteError.length() != 0) {
+								if (noteError != null && noteError.length() != 0 && uriproxySystemTest !=null) {
 									Reps0WSRR.logMe(">>>>>>WSRRoutine P21", log);
 									result = Reps0WSRR.updateSinglePropertyJSONFormat(uriproxySystemTest,
 											"sm63_ERRORE_GENERAZIONE_WSPROXY", noteError, registry, user, password);
@@ -322,7 +325,7 @@ public class Reps0WSRR {
 							Reps0WSRR.logMe(">>>>>>WSRRoutine P37", log);
 							if (result) {
 								Reps0WSRR.logMe(">>>>>>WSRRoutine P38", log);
-								if (noteUser != null && noteUser.length() != 0) {
+								if (noteUser != null && noteUser.length() != 0 && uriproxyProduction !=null) {
 									result = Reps0WSRR.updateSinglePropertyJSONFormat(uriproxyProduction,
 											"sm63_NOTE_GEN_WSPROXY", noteUser, registry, user, password);
 									Reps0WSRR.logMe(">>>>>>WSRRoutine P39", log);
@@ -341,7 +344,7 @@ public class Reps0WSRR {
 
 								if (result) {
 									Reps0WSRR.logMe(">>>>>>WSRRoutine P42", log);
-									if (noteDP != null && noteDP.length() != 0) {
+									if (noteDP != null && noteDP.length() != 0 && uriproxyProduction !=null) {
 										Reps0WSRR.logMe(">>>>>>WSRRoutine P43", log);
 										result = Reps0WSRR.updateSinglePropertyJSONFormat(uriproxyProduction,
 												"sm63_NOTE", noteDP, registry, user, password);
@@ -351,7 +354,7 @@ public class Reps0WSRR {
 
 								if (result) {
 									Reps0WSRR.logMe(">>>>>>WSRRoutine P45", log);
-									if (noteError != null && noteError.length() != 0) {
+									if (noteError != null && noteError.length() != 0 && uriproxyProduction !=null) {
 										Reps0WSRR.logMe(">>>>>>WSRRoutine P46", log);
 
 										result = Reps0WSRR.updateSinglePropertyJSONFormat(uriproxyProduction,
@@ -416,7 +419,7 @@ public class Reps0WSRR {
 							Reps0WSRR.logMe(">>>>>>WSRRoutine P61", log);
 							if (result) {
 								Reps0WSRR.logMe(">>>>>>WSRRoutine P62", log);
-								if (noteUser != null && noteUser.length() != 0) {
+								if (noteUser != null && noteUser.length() != 0 && uriproxyIndependent !=null) {
 									result = Reps0WSRR.updateSinglePropertyJSONFormat(uriproxyIndependent,
 											"sm63_NOTE_GEN_WSPROXY", noteUser, registry, user, password);
 									Reps0WSRR.logMe(">>>>>>WSRRoutine P63", log);
@@ -435,7 +438,7 @@ public class Reps0WSRR {
 
 								if (result) {
 									Reps0WSRR.logMe(">>>>>>WSRRoutine P66", log);
-									if (noteDP != null && noteDP.length() != 0) {
+									if (noteDP != null && noteDP.length() != 0 && uriproxyIndependent !=null) {
 										Reps0WSRR.logMe(">>>>>>WSRRoutine P67", log);
 
 										result = Reps0WSRR.updateSinglePropertyJSONFormat(uriproxyIndependent,
@@ -446,7 +449,7 @@ public class Reps0WSRR {
 
 								if (result) {
 									Reps0WSRR.logMe(">>>>>>WSRRoutine P69", log);
-									if (noteError != null && noteError.length() != 0) {
+									if (noteError != null && noteError.length() != 0 && uriproxyIndependent !=null) {
 										Reps0WSRR.logMe(">>>>>>WSRRoutine P70", log);
 										result = Reps0WSRR.updateSinglePropertyJSONFormat(uriproxyIndependent,
 												"sm63_ERRORE_GENERAZIONE_WSPROXY", noteError, registry, user, password);
@@ -528,7 +531,7 @@ public class Reps0WSRR {
 							Reps0WSRR.logMe(">>>>>>WSRRoutine P87", log);
 							if (result) {
 								Reps0WSRR.logMe(">>>>>>WSRRoutine P88", log);
-								if (noteUser != null && noteUser.length() != 0) {
+								if (noteUser != null && noteUser.length() != 0 && uriproxyUserAcceptance !=null) {
 									result = Reps0WSRR.updateSinglePropertyJSONFormat(uriproxyUserAcceptance,
 											"sm63_NOTE_GEN_WSPROXY", noteUser, registry, user, password);
 									Reps0WSRR.logMe(">>>>>>WSRRoutine P89", log);
@@ -547,7 +550,7 @@ public class Reps0WSRR {
 
 								if (result) {
 									Reps0WSRR.logMe(">>>>>>WSRRoutine P92", log);
-									if (noteDP != null && noteDP.length() != 0) {
+									if (noteDP != null && noteDP.length() != 0 && uriproxyUserAcceptance !=null) {
 										Reps0WSRR.logMe(">>>>>>WSRRoutine P93", log);
 
 										result = Reps0WSRR.updateSinglePropertyJSONFormat(uriproxyUserAcceptance,
@@ -558,7 +561,7 @@ public class Reps0WSRR {
 
 								if (result) {
 									Reps0WSRR.logMe(">>>>>>WSRRoutine P95", log);
-									if (noteError != null && noteError.length() != 0) {
+									if (noteError != null && noteError.length() != 0 && uriproxyUserAcceptance !=null) {
 										Reps0WSRR.logMe(">>>>>>WSRRoutine P96", log);
 										result = Reps0WSRR.updateSinglePropertyJSONFormat(uriproxyUserAcceptance,
 												"sm63_ERRORE_GENERAZIONE_WSPROXY", noteError, registry, user, password);
