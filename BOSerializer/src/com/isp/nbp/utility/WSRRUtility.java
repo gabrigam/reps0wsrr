@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.StringTokenizer;
 
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONArray;
@@ -25,11 +27,12 @@ public class WSRRUtility {
 	String wsrr = "https://gabrieleWSRR:9443/WSRR/8.5";
 
 	WSRRUtility wut = new WSRRUtility();
-	System.out.println(wut.getLastUsableServiceVersion("TESTINA400", wsrr, "gabriele", "viviana"));
+	System.out.println(wut.getLastUsableServiceVersionMore("BRIGADAX02", wsrr, "gabriele", "viviana"));
 	//wut.getEndpointNameFromBsrUriSLDEnvironmentCheckSecurity("98d59998-78a1-4167.a4d1.8e1ab88ed132", "Application",
 	//		"REST", false, "KLL", wsrr, "gabriele", "viviana");
 	
 
+	
 	
 	
 }
@@ -4715,8 +4718,111 @@ public class WSRRUtility {
 		}
 	
 	
-	/////////////////////////////////////////////////////
+		////////////////////////////////////////////////////
+		//29052018 migliorata prende solo le versioni effettive
+			public String getLastUsableServiceVersionMore(String name, String baseURL, String user, String password) {
 
+				// Create the variable to return
+				String usableSV = null;
+
+				//String query = "/Metadata/JSON/PropertyQuery?query=/WSRR/GenericObject[@name='%CATALOGNAME%']&p1=version";
+
+				String query ="/Metadata/JSON/PropertyQuery?query=/WSRR/GenericObject[classifiedByAnyOf(.,'http://www.ibm.com/xmlns/prod/serviceregistry/profile/v6r3/GovernanceEnablementModel%23SOPENServiceVersion','http://www.ibm.com/xmlns/prod/serviceregistry/profile/v6r3/GovernanceEnablementModel%23SCOPENServiceVersion','http://www.ibm.com/xmlns/prod/serviceregistry/profile/v6r3/GovernanceEnablementModel%23SHOSTServiceVersion','http://www.ibm.com/xmlns/prod/serviceregistry/profile/v6r3/GovernanceEnablementModel%23SCHOSTServiceVersion')%20and%20@name='%CATALOGNAME%']&p1=version";
+				query = query.replaceAll("%CATALOGNAME%", name);
+
+				HttpURLConnection urlConnection = null;
+
+				try {
+					StringBuffer sb = new StringBuffer();
+					sb.append(baseURL).append(query);
+					//System.out.println("RIS1 "+sb.toString());
+					URL url = new URL(sb.toString());
+					urlConnection = (HttpURLConnection) url.openConnection();
+					urlConnection.setRequestMethod("GET");
+					urlConnection.setRequestProperty("Content-Type", "text/xml; charset=UTF-8");
+					urlConnection.setUseCaches(false);
+
+					if (user != null && password != null) {
+
+						String userPassword = user + ":" + password;
+
+						String encoding = new String(Base64.encodeBase64(userPassword.getBytes()));
+
+						urlConnection.setRequestProperty("Authorization", "Basic " + encoding);
+					}
+
+					int responsecode = urlConnection.getResponseCode();
+					if (responsecode == 200 || (responsecode == 201)) {
+						InputStream is = null;
+						is = urlConnection.getInputStream();
+						int ch;
+						sb.delete(0, sb.length());
+						while ((ch = is.read()) != -1) {
+							sb.append((char) ch);
+						}
+						usableSV = sb.toString();
+						is.close();
+					} else {
+						BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+						StringBuffer stringBuffer = new StringBuffer();
+						String line = null;
+						while (null != (line = reader.readLine())) {
+							stringBuffer.append(line);
+						}
+						reader.close();
+					}
+					urlConnection.disconnect();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				finally {
+					if (urlConnection != null)
+						urlConnection.disconnect();
+				}
+
+				if (usableSV != null && usableSV.equals("[]"))
+					usableSV = null;
+
+				if (usableSV ==null) return usableSV;
+				
+				JSONArray jsa = new JSONArray(usableSV);
+				JSONArray jsae = null;
+				JSONObject jso = null;
+				int i = jsa.length();
+				int j = 0;
+				String current="";
+				String [] versionArray=new String[100];
+				for(int ii = 0;ii<versionArray.length;ii++)
+				{
+					versionArray[ii]="+";
+				}
+				while (i > j) {
+					jsae = (JSONArray) jsa.getJSONArray(j);
+					try {
+						jso = (JSONObject) jsae.getJSONObject(0);
+	                     current=(String) jso.get("value");
+						if (current !=null && current.length() !=0) {
+							 versionArray[j]=current; 
+						}
+					} catch (Exception ex) {
+						return null;
+					}
+
+					j++;
+				}
+				Arrays.sort(versionArray);
+				StringBuilder versionsList=new StringBuilder();
+				for(int iii = 0;iii<versionArray.length;iii++)
+				{
+					if (!versionArray[iii].equals("+"))
+					versionsList.append(versionArray[iii]).append(" ");
+				}
+			    return versionsList.toString().substring(0, versionsList.toString().length()-1);
+			}
+		
+		
+		/////////////////////////////////////////////////////
 	public String getGenericObjectByName(String name, String baseURL, String user, String password) {
 
 		// Create the variable to return
