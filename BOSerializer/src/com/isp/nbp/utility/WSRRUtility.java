@@ -39,7 +39,7 @@ public class WSRRUtility {
 
 	public static String aboutLib() {
 
-		return "lib WSRREnvelopes & utility methods V4.0 May 2017";
+		return "lib WSRREnvelopes & utility methods V4.1 May 2018";
 
 	}
 
