@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.apache.commons.codec.binary.Base64;
@@ -36,6 +37,9 @@ public class Reps0WSRR {
 	// 14042018 aggiunta modifica per poter gestire il codice anche quando sono in UPD (aggiunta modifica nuovo EP) inserito test su presenza proxy
 	//          esempio noteUser != null && noteUser.length() != 0 && uriproxySystemTest !=null
 	
+	// 11/10/2018 inserito codice per creazione endpoint di tipo poun quando il servizio ha sicurezza SI-APIGatewayTarget
+	//            viene eseguito un check della url se quest'ultimanon è valida si ha una condizione di errore
+	
 	public Reps0WSRR() {
 
 		// notes
@@ -43,7 +47,7 @@ public class Reps0WSRR {
 
 	public boolean updateEndPointAndWSProxyData(String bsrURISLD, String interfaceType, TWList notes,
 			TWList endPointbsrURI, TWList endpontProxybsrURI, TWList securizedUrls, TWList flagISPHeader,
-			TWList timeout, TWList espostocomeAPI, String sicurezza, String registry, String user, String password) {
+			TWList timeout, TWList espostocomeAPI, String sicurezza, String proxyendpointApplication,String registry, String user, String password) {
 
 		WSRRUtility wsrrutility = new WSRRUtility();
 		WSDLLoaderBPM envelopes = new WSDLLoaderBPM();
@@ -84,6 +88,9 @@ public class Reps0WSRR {
 		String productionespostoComeAPI = (String) espostocomeAPI.getArrayData(2);
 		String independentespostoComeAPI = (String) espostocomeAPI.getArrayData(3);
 		String userAcceptanceespostoComeAPI = (String) espostocomeAPI.getArrayData(4);
+		
+		//11/10/2018
+		boolean urlNotValid=false;
 
 		if (uriendpointSystemTest == null)
 			systemTestespostoComeAPI = applicationespostoComeAPI;
@@ -123,7 +130,7 @@ public class Reps0WSRR {
 		String bsrURI = null;
 
 		boolean log = true;
-		Reps0WSRR.logMe(">RepsoWSRR mapper V20.6 April 2018", true);
+		Reps0WSRR.logMe(">RepsoWSRR mapper V20.7 October 2018", true);
 
 		Reps0WSRR.logMe(">>>>>>WSRRoutine parametri::", log);
 		Reps0WSRR.logMe(">>>>>>WSRRoutine " + bsrURISLD, log);
@@ -203,7 +210,6 @@ public class Reps0WSRR {
 								registry, user, password);
 						Reps0WSRR.logMe(">>>>>>WSRRoutine P6", log);
 					}
-
 				}
 
 				if (result) {
@@ -214,6 +220,57 @@ public class Reps0WSRR {
 						Reps0WSRR.logMe(">>>>>>WSRRoutine P8", log);
 					}
 
+				}
+				
+				//11/10/2018 
+				if (result) {
+					if (sicurezza.equals("SI-APIGatewayTarget")) {
+						
+						String envelope=null;
+						
+						String pounEndpoint=Reps0WSRR.trasformURL(proxyendpointApplication);
+						
+						if (pounEndpoint.equals("ERRORE")) {
+							Reps0WSRR.logMe(">>>>>>WSRRoutine Attenzione la URL dell'enpoint endpoint securizzato "+applicationUrlSecurized +" bsrURI "+ uriendpointApplication+" non Ha un formato valido", log);
+							pounEndpoint=proxyendpointApplication;
+							urlNotValid=true;
+						}							
+						
+						if (interfaceType.equalsIgnoreCase("SOAP")) {
+							Reps0WSRR.logMe(">>>>>>WSRRoutine PDEV1", log);
+
+							envelope = envelopes.createSoapEndpointXMLDAta(pounEndpoint, applicationTimeout,
+									applicationFlagISPHeader, "Application", "", null, sicurezza);
+							Reps0WSRR.logMe(">>>>>>WSRRoutine PDEV2", log);
+						}
+
+						if (interfaceType.equalsIgnoreCase("REST")) {
+							Reps0WSRR.logMe(">>>>>>WSRRoutine PDEV3", log);
+							envelope = envelopes.createRestEndpointXMLDAta(pounEndpoint, applicationTimeout,
+									"Application", "", null, sicurezza, applicationespostoComeAPI);
+							Reps0WSRR.logMe(">>>>>>WSRRoutine PDEV4", log);
+						}
+
+						if (interfaceType.equalsIgnoreCase("CALLABLE")) {
+							Reps0WSRR.logMe(">>>>>>WSRRoutine PDEV5", log);
+
+							envelope = envelopes.createCallableEndpointXMLDAta(pounEndpoint,
+									applicationTimeout, "Application", "", null, sicurezza);
+							Reps0WSRR.logMe(">>>>>>WSRRoutine PDEV6", log);
+						}
+						
+						bsrURI = wsrrutility.createWSRRGenericObject(envelope, "POST", registry, user, password);
+						
+						if (bsrURI !=null) {
+							result = Reps0WSRR.updateSinglePropertyJSONFormat(bsrURI, "sm63_SPECIALIZZAZIONE",
+									"POUN", registry, user, password);
+							Reps0WSRR.logMe(">>>>>>WSRRoutine PDEV7", log);
+						}
+						result = wsrrutility.updateRelationShip(bsrURISLD, "gep63_availableEndpoints", bsrURI,
+								registry, user, password);
+						Reps0WSRR.logMe(">>>>>>WSRRoutine PDEV8", log);
+					}
+					
 				}
 
 				if (result) {
@@ -629,14 +686,17 @@ public class Reps0WSRR {
 
 			}
 		} catch (Exception ex) {
-			result = false;
+			result = true;
 			Reps0WSRR.logMe(">>>>>>WSRRoutine P111 " + false, log);
 			Reps0WSRR.logMe(">>>>>>WSRRoutine P112 " + ex.getMessage(), log);
 			Reps0WSRR.logMe(">>>>>>WSRRoutine P113 " + ex.getStackTrace().toString(), log);
 		}
 
+		if (urlNotValid==true) {
 		Reps0WSRR.logMe(">>>>>>WSRRoutine P200 " + result, log);
-		return result;
+		return true;
+		}else Reps0WSRR.logMe(">>>>>>WSRRoutine P200 " + !result, log);
+		return !result;
 
 	}
 
@@ -658,8 +718,8 @@ public class Reps0WSRR {
 		boolean result = false;
 
 		String query = "/Metadata/JSON/%BSRURI%/properties/%PROPERTYNAME%";
-		System.out.println("ERROREREPS0Updateinfo200! " + bsrURIToChange + " -  " + propertyName + "  -  "
-				+ propertyValue + " -  " + createURL + "  -  " + user + "  -  " + "eiiij" + password + "*deewww");
+		//System.out.println("ERROREREPS0Updateinfo200! " + bsrURIToChange + " -  " + propertyName + "  -  "
+		//		+ propertyValue + " -  " + createURL + "  -  " + user + "  -  " + "eiiij" + password + "*deewww");
 		String value = "{\"value\":\"%VALUE%\"}";
 		if (bsrURIToChange == null || bsrURIToChange.length() == 0)
 			bsrURIToChange = "bsrURI_not_Specified";
@@ -673,8 +733,8 @@ public class Reps0WSRR {
 		HttpURLConnection urlConnection = null;
 		StringBuffer sb = new StringBuffer();
 		sb.append(createURL).append(query);
-		System.out.println("ERROREREPS0Updateinfo300! " + sb.toString());
-		System.out.println("ERROREREPS0Updateinfo350! " + value);
+		//System.out.println("ERROREREPS0Updateinfo300! " + sb.toString());
+		//System.out.println("ERROREREPS0Updateinfo350! " + value);
 		try {
 			URL url = new URL(sb.toString());
 			urlConnection = (HttpURLConnection) url.openConnection();
@@ -701,8 +761,8 @@ public class Reps0WSRR {
 
 			if (returnCode == 200 || (returnCode == 201)) {
 
-				System.out.println(
-						"ERROREREPS0Updateinfo200 : " + bsrURIToChange + " -  " + propertyName + " - " + propertyValue);
+				//System.out.println(
+				//		"ERROREREPS0Updateinfo200 : " + bsrURIToChange + " -  " + propertyName + " - " + propertyValue);
 				InputStream is = null;
 				is = urlConnection.getInputStream();
 				int ch;
@@ -714,8 +774,8 @@ public class Reps0WSRR {
 				is.close();
 
 			} else {
-				System.out.println("ERROREREPS0Update  : " + returnCode + " - " + bsrURIToChange + " -  " + propertyName
-						+ " - " + propertyValue);
+				//System.out.println("ERROREREPS0Update  : " + returnCode + " - " + bsrURIToChange + " -  " + propertyName
+				//		+ " - " + propertyValue);
 				// BufferedReader reader = new BufferedReader(new
 				// InputStreamReader(urlConnection.getInputStream()));
 				BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getErrorStream()));
@@ -724,14 +784,14 @@ public class Reps0WSRR {
 				while (null != (line = reader.readLine())) {
 					stringBuffer.append(line);
 				}
-				System.out.println("ERROREREPS0Update  Errore " + stringBuffer.toString());
+				//System.out.println("ERROREREPS0Update  Errore " + stringBuffer.toString());
 				reader.close();
 				throw new Exception("Unable to update WSRR GenericObject " + stringBuffer.toString());
 			}
 			urlConnection.disconnect();
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("ERROREREPS0Updateinfo600! " + e.toString());
+			//System.out.println("ERROREREPS0Updateinfo600! " + e.toString());
 
 		}
 
@@ -742,4 +802,23 @@ public class Reps0WSRR {
 
 		return result;
 	}
+	
+	private static String trasformURL(String url) {
+
+    	String urldev=null;
+    	
+        URL aURL;
+		try {
+			aURL = new URL(url);
+		} catch (MalformedURLException e) {
+          return "ERRORE";
+		}
+    	
+        String port="";
+        if (aURL.getPort()!=-1) port=":"+aURL.getPort();
+        
+       urldev=aURL.getProtocol()+"://"+aURL.getHost()+port+"/dev"+aURL.getFile();
+		
+    	return urldev;
+    }
 }
